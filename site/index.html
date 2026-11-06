@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="tr" data-lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bird Atlas · Kuş Atlası – your eBird sightings on your own map</title>
+<meta name="description" content="Bird Atlas turns your eBird data into a personal map: every sighting, lifer, calendar and chart, with share cards. Your data stays on your device. Kuş Atlası: eBird gözlemlerin kişisel haritanda.">
+<meta name="theme-color" content="#10325C">
+<link rel="icon" type="image/png" href="/img/favicon-64.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="canonical" href="https://birdatlas.app/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://birdatlas.app/">
+<meta property="og:title" content="Bird Atlas – your eBird sightings on your own map">
+<meta property="og:description" content="Every sighting, lifer, calendar and chart on one personal map. Your data stays on your device.">
+<meta property="og:image" content="https://birdatlas.app/img/og-en.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+@font-face { font-family: "Poppins"; font-weight: 400; font-display: swap; src: url("/app/lib/fonts/poppins-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-024F, U+1E00-1EFF; }
+@font-face { font-family: "Poppins"; font-weight: 400; font-display: swap; src: url("/app/lib/fonts/poppins-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+20AC; }
+@font-face { font-family: "Poppins"; font-weight: 700; font-display: swap; src: url("/app/lib/fonts/poppins-latin-ext-700-normal.woff2") format("woff2"); unicode-range: U+0100-024F, U+1E00-1EFF; }
+@font-face { font-family: "Poppins"; font-weight: 700; font-display: swap; src: url("/app/lib/fonts/poppins-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+20AC; }
+
+:root {
+  --navy: #10325C;      /* başlıklar, koyu bant */
+  --blue: #1F5FB0;      /* baştankaranın mavisi: ana düğme, bağlantılar */
+  --yellow: #F1C93B;    /* baştankaranın göğsü: vurgu */
+  --green: #2EAF72;     /* haritadaki orta yoğunluk */
+  --paper: #F5F8FC;     /* serin, açık zemin */
+  --ink: #42536A;       /* gövde metni */
+  --line: #D9E3F0;
+  --white: #FFFFFF;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.65 "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif; }
+img { max-width: 100%; display: block; }
+main { overflow-x: clip; }
+a { color: var(--blue); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3 { color: var(--navy); font-weight: 700; line-height: 1.15; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.wrap { width: min(1120px, 100% - 32px); margin-inline: auto; }
+html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display: none !important; }
+
+/* ---------- üst çubuk ---------- */
+.top { position: absolute; inset: 0 0 auto; z-index: 3; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--navy); text-decoration: none; font-weight: 700; font-size: 18px; }
+.brand img { width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(16,50,92,.15); }
+.langs { display: flex; gap: 4px; background: rgba(255,255,255,.8); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.langs button { font: inherit; font-size: 14px; border: 0; background: none; color: var(--navy); padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+.langs button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+
+/* ---------- giriş: kuş alanlarının nokta haritası ---------- */
+.hero { position: relative; overflow: hidden; padding: 120px 0 72px; background: linear-gradient(180deg, #EAF1FA 0%, var(--paper) 100%); }
+.hero .dots { position: absolute; top: 0; bottom: 0; right: 0; width: 62%; opacity: .7; }
+.hero .dots img { width: 100%; height: 100%; object-fit: cover; }
+.hero .wrap { position: relative; display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+.hero h1 { font-size: clamp(38px, 5.6vw, 66px); letter-spacing: -1.5px; }
+.hero .lede { margin-top: 20px; font-size: clamp(17px, 1.6vw, 20px); max-width: 34em; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.btn { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 24px; border-radius: 14px; font-weight: 700; font-size: 16px; text-decoration: none; }
+.btn.primary { background: var(--blue); color: #fff; box-shadow: 0 6px 18px rgba(31,95,176,.35); }
+.btn.primary:hover { background: #18508F; }
+.btn.play { background: #fff; color: var(--navy); border: 2px solid var(--navy); }
+.btn.play small { font-weight: 400; color: var(--ink); }
+.note { margin-top: 14px; font-size: 14px; }
+.legend { display: flex; align-items: center; gap: 10px; margin-top: 36px; font-size: 13px; }
+.legend i { display: inline-block; border-radius: 50%; border: 1.5px solid rgba(16,50,92,.35); }
+
+/* ---------- telefon ---------- */
+.phone { position: relative; width: min(320px, 78vw); margin-inline: auto; padding: 9px; background: #1B1E24; border-radius: 40px; box-shadow: 0 30px 60px rgba(16,50,92,.28), inset 0 0 0 2px #3A3F48; }
+.phone img { border-radius: 31px; width: 100%; height: auto; aspect-ratio: 1280 / 2490; object-fit: cover; object-position: top; background: #fff; }
+.pair { position: relative; display: flex; justify-content: center; }
+.pair .phone { width: min(260px, 44vw); }
+.pair .phone:first-child { transform: rotate(-4deg) translateX(14px); z-index: 1; }
+.pair .phone:last-child { transform: rotate(4deg) translate(-14px, 40px); }
+
+/* ---------- özellikler ---------- */
+.features { padding: 96px 0 40px; }
+.intro { max-width: 40em; }
+.intro h2 { font-size: clamp(30px, 3.6vw, 44px); letter-spacing: -.8px; }
+.intro p { margin-top: 14px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; padding: 72px 0; border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: 0; }
+.row:nth-child(even) .text { order: 2; }
+.row h3 { font-size: clamp(24px, 2.6vw, 32px); letter-spacing: -.5px; }
+.row p { margin-top: 14px; max-width: 30em; }
+.row ul { margin: 16px 0 0; padding-left: 20px; }
+.row li { margin-top: 6px; }
+.row li::marker { color: var(--blue); }
+
+.more { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 28px 40px; padding: 24px 0 96px; }
+.more h3 { font-size: 18px; display: flex; align-items: center; gap: 10px; }
+.more h3::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--c, var(--blue)); flex: none; border: 1.5px solid rgba(16,50,92,.35); }
+.more p { margin-top: 6px; font-size: 15px; }
+
+/* ---------- başlarken: gerçek bir sıra ---------- */
+.start { background: #fff; border-block: 1px solid var(--line); padding: 88px 0; }
+.start h2 { font-size: clamp(28px, 3.2vw, 40px); }
+.steps { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; counter-reset: s; }
+.steps li { counter-increment: s; }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--yellow); color: var(--navy); font-weight: 700; font-size: 20px; margin-bottom: 14px; }
+.steps h3 { font-size: 19px; }
+.steps p { margin-top: 6px; font-size: 15px; }
+.start .alt { margin-top: 36px; font-size: 15px; }
+
+/* ---------- gizlilik ---------- */
+.privacy { background: var(--navy); color: #D5E2F3; padding: 88px 0; }
+.privacy h2 { color: #fff; font-size: clamp(28px, 3.2vw, 40px); max-width: 18em; }
+.privacy .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 36px; }
+.privacy h3 { color: var(--yellow); font-size: 18px; }
+.privacy p { margin-top: 8px; font-size: 15px; }
+.privacy a { color: #fff; }
+
+footer { padding: 40px 0 56px; font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; align-items: center; }
+footer nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
+
+@media (max-width: 860px) {
+  body { font-size: 16px; }
+  .hero .dots { width: 100%; opacity: .35; }
+  .hero { padding-top: 96px; }
+  .hero .wrap, .row { grid-template-columns: 1fr; gap: 36px; }
+  .row:nth-child(even) .text { order: 0; }
+  .row { padding: 56px 0; }
+  .steps, .privacy .cols { grid-template-columns: 1fr; }
+  .pair { padding-bottom: 40px; }
+}
+@media (max-width: 420px) { .brand span { display: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/img/logo-180.png" alt=""><span><span data-l="tr">Kuş Atlası</span><span data-l="en">Bird Atlas</span></span></a>
+    <div class="langs" role="group" aria-label="Language / Dil">
+      <button type="button" data-set="tr" aria-pressed="true">TR</button>
+      <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="dots"><img src="/img/hero-map.svg" alt=""></div>
+    <div class="wrap">
+      <div>
+        <h1><span data-l="tr">eBird gözlemlerin, kendi haritanda</span><span data-l="en">Your eBird sightings, on your own map</span></h1>
+        <p class="lede">
+          <span data-l="tr">eBird verini bir kez yükle; hangi kuşu nerede, ne zaman gördüğün, ilk kez gördüğün türler, takvimin ve grafiklerin hep elinin altında. Verilerin telefonunda kalır.</span>
+          <span data-l="en">Upload your eBird data once and keep every bird you've seen at hand: where and when, your lifers, your calendar and charts. Your data stays on your device.</span>
+        </p>
+        <div class="ctas">
+          <a class="btn primary" href="/app/"><span data-l="tr">Tarayıcıda aç</span><span data-l="en">Open in your browser</span></a>
+          <a class="btn play" href="/android" id="play-btn"><span>Google Play</span> <small data-l="tr" class="soon">yakında</small><small data-l="en" class="soon">coming soon</small></a>
+        </div>
+        <p class="note">
+          <span data-l="tr">eBird hesabın yok mu? Uygulamada "Örnek veriyle dene"ye bas.</span>
+          <span data-l="en">No eBird account? Tap "Try with sample data" in the app.</span>
+        </p>
+        <div class="legend" aria-hidden="true">
+          <i style="width:12px;height:12px;background:rgb(22,98,182)"></i><i style="width:16px;height:16px;background:rgb(46,204,113)"></i><i style="width:20px;height:20px;background:rgb(254,208,8)"></i><i style="width:24px;height:24px;background:rgb(231,76,60)"></i>
+          <span data-l="tr">Her daire bir gözlem alanı; büyüdükçe tür sayısı artar.</span>
+          <span data-l="en">Each circle is a birding spot; the bigger it is, the more species.</span>
+        </div>
+      </div>
+      <div class="phone"><img data-shot="map" alt="" width="600" height="1167"></div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="wrap">
+      <div class="intro">
+        <h2><span data-l="tr">Defterindeki her gün, bir dokunuş uzağında</span><span data-l="en">Every day in your notebook, one tap away</span></h2>
+        <p><span data-l="tr">Kuş Atlası, eBird'e kaydettiğin gözlemleri okur ve onları senin için düzenler. Hesap açmana gerek yok.</span><span data-l="en">Bird Atlas reads the sightings you've logged in eBird and organizes them for you. No account needed.</span></p>
+      </div>
+
+      <div class="rows">
+        <article class="row">
+          <div class="text">
+            <h3><span data-l="tr">Nerede, ne zaman gördüğünü hatırla</span><span data-l="en">Remember where and when</span></h3>
+            <p><span data-l="tr">Bir alana dokun: orada gördüğün türler fotoğraflarıyla, gözlem sayılarıyla ve tarihleriyle listelenir. "Tüm gözlemlerim" bir türü gördüğün bütün yerleri ve günleri tek listede toplar.</span><span data-l="en">Tap a spot to see its species with photos, counts and dates. "All my sightings" gathers every place and day you saw a species in one list.</span></p>
+          </div>
+          <div class="phone"><img data-shot="place" alt="" loading="lazy" width="600" height="1167"></div>
+        </article>
+
+        <article class="row">
+          <div class="text">
+            <h3><span data-l="tr">Takvim ve yıllık grafikler</span><span data-l="en">Calendar and year charts</span></h3>
+            <p><span data-l="tr">Takvimde bir güne dokun, o gün hangi alanda hangi türleri gördüğünü oku. Kuş yılını aylık ya da haftalık grafiklerde gör, yılları karşılaştır.</span><span data-l="en">Tap a day to read which species you saw at which spot. See your bird year in monthly or weekly charts and compare years.</span></p>
+            <ul>
+              <li><span data-l="tr">Tür, gözlem, gün ya da birey sayısına göre</span><span data-l="en">By species, sightings, days or bird counts</span></li>
+              <li><span data-l="tr">Tek bir alan ya da tür için de</span><span data-l="en">Also for a single place or species</span></li>
+            </ul>
+          </div>
+          <div class="pair"><div class="phone"><img data-shot="calendar" alt="" loading="lazy" width="600" height="1167"></div><div class="phone"><img data-shot="chart" alt="" loading="lazy" width="600" height="1167"></div></div>
+        </article>
+
+        <article class="row">
+          <div class="text">
+            <h3><span data-l="tr">Kertiklerinin haritası</span><span data-l="en">Your lifers, mapped</span></h3>
+            <p><span data-l="tr">Her türü ilk kez nerede, ne zaman gördüğün fotoğraflı halkalarla haritada. 50., 100., 200. tür gibi dönüm noktaları da kayıtlı.</span><span data-l="en">See where and when you first met each species, as photo rings on the map, with milestones like your 50th, 100th and 200th species.</span></p>
+          </div>
+          <div class="phone"><img data-shot="lifers" alt="" loading="lazy" width="600" height="1167"></div>
+        </article>
+
+        <article class="row">
+          <div class="text">
+            <h3><span data-l="tr">Paylaşım kartları</span><span data-l="en">Share cards</span></h3>
+            <p><span data-l="tr">Bir geziyi, bir günü, bir ayı, bir türü ya da yeni kertiğini Instagram hikâyesi, kare gönderi veya PDF olarak paylaş. Hassas türlerde konumu yalnızca il düzeyinde göster ya da tamamen gizle.</span><span data-l="en">Share a trip, a day, a month, a species or your latest lifer as an Instagram story, square post or PDF. For sensitive species, show only the province or hide the location.</span></p>
+          </div>
+          <div class="phone"><img data-shot="share" alt="" loading="lazy" width="600" height="1167"></div>
+        </article>
+
+        <article class="row">
+          <div class="text">
+            <h3><span data-l="tr">Maviş'e sor</span><span data-l="en">Ask Maviş</span></h3>
+            <p><span data-l="tr">Dürbünlü asistanımız Maviş, verine dair soruları cihazında cevaplar: "En verimli ayım?", "2025'te Mogan'da neler gördüm?", "En büyük sürüm?"</span><span data-l="en">Maviş, our binocular-toting assistant, answers questions about your data right on your device: "My best month?", "What did I see at Lake Mogan in 2025?", "My largest flock?"</span></p>
+          </div>
+          <div class="phone"><img data-shot="mavis" alt="" loading="lazy" width="600" height="1167"></div>
+        </article>
+      </div>
+
+      <div class="more">
+        <div style="--c: rgb(22,98,182)"><h3><span data-l="tr">Kendi fotoğrafların</span><span data-l="en">Your own photos</span></h3><p><span data-l="tr">Wikipedia fotoğrafının yerine kendi çektiğin kareyi koy; kartlarda da o görünür.</span><span data-l="en">Swap the Wikipedia photo for your own shot; it shows on your cards too.</span></p></div>
+        <div style="--c: rgb(46,204,113)"><h3><span data-l="tr">Çevreyi keşfet</span><span data-l="en">Explore nearby</span></h3><p><span data-l="tr">Haritaya dokun, seçtiğin çaptaki son 30 günün eBird kayıtlarını gör.</span><span data-l="en">Tap the map to see eBird sightings from the last 30 days around that point.</span></p></div>
+        <div style="--c: rgb(254,208,8)"><h3><span data-l="tr">Elle kayıt</span><span data-l="en">Manual records</span></h3><p><span data-l="tr">eBird dışındaki gözlemlerini tür, tarih, adet ve konumla ekle.</span><span data-l="en">Add sightings outside eBird with species, date, count and place.</span></p></div>
+        <div style="--c: rgb(231,76,60)"><h3><span data-l="tr">Türkçe ve İngilizce</span><span data-l="en">English and Turkish</span></h3><p><span data-l="tr">Arayüz ve tür adları iki dilde.</span><span data-l="en">Interface and species names in both languages.</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="start">
+    <div class="wrap">
+      <h2><span data-l="tr">Üç adımda başla</span><span data-l="en">Get started in three steps</span></h2>
+      <ol class="steps">
+        <li><h3><span data-l="tr">Verini iste</span><span data-l="en">Request your data</span></h3><p><span data-l="tr">eBird'de <a href="https://ebird.org/downloadMyData" rel="noopener">Verilerimi indir</a> sayfasından talep oluştur.</span><span data-l="en">Request it on eBird's <a href="https://ebird.org/downloadMyData" rel="noopener">Download My Data</a> page.</span></p></li>
+        <li><h3><span data-l="tr">ZIP'i indir</span><span data-l="en">Download the ZIP</span></h3><p><span data-l="tr">E-postana gelen bağlantıdan dosyayı indir; açmana gerek yok.</span><span data-l="en">Download the file from the link in your email; no need to unzip it.</span></p></li>
+        <li><h3><span data-l="tr">Kuş Atlası'nda seç</span><span data-l="en">Choose it in Bird Atlas</span></h3><p><span data-l="tr">Uygulamada "eBird ZIP veya CSV Dosyasını Seç"e bas. Haritan hazır.</span><span data-l="en">Tap "Choose eBird ZIP or CSV File" in the app. Your map is ready.</span></p></li>
+      </ol>
+      <p class="alt"><span data-l="tr">Web sürümünü iPhone'da ya da bilgisayarda da kullanabilirsin. Telefonda tarayıcının menüsünden "Ana ekrana ekle" dersen uygulama gibi açılır.</span><span data-l="en">The web version works on iPhone and computers too. On a phone, choose "Add to Home Screen" in your browser menu and it opens like an app.</span></p>
+    </div>
+  </section>
+
+  <section class="privacy">
+    <div class="wrap">
+      <h2><span data-l="tr">Gözlemlerin sende kalır</span><span data-l="en">Your sightings stay with you</span></h2>
+      <div class="cols">
+        <div><h3><span data-l="tr">Sunucu yok</span><span data-l="en">No server</span></h3><p><span data-l="tr">Verilerin yalnızca kendi cihazında, tarayıcının ya da uygulamanın deposunda saklanır. Biz göremeyiz.</span><span data-l="en">Your data is stored only on your own device, in the browser or app storage. We can't see it.</span></p></div>
+        <div><h3><span data-l="tr">Hesap, reklam, takip yok</span><span data-l="en">No account, ads or tracking</span></h3><p><span data-l="tr">Kayıt olmazsın; sitede çerez ya da analiz aracı yoktur.</span><span data-l="en">No sign-up, and the site uses no cookies or analytics.</span></p></div>
+        <div><h3><span data-l="tr">Paylaşmak senin elinde</span><span data-l="en">You decide what to share</span></h3><p><span data-l="tr">Kartlar cihazında üretilir; fotoğraflarındaki GPS bilgisi karta geçmez.</span><span data-l="en">Cards are made on your device, and your photos' GPS data is never copied to them.</span></p></div>
+      </div>
+      <p style="margin-top:32px"><a href="/privacy/"><span data-l="tr">Gizlilik politikasının tamamı</span><span data-l="en">Read the full privacy policy</span></a></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 EG Apps Studio</span>
+    <nav aria-label="Footer">
+      <a href="/app/"><span data-l="tr">Uygulamayı aç</span><span data-l="en">Open the app</span></a>
+      <a href="https://www.instagram.com/birdatlas.app" rel="noopener">Instagram</a>
+      <a href="mailto:egapps.support@gmail.com"><span data-l="tr">İletişim</span><span data-l="en">Contact</span></a>
+      <a href="/privacy/"><span data-l="tr">Gizlilik</span><span data-l="en">Privacy</span></a>
+    </nav>
+    <p class="fine"><span data-l="tr">Kuş Atlası bağımsız bir uygulamadır; eBird ya da Cornell Lab of Ornithology ile bağlantılı değildir.</span><span data-l="en">Bird Atlas is an independent app and is not affiliated with eBird or the Cornell Lab of Ornithology.</span></p>
+  </div>
+</footer>
+
+<script>
+  // Google Play'de herkese açık yayına çıkınca true yap: "yakında" yazısı kalkar.
+  const PLAY_LIVE = false;
+  if (PLAY_LIVE) document.querySelectorAll('.soon').forEach(e => e.remove());
+
+  function setLang(l) {
+    document.documentElement.lang = l; document.documentElement.dataset.lang = l;
+    document.querySelectorAll('.langs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+    document.querySelectorAll('img[data-shot]').forEach(i => { i.src = `/img/shots/${i.dataset.shot}-${l}.webp`; });
+    document.title = l === 'tr' ? 'Kuş Atlası – eBird gözlemlerin, kendi haritanda' : 'Bird Atlas – your eBird sightings, on your own map';
+    try { localStorage.setItem('app_lang', l); } catch (e) {}
+  }
+  let saved = null; try { saved = localStorage.getItem('app_lang'); } catch (e) {}
+  let q = new URLSearchParams(location.search).get('lang');
+  setLang(q === 'en' || q === 'tr' ? q : saved || ((navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en'));
+  document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
+</script>
+</body>
+</html>

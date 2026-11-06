@@ -1,0 +1,34 @@
+{
+  "name": "kus-atlasi",
+  "version": "1.11.0",
+  "private": true,
+  "description": "Kuş Atlası / Bird Atlas – kişisel kuş gözlem haritası (Android + web)",
+  "scripts": {
+    "copy-libs": "node scripts/copy-libs.mjs",
+    "sync": "npm run copy-libs && npx cap sync android && node scripts/android-ayarlari.mjs",
+    "open": "npx cap open android",
+    "postinstall": "node scripts/copy-libs.mjs",
+    "taksonomi": "node scripts/taksonomi.mjs",
+    "ikon": "node scripts/ikon.mjs",
+    "web": "node scripts/web-build.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@fontsource/poppins": "^5.0.0",
+    "@maplibre/maplibre-gl-leaflet": "latest",
+    "jszip": "^3.10.1",
+    "leaflet": "1.9.4",
+    "maplibre-gl": "^5.0.0",
+    "papaparse": "^5.4.1",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/filesystem": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0",
+    "sharp": "^0.33.5"
+  }
+}

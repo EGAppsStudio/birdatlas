@@ -1,0 +1,18 @@
+# bağımlılıklar ve derleme çıktıları
+node_modules/
+www/lib/
+dist/
+android/app/build/
+android/.gradle/
+android/build/
+*.aab
+*.apk
+
+# ASLA depoya girmeyecekler: imza anahtarı, şifreler, API anahtarları
+*.jks
+*.keystore
+keystore.properties
+gizli.env
+.env
+.env.*
+*.pem
