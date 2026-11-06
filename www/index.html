@@ -193,6 +193,7 @@
         #lang-menu button { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: none; border-radius: 8px; padding: 8px 10px; font-size: 14px; color: #0A3E70; cursor: pointer; text-align: left; }
         #lang-menu button.on { background: #e8f0fa; }
         #lang-menu button span { color: #5B6B7E; font-size: 12px; }
+        svg.flag { display: inline-block; vertical-align: -2px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,0.12); }
         #lang-menu .lm-soon { font-size: 11px; color: #8a97a8; padding: 6px 10px 2px; border-top: 1px solid #eef2f6; margin-top: 4px; }
         .cal-arrow { cursor: pointer; width: 34px; height: 30px; border-radius: 6px; background: white; font-weight: bold; font-size: 20px; line-height: 1; padding: 0 0 3px; flex-shrink: 0; }
         .sort-row { display: flex; gap: 4px; margin-bottom: 10px; }
@@ -231,7 +232,7 @@
             <div class="guide-body" id="guide-body"></div>
         </div>
     </div>
-    <button id="lang-toggle" data-no-i18n onclick="toggleLangMenu(event)">🇹🇷 TR ▾</button>
+    <button id="lang-toggle" data-no-i18n onclick="toggleLangMenu(event)">TR ▾</button>
 
     <div id="panels-wrapper" style="display:none;">
         <button id="hide-panels-btn" onclick="window.togglePanels()">☰ Panelleri Göster</button>
@@ -646,7 +647,16 @@
         window.alert = m => _alert(tx(String(m)));
         window.confirm = m => _confirm(tx(String(m)));
 
-        function updateLangBtn() { let b = document.getElementById('lang-toggle'); if (b) b.textContent = LANG === 'en' ? '🇬🇧 EN ▾' : '🇹🇷 TR ▾'; }
+        function flagSvg(c) {
+            const W = (v, body) => `<svg class="flag" viewBox="${v}" width="20" height="14" aria-hidden="true" preserveAspectRatio="none">${body}</svg>`;
+            if (c === 'tr') return W('0 0 30 20', '<rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="16.2,10 19.9,8.8 17.6,11.9 17.6,8.1 19.9,11.2"/>');
+            if (c === 'en') return W('0 0 60 30', '<rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#C8102E" stroke-width="2"/><path d="M30,0V30M0,15H60" stroke="#fff" stroke-width="10"/><path d="M30,0V30M0,15H60" stroke="#C8102E" stroke-width="6"/>');
+            if (c === 'es') return W('0 0 30 20', '<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>');
+            if (c === 'ru') return W('0 0 30 20', '<rect width="30" height="20" fill="#fff"/><rect y="6.67" width="30" height="6.67" fill="#0039A6"/><rect y="13.33" width="30" height="6.67" fill="#D52B1E"/>');
+            if (c === 'ar') return W('0 0 30 20', '<rect width="30" height="20" fill="#006C35"/><rect x="8" y="12" width="14" height="1.4" rx=".7" fill="#fff"/><rect x="9" y="6.5" width="12" height="3" rx="1" fill="#fff" opacity=".85"/>');
+            return '';
+        }
+        function updateLangBtn() { let b = document.getElementById('lang-toggle'); if (b) b.innerHTML = LANG === 'en' ? flagSvg('en') + ' EN ▾' : flagSvg('tr') + ' TR ▾'; }
         window.setLang = function(l) {
             LANG = l; try { localStorage.setItem('app_lang', l); } catch (e) {}
             document.documentElement.lang = l;
@@ -1500,7 +1510,9 @@
             let uniqueSci = [...new Set(obsData.map(d=>d.sci_name))];
             let speciesImages = {}; let loaded = 0;
             let imgCache = loadImgCache();
-            const batchSize = 10;
+            // v1.11: önceden yoğunluk yüzünden "fotoğraf yok" kaydedilmiş türleri bir kez yeniden dene
+            try { if (!localStorage.getItem('img_empty_retry_v1')) { Object.keys(imgCache).forEach(k => { if (!imgCache[k]) delete imgCache[k]; }); localStorage.setItem('img_empty_retry_v1', '1'); } } catch (e) {}
+            const batchSize = 5;
             for(let i=0; i<uniqueSci.length; i+=batchSize) {
                 const batch = uniqueSci.slice(i, i+batchSize);
                 await Promise.all(batch.map(async sci => {
@@ -2708,7 +2720,9 @@
             let ctrl = new AbortController(); let t = setTimeout(() => ctrl.abort(), 9000);
             try {
                 let res = await fetch('https://en.wikipedia.org/w/api.php?format=json&formatversion=2&origin=*&' + params, { signal: ctrl.signal });
-                return res.ok ? await res.json() : null;
+                if (res.status === 404) return null;
+                if (!res.ok) throw new Error('wiki ' + res.status);   // 429/5xx: geçici → önbelleğe yazılmaz, sonra tekrar denenir
+                return await res.json();
             } finally { clearTimeout(t); }
         }
         // null = ağ hatası (önbelleğe yazılmaz, sonra tekrar denenir) · '' = fotoğraf yok
@@ -4025,14 +4039,14 @@
         };
 
         // ----- Dil menüsü: düğme ŞU ANKİ dili gösterir -----
-        const LANGS = [['tr', '🇹🇷', 'Türkçe'], ['en', '🇬🇧', 'English']];
+        const LANGS = [['tr', 'Türkçe'], ['en', 'English']];
         window.toggleLangMenu = function(e) {
             e.stopPropagation();
             let m = document.getElementById('lang-menu');
             if (m) { m.remove(); return; }
             m = document.createElement('div'); m.id = 'lang-menu'; m.setAttribute('data-no-i18n', '');
-            m.innerHTML = LANGS.map(([c, f, n]) => `<button class="${c === LANG ? 'on' : ''}" onclick="document.getElementById('lang-menu').remove(); setLang('${c}')">${f} <b>${c.toUpperCase()}</b> <span>${n}</span></button>`).join('')
-                + `<div class="lm-soon">🇪🇸 ES · 🇷🇺 RU · 🇸🇦 AR · ${LT('yakında', 'coming soon')}</div>`;
+            m.innerHTML = LANGS.map(([c, n]) => `<button class="${c === LANG ? 'on' : ''}" onclick="document.getElementById('lang-menu').remove(); setLang('${c}')">${flagSvg(c)} <b>${c.toUpperCase()}</b> <span>${n}</span></button>`).join('')
+                + `<div class="lm-soon">${flagSvg('es')} ES · ${flagSvg('ru')} RU · ${flagSvg('ar')} AR · ${LT('yakında', 'coming soon')}</div>`;
             let r = e.currentTarget.getBoundingClientRect();
             m.style.top = (r.bottom + 6) + 'px'; m.style.right = (window.innerWidth - r.right) + 'px';
             document.body.appendChild(m);
