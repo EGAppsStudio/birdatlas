@@ -1757,7 +1757,12 @@
                             // Sayının temsil ettiği kertiklerin bulunduğu yerlere yakınlaş
                             let b = L.latLngBounds(c.items.map(l => [l.lat, l.lon]));
                             if (b.getNorthEast().equals(b.getSouthWest())) mapObj.setView(b.getNorthEast(), Math.max(RING_ZOOM, Math.min(mapObj.getZoom() + 3, mapObj.getMaxZoom())));
-                            else { mapObj.fitBounds(b, { padding: [60, 60], maxZoom: 13 }); if (mapObj.getZoom() <= lastLiferZoom) mapObj.setZoom(lastLiferZoom + 1); }
+                            else {
+                                // Tek hareketle yakınlaş: önce uzaklaşıp sonra başka yere atlamasın
+                                let cur = mapObj.getZoom(), z = Math.min(mapObj.getBoundsZoom(b, false, L.point(60, 60)), 13);
+                                if (z > cur) mapObj.setView(b.getCenter(), z);
+                                else mapObj.setView(center, Math.min(cur + 2, mapObj.getMaxZoom()));
+                            }
                         });
                         markerLayerGroup.addLayer(m);
                         return;
