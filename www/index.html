@@ -131,6 +131,15 @@
         /* v1.9: kapakta TR/EN ve ? en sağ üstte; logo yerine oturunca altına kayarlar */
         #animated-logo.on-map { position: fixed !important; top: calc(15px + env(safe-area-inset-top)) !important; right: calc(15px + env(safe-area-inset-right)) !important; left: auto !important; width: 65px !important; height: 65px !important; border: 4px solid white !important; box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important; margin: 0 !important; z-index: 999999 !important; }
         #upload-overlay { overflow-y: auto; justify-content: flex-start !important; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); box-sizing: border-box; }
+        #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/cover-map.jpg') center / cover no-repeat, #fff !important; }
+        #guide-btn { display: none !important; }
+        #sa-probe { position: fixed; left: -9999px; top: 0; width: 1px; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); visibility: hidden; pointer-events: none; }
+        #tour .tl { display: flex; gap: 8px; margin-top: 10px; }
+        #tour .tl button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 10px; border: 1.5px solid #cfd8e3; background: #fff; font: inherit; font-size: 13.5px; color: #0A3E70; cursor: pointer; }
+        #tour .tl button.on { border-color: #1662B6; background: #EAF2FC; font-weight: bold; }
+        #tour .tback { padding: 7px 10px; }
+        #tour .twait { display: inline-block; animation: tourpulse 1.4s ease-in-out infinite; }
+        @keyframes tourpulse { 50% { opacity: .35; } }
         .upload-card { margin: auto; }
         /* Geri bildirim paneli */
         .fb-btn { width: 100%; padding: 9px 10px; margin-bottom: 6px; background: #fff; color: #0A3E70; border: 1px solid #1662B6; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: left; }
@@ -462,6 +471,7 @@
         </button>
     </div>
 
+    <div id="sa-probe"></div>
     <div id="upload-overlay">
         <div class="upload-card">
             
@@ -495,7 +505,6 @@
                 </div>
             </div>
             <div id="last-upload-info" style="font-size:12px; color:#1662B6; font-weight:bold; margin-top:15px; border-top:1px solid #eee; padding-top:10px;"></div>
-            <button onclick="openSettings()" style="margin-top: 15px; padding: 8px 16px; background: none; color: #0A3E70; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight:bold;">⚙️ İlk Kurulum: API Şifrelerini Gir</button>
         </div>
     </div>
 
@@ -3031,9 +3040,34 @@
         // ----- Veri yüklendikten sonra: kertik dönüm noktası + değerlendirme zamanı -----
         const MILESTONES = [25, 50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1250, 1500, 2000];
         function reachedMilestones() { return MILESTONES.filter(m => m <= liferArray.length); }
+        // Yükleme sırasında Wikipedia yoğunluktan cevap vermediyse (önbellekte kaydı yok) fotoğrafı sonra sessizce yeniden dene
+        let photoRetryToken = 0;
+        async function retryMissingPhotos() {
+            let token = ++photoRetryToken, cache = loadImgCache(), changed = false;
+            let todo = [...new Set(obsData.map(d => d.sci_name))].filter(sci => !MY_PHOTOS[sci] && !WIKI_IMAGES[sci] && !Object.prototype.hasOwnProperty.call(cache, sci));
+            for (let round = 0; round < 2 && todo.length; round++) {
+                let left = [];
+                for (let sci of todo) {
+                    if (token !== photoRetryToken) return;
+                    let url = await fetchSpeciesImage(sci);
+                    if (url === null) left.push(sci);
+                    else {
+                        cache[sci] = url;
+                        if (url) { WIKI_IMAGES[sci] = url; obsData.forEach(d => { if (d.sci_name === sci) d.img = url; }); liferArray.forEach(l => { if (l.sci_name === sci) l.img = url; }); changed = true; }
+                    }
+                    await new Promise(r => setTimeout(r, 1200));
+                }
+                saveImgCache(cache); todo = left;
+                if (todo.length) await new Promise(r => setTimeout(r, 20000));
+            }
+            if (!changed || token !== photoRetryToken) return;
+            let apply = () => { if (tourIdx >= 0) return setTimeout(apply, 3000); renderAll(); };
+            apply();
+        }
         function afterDataLoaded() {
             bindMiniFollow();
             maybeStartTour(true);
+            setTimeout(retryMissingPhotos, 5000);
             if (isSample()) return;
             let reached = reachedMilestones(); let top = reached.length ? reached[reached.length - 1] : 0;
             let seen = NaN; try { seen = parseInt(localStorage.getItem('milestone_seen'), 10); } catch (e) {}
@@ -4700,14 +4734,24 @@
         renderNav();
 
         // ===== v1.12: İlk açılış turu (Maviş anlatır) =====
-        let tourIdx = -1, tourSteps = [], tourAfterData = false;
+        let tourIdx = -1, tourSteps = [], tourAfterData = false, tourPre = false, tourWaiting = false, tourWaitTimer = null, tourView = null;
+        function ensureTab(t) { if (navTab !== t) openTab(t); }
+        function tourSafe() { let p = $t('sa-probe'), cs = p ? getComputedStyle(p) : null; return { t: cs ? parseFloat(cs.paddingTop) || 0 : 0, b: cs ? parseFloat(cs.paddingBottom) || 0 : 0 }; }
+        function saveTourView() { try { tourView = obsData.length && mapObj ? { c: mapObj.getCenter(), z: mapObj.getZoom() } : null; } catch (e) { tourView = null; } }
+        function restoreTourView() {
+            try {
+                if (tourView) mapObj.setView(tourView.c, tourView.z);
+                else if (obsData.length) { let la = obsData.map(d => d.lat), lo = obsData.map(d => d.lon); mapObj.fitBounds([[Math.min(...la), Math.min(...lo)], [Math.max(...la), Math.max(...lo)]]); }
+            } catch (e) {}
+            tourView = null;
+        }
         const $t = id => document.getElementById(id);
         function tourDone() { try { return localStorage.getItem('tour_done') === '1'; } catch (e) { return true; } }
         function setTourFlag(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
         function onMapReady(fn) {
             let n = 0, iv = setInterval(() => {
                 let l = $t('animated-logo');
-                if ((l && l.classList.contains('on-map') && $t('upload-overlay').style.display === 'none') || ++n > 80) { clearInterval(iv); setTimeout(fn, 500); }
+                if ((l && l.classList.contains('on-map') && $t('upload-overlay').style.display === 'none') || ++n > 1200) { clearInterval(iv); setTimeout(fn, 500); }
             }, 150);
         }
         function latestDay() { let ds = obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor').sort(); return ds[ds.length - 1]; }
@@ -4738,7 +4782,8 @@
             let s = [];
             if (preData) {
                 s.push({ id: 'welcome', pre: true, title: LT('Merhaba, ben Maviş! 👋', "Hi, I'm Maviş! 👋"),
-                    text: LT('Kuş Atlası, eBird gözlemlerini kişisel haritana dönüştürür. Seni bir dakikada gezdireyim.', 'Bird Atlas turns your eBird sightings into your personal map. Let me show you around in a minute.') });
+                    text: LT('Kuş Atlası, eBird gözlemlerini kişisel haritana dönüştürür. Seni bir dakikada gezdireyim.', 'Bird Atlas turns your eBird sightings into your personal map. Let me show you around in a minute.')
+                        + `<div class="tl">${[['tr', 'Türkçe'], ['en', 'English']].map(([c, n]) => `<button class="${LANG === c ? 'on' : ''}" onclick="tourLang('${c}')">${flagSvg(c)} ${n}</button>`).join('')}</div>` });
                 s.push({ id: 'ask', pre: true, title: LT('eBird hesabın ve kayıtların var mı?', 'Do you have an eBird account with sightings?'),
                     text: LT('Varsa kendi verini nasıl yükleyeceğini göstereyim. Yoksa örnek veriyle gezelim; istediğin zaman kendi verine geçebilirsin.', "If so, I'll show you how to load your own data. If not, let's explore with sample data; you can switch to your own any time."),
                     buttons: [[LT('Evet, verim var', 'Yes, I have data'), 'tourOwnData()', true], [LT('Hayır, örnekle dene', 'No, try sample data'), 'tourSample()']] });
@@ -4746,20 +4791,20 @@
                 s.push({ id: 'welcome', title: LT('Merhaba, ben Maviş! 👋', "Hi, I'm Maviş! 👋"),
                     text: LT('Kuş Atlası\'nın yeni düzenini birlikte gezelim. Bir dakika sürer; istersen "Geç" de.', "Let's walk through Bird Atlas together. It takes a minute; tap \"Skip\" if you like.") });
             }
-            s.push({ id: 'map', title: LT('Haritan', 'Your map'),
+            s.push({ id: 'map', enter: () => closeTabs(), title: LT('Haritan', 'Your map'),
                 text: LT('Her daire bir gözlem alanı; büyüdükçe ve kırmızıya döndükçe orada daha çok tür görmüşsün. Bir daireye dokununca türler, tarihler ve "Tüm gözlemlerim" açılır.', 'Each circle is a birding spot; bigger and redder means more species. Tap a circle to see its species, dates and "All my sightings".') });
-            s.push({ id: 'tabs', target: () => $t('tabbar'), title: LT('Dört sekme', 'Four tabs'),
+            s.push({ id: 'tabs', target: () => $t('tabbar'), enter: () => closeTabs(), title: LT('Dört sekme', 'Four tabs'),
                 text: LT('Gözlemlerim · Kertikler · Keşfet · Paylaş. Açık sekmeye tekrar dokununca kapanır, harita tam ekran olur.', 'My sightings · Lifers · Explore · Share. Tap an open tab again to close it and see the full map.') });
             s.push({ id: 'calendar', target: () => $t('filter-panels'),
                 enter: () => {
-                    openTab('obs'); setObsSub('calendar');
+                    ensureTab('obs'); setObsSub('calendar');
                     let d = latestDay();
                     if (d) { currentCalDate = new Date(+d.slice(0, 4), +d.slice(5, 7) - 1, 1); selectedDates.clear(); selectedDates.add(d); lastClickedDay = d; renderAll(); }
                 },
                 title: LT('Gözlemlerim → Takvim', 'My sightings → Calendar'),
                 text: LT('Renkli günler gözlem yaptığın günler. Bir güne dokun: harita o güne süzülür, altta o gün hangi yerde hangi türleri gördüğün çıkar. Ben senin için son gününü seçtim. En altta yıllık grafik var.', "Colored days are days you went birding. Tap a day: the map filters to it and below you'll see which species you saw where. I picked your latest day. The year chart is at the bottom.") });
             s.push({ id: 'species', target: () => $t('filter-panels'),
-                enter: () => { setObsSub('species'); },
+                enter: () => { ensureTab('obs'); setObsSub('species'); },
                 title: LT('Konumlar ve Türler', 'Places and Species'),
                 text: LT('Üstteki küçük sekmelerle Konumlar ve Türler listesine geç. Bir türe dokununca harita yalnız onu gösterir. Fotoğrafa dokun: büyür ve istersen kendi fotoğrafını koyarsın.', 'Switch to Places or Species with the small tabs on top. Tap a species to show only it on the map. Tap its photo to enlarge it and use your own picture.') });
             s.push({ id: 'chips', target: () => $t('filter-bar'),
@@ -4767,13 +4812,13 @@
                 leave: () => { clearFilter('all'); },
                 title: LT('Açık filtreler', 'Active filters'),
                 text: LT('Seçtiğin gün ve tür haritanın üstünde etiket olarak durur. ✕ ile birini, "Tümünü temizle" ile hepsini kaldırırsın.', 'The day and species you picked stay on the map as tags. Tap ✕ to remove one, "Clear all" for all.') });
-            s.push({ id: 'lifer', target: () => $t('filter-panels'), enter: () => openTab('lifer'),
+            s.push({ id: 'lifer', target: () => $t('filter-panels'), enter: () => ensureTab('lifer'),
                 title: LT('Kertikler', 'Lifers'),
                 text: LT('Kertik, bir türü ilk kez gördüğün an. "Kertik Haritasını Aç" ile hepsini fotoğraflı haritada gör; takvimde yeşil günler kertik günlerin.', 'A lifer is the first time you saw a species. "Open Lifer Map" shows them all with photos; green days in the calendar are lifer days.') });
-            s.push({ id: 'explore', target: () => $t('filter-panels'), enter: () => { openTab('explore'); demoExplore(); },
+            s.push({ id: 'explore', target: () => $t('filter-panels'), enter: () => { ensureTab('explore'); demoExplore(); },
                 title: LT('Çevreyi keşfet', 'Explore nearby'),
                 text: LT('Keşfet sekmesinde arama çapını seç, sonra haritada bir noktaya dokun: o çaptaki son 30 günün eBird kayıtları listelenir. Bu liste tur için uyduruldu.', 'In the Explore tab pick a radius, then tap a point on the map: eBird sightings from the last 30 days within it are listed. This list is made up for the tour.') });
-            s.push({ id: 'explore2', target: () => $t('explore-dock'), enter: () => { exploreDockDismissed = false; closeTabs(); try { mapObj.setView([lastExploreLat, lastExploreLng], 10); } catch (e) {} },
+            s.push({ id: 'explore2', target: () => $t('explore-dock'), enter: () => { if (!exploreMode || !exploreData.length) { ensureTab('explore'); demoExplore(); } exploreDockDismissed = false; closeTabs(); try { mapObj.setView([lastExploreLat, lastExploreLng], 10); } catch (e) {} },
                 leave: () => { setExplore(false); closeTabs(); },
                 title: LT('Keşfet: haritada', 'Explore: on the map'),
                 text: LT('Sarı daire aradığın alan; sonuçlar üstteki kutuda kalır, haritada gezinirken de görürsün. Gerçek sonuçlar için ücretsiz eBird API anahtarı gerekir (☰ → Ayarlar); anahtar girince dokunduğun yerin gerçek, güncel kayıtları gelir.', 'The yellow circle is the searched area; results stay in the box on top while you move around. Real results need a free eBird API key (☰ → Settings); with a key you get real, recent sightings for the spot you tap.') });
@@ -4805,28 +4850,32 @@
             let st = tourSteps[tourIdx], r = $t('tour'); if (!st || !r) return; let spot = r.querySelector('.tour-spot'), tip = r.querySelector('.tour-tip'), dim = r.querySelector('.tour-dim');
             let el = st.target ? st.target() : null, rect = el && el.getClientRects().length ? el.getBoundingClientRect() : null;
             if (rect && rect.width && rect.height) {
-                let pad = 6, top = Math.max(4, rect.top - pad), left = Math.max(4, rect.left - pad);
-                let w = Math.min(innerWidth - 8, rect.width + pad * 2), h = Math.min(innerHeight - top - 4, rect.height + pad * 2);
+                let sa = tourSafe(), H = innerHeight - sa.b, T0 = sa.t;
+                let pad = 6, top = Math.max(4 + T0, rect.top - pad), left = Math.max(4, rect.left - pad);
+                let w = Math.min(innerWidth - 8, rect.width + pad * 2), h = Math.min(H - top - 4, rect.height + pad * 2);
                 Object.assign(spot.style, { display: 'block', top: top + 'px', left: left + 'px', width: w + 'px', height: h + 'px' });
                 dim.style.display = 'none';
                 let tw = Math.min(360, innerWidth - 24), th = tip.offsetHeight || 180;
                 let below = top + h + 12, above = top - th - 12;
-                let ty = below + th < innerHeight - 8 ? below : above > 8 ? above : Math.max(8, innerHeight - th - 12);
+                let ty = below + th < H - 12 ? below : above > 8 + T0 ? above : Math.max(8 + T0, H - th - 16);
                 Object.assign(tip.style, { width: tw + 'px', top: ty + 'px', left: Math.max(12, Math.min(innerWidth - tw - 12, left + w / 2 - tw / 2)) + 'px' });
             } else {
                 spot.style.display = 'none'; dim.style.display = 'block';
                 let tw = Math.min(360, innerWidth - 24);
-                Object.assign(tip.style, { width: tw + 'px', left: (innerWidth - tw) / 2 + 'px', top: Math.max(12, innerHeight / 2 - (tip.offsetHeight || 200) / 2) + 'px' });
+                let sa = tourSafe(), H = innerHeight - sa.b;
+                Object.assign(tip.style, { width: tw + 'px', left: (innerWidth - tw) / 2 + 'px', top: Math.max(12 + sa.t, Math.min(H - (tip.offsetHeight || 200) - 16, (sa.t + H) / 2 - (tip.offsetHeight || 200) / 2)) + 'px' });
             }
         }
         function renderTourStep() {
             let st = tourSteps[tourIdx], r = ensureTourDom(), tip = r.querySelector('.tour-tip');
             let main = tourSteps.filter(x => x.id !== 'welcome' && !x.pre), k = main.indexOf(st);
-            let btns = st.buttons ? st.buttons.map(([t, fn, primary]) => `<button class="${primary ? 'tp' : 'tg'}" onclick="${fn}">${t}</button>`).join('')
-                : `<button class="tg" onclick="endTour(true)">${LT('Geç', 'Skip')}</button><button class="tp" onclick="nextTour()">${tourIdx === 0 ? LT('Başla', 'Start') : LT('İleri', 'Next')}</button>`;
+            let prev = tourSteps[tourIdx - 1], canBack = tourIdx > 0 && prev && !prev.pre && !st.pre;
+            let back = canBack ? `<button class="tg tback" onclick="prevTour()" aria-label="${LT('Geri', 'Back')}">‹ ${LT('Geri', 'Back')}</button>` : '';
+            let btns = st.buttons ? back + st.buttons.map(([t, fn, primary]) => `<button class="${primary ? 'tp' : 'tg'}" onclick="${fn}">${t}</button>`).join('')
+                : (canBack ? '' : `<button class="tg" onclick="endTour(true)">${LT('Geç', 'Skip')}</button>`) + back + `<button class="tp" onclick="nextTour()">${tourIdx === 0 ? LT('Başla', 'Start') : LT('İleri', 'Next')}</button>`;
             tip.innerHTML = `<div class="tt"><span class="tm">${mavisSVG(34, st.id === 'done' ? 'wave' : 'idle')}</span><span>${st.title}</span></div>
                 <div class="tx">${st.text}</div>
-                <div class="tb">${k >= 0 ? `<span class="tc">${k + 1} / ${main.length}</span>` : '<span></span>'}<span class="tbs">${btns}</span></div>`;
+                <div class="tb">${k >= 0 ? `<span class="tc">${k + 1} / ${main.length}${canBack ? ` · <a href="#" onclick="endTour(true); return false;" style="color:#5B6B7E;">${LT('Geç', 'Skip')}</a>` : ''}</span>` : '<span></span>'}<span class="tbs">${btns}</span></div>`;
             r.style.display = 'block';
             placeTour(); setTimeout(placeTour, 350); setTimeout(placeTour, 900);
         }
@@ -4839,11 +4888,15 @@
             setTimeout(renderTourStep, st.enter ? 250 : 0);
         }
         window.nextTour = () => goTour(tourIdx + 1);
+        window.prevTour = () => { if (tourIdx > 0) goTour(tourIdx - 1); };
+        window.tourLang = function(l) { setLang(l); tourSteps = buildTourSteps(tourPre); renderTourStep(); };
         window.endTour = function(done) {
             let cur = tourSteps[tourIdx];
             if (cur && cur.leave) { try { cur.leave(); } catch (e) {} }
-            tourIdx = -1; let r = $t('tour'); if (r) r.style.display = 'none';
+            let wasMain = tourIdx >= 0 && cur && !cur.pre;
+            tourIdx = -1; tourWaiting = false; clearInterval(tourWaitTimer); let r = $t('tour'); if (r) r.style.display = 'none';
             if (done) { setTourFlag('tour_done', '1'); setTourFlag('tour_resume', null); }
+            if (wasMain) restoreTourView();
         };
         // Veri yokken: kendi verisi
         window.tourOwnData = function() {
@@ -4854,22 +4907,33 @@
                 buttons: [[LT('Anladım', 'Got it'), 'endTour(false)', true], [LT('Örnekle dene', 'Try sample'), 'tourSample()']] }];
             tourIdx = 0; renderTourStep();
         };
-        window.tourSample = function() { endTour(false); setTourFlag('tour_resume', '1'); loadSampleData(); };
+        window.tourSample = function() {
+            endTour(false); setTourFlag('tour_resume', '1');
+            tourWaiting = true; tourPre = false;
+            tourSteps = [{ id: 'wait', pre: true, title: `<span class="twait">⏳</span> ${LT('Örnek veriyi yüklüyorum…', 'Loading sample data…')}`,
+                text: `<span id="tour-wait-st">${LT('Biraz sürebilir; tür fotoğrafları da indiriliyor. Hazır olunca tura başlarız.', 'This may take a moment while species photos download. The tour starts when it is ready.')}</span>`, buttons: [] }];
+            tourIdx = 0; renderTourStep();
+            clearInterval(tourWaitTimer);
+            tourWaitTimer = setInterval(() => { let a = $t('loading-status'), b = $t('tour-wait-st'); if (!tourWaiting) return clearInterval(tourWaitTimer); if (a && b && a.innerText.trim()) b.textContent = a.innerText.trim(); }, 400);
+            setTimeout(loadSampleData, 50);
+        };
         window.startTour = function(force) {
             if (!force && tourDone()) return;
             closeMainMenu(); closeTabs();
             let hasData = obsData.length > 0;
+            tourPre = !hasData; saveTourView();
             tourSteps = buildTourSteps(!hasData);
             ensureTourDom(); goTour(0);
         };
         // Açılışta: veri yoksa kapakta sor; veri varsa harita açılınca başla
         function maybeStartTour(fromData) {
-            if (tourIdx >= 0) return;
+            if (tourIdx >= 0 && !tourWaiting) return;
             let resume = false; try { resume = localStorage.getItem('tour_resume') === '1'; } catch (e) {}
             if (tourDone() && !resume) return;
             if (fromData) {
                 onMapReady(() => {
-                    if (tourIdx >= 0) return;
+                    if (tourIdx >= 0 && !tourWaiting) return;
+                    tourWaiting = false; clearInterval(tourWaitTimer); tourIdx = -1; tourPre = false; saveTourView();
                     setTourFlag('tour_resume', null);
                     tourSteps = buildTourSteps(false);
                     if (resume) tourSteps = tourSteps.filter(x => x.id !== 'welcome');
