@@ -135,6 +135,8 @@
         #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/cover-map.jpg') center / cover no-repeat, #fff !important; }
         #guide-btn { display: none !important; }
         body:has(#upload-btn-label[style*="display: none"]) #lang-toggle { display: none !important; }
+        /* Tur açıkken dil zaten Maviş'in kartında seçiliyor: sağ üstteki dil düğmesi gizli */
+        body:has(#tour[style*="display: block"]) :is(#lang-toggle, #lang-menu) { display: none !important; }
         #sa-probe { position: fixed; left: -9999px; top: 0; width: 1px; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); visibility: hidden; pointer-events: none; }
         #tour .tl { display: flex; gap: 8px; margin-top: 10px; }
         #tour .tl button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 10px; border: 1.5px solid #cfd8e3; background: #fff; font: inherit; font-size: 13.5px; color: #0A3E70; cursor: pointer; }
