@@ -4957,7 +4957,12 @@
                     if (tourLiferLL) {
                         let [x, y] = tourFreeSpot(230); tourFocus(tourLiferLL, 11, x, y);
                         // baloncuk halkası simetrik değil: çizildikten sonra kutusunu boş alanın ortasına kaydır
-                        setTimeout(() => { try { let br = tourBubbleRect(tourLiferLL); if (br) { mapObj.panBy([br.left + br.width / 2 - x, br.top + br.height / 2 - y], { animate: false }); setTimeout(placeTour, 120); } } catch (e) {} }, 450);
+                        setTimeout(() => { try {
+                            let br = tourBubbleRect(tourLiferLL); if (!br) return;
+                            // telefonda: baloncuklar pencerenin hemen altından başlasın (alt kısmı kartın altında kalabilir)
+                            if (innerWidth < 900) { let fb = $t('filter-panels').getBoundingClientRect().bottom; y = fb + 18 + br.height / 2; }
+                            mapObj.panBy([br.left + br.width / 2 - x, br.top + br.height / 2 - y], { animate: false }); setTimeout(placeTour, 120);
+                        } catch (e) {} }, 450);
                     }
                 },
                 leave: () => { document.body.classList.remove('tour-compact'); if (liferMode) toggleLiferMode(); tourLiferLL = null; },
@@ -5042,6 +5047,8 @@
                 <div class="tb">${k >= 0 ? `<span class="tc">${k + 1} / ${main.length}${canBack ? ` · <a href="#" onclick="endTour(true); return false;" style="color:#5B6B7E;">${LT('Geç', 'Skip')}</a>` : ''}</span>` : '<span></span>'}<span class="tbs">${btns}</span></div>`;
             r.style.display = 'block';
             placeTour(); setTimeout(placeTour, 350); setTimeout(placeTour, 900);
+            // pencere içeriği sonradan büyüyebilir (paylaşım kartı vb.): vurguyu kısa aralıklarla güncelle
+            clearInterval(window._tourPlaceTimer); window._tourPlaceTimer = setInterval(() => { if (tourIdx < 0) return clearInterval(window._tourPlaceTimer); placeTour(); }, 600);
         }
         async function goTour(i) {
             let cur = tourSteps[tourIdx];
