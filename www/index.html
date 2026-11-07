@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0A3E70">
     <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" href="img/icon-192.png">
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Bird Atlas">
@@ -1609,16 +1610,27 @@
             let imgCache = loadImgCache();
             // v1.11: önceden yoğunluk yüzünden "fotoğraf yok" kaydedilmiş türleri bir kez yeniden dene
             try { if (!localStorage.getItem('img_empty_retry_v1')) { Object.keys(imgCache).forEach(k => { if (!imgCache[k]) delete imgCache[k]; }); localStorage.setItem('img_empty_retry_v1', '1'); } } catch (e) {}
-            const batchSize = 3;
-            for(let i=0; i<uniqueSci.length; i+=batchSize) {
-                const batch = uniqueSci.slice(i, i+batchSize);
-                await Promise.all(batch.map(async sci => {
-                    if (Object.prototype.hasOwnProperty.call(imgCache, sci)) speciesImages[sci] = imgCache[sci];
-                    else {
-                        let url = await fetchSpeciesImage(sci);
-                        if (url !== null) { imgCache[sci] = url; speciesImages[sci] = url; }
-                    }
-                    loaded++; statusEl.innerText = `Fotoğraflar İndiriliyor (${loaded}/${uniqueSci.length})...`;
+            // v1.12: Wikipedia'ya tek tek değil, 50'şer türlük toplu sorulur (254 tür ≈ 6 istek).
+            // Bulunamayanlar tek tek denenir; yine de çok uzarsa harita açılır, kalanlar arka planda tamamlanır.
+            uniqueSci.forEach(sci => { if (Object.prototype.hasOwnProperty.call(imgCache, sci)) { speciesImages[sci] = imgCache[sci]; loaded++; } });
+            let todoSci = uniqueSci.filter(sci => !Object.prototype.hasOwnProperty.call(speciesImages, sci));
+            let showPhotoStatus = () => { statusEl.innerText = `Fotoğraflar İndiriliyor (${loaded}/${uniqueSci.length})...`; };
+            showPhotoStatus();
+            let single = [];
+            for (let i = 0; i < todoSci.length; i += 50) {
+                let res = await fetchSpeciesImagesBatch(todoSci.slice(i, i + 50));
+                Object.entries(res).forEach(([sci, url]) => {
+                    if (url) { imgCache[sci] = url; speciesImages[sci] = url; loaded++; }
+                    else if (url === undefined) single.push(sci);   // toplu sorguda çıkmadı: tek tek dene
+                });
+                showPhotoStatus();
+            }
+            let deadline = Date.now() + 20000;
+            for (let i = 0; i < single.length && Date.now() < deadline; i += 3) {
+                await Promise.all(single.slice(i, i + 3).map(async sci => {
+                    let url = await fetchSpeciesImage(sci);
+                    if (url !== null) { imgCache[sci] = url; if (url) speciesImages[sci] = url; }
+                    loaded++; showPhotoStatus();
                 }));
             }
             saveImgCache(imgCache);
@@ -2827,6 +2839,24 @@
                 return await res.json();
             } finally { clearTimeout(t); }
         }
+        // Toplu: {sci: url} · undefined = bu sorguda bulunamadı (tek tek denenmeli) · null = ağ hatası
+        async function fetchSpeciesImagesBatch(list) {
+            let out = {}, titles = list.filter(t => !/\b(sp\.|x)\b|\//.test(t));
+            list.forEach(t => { out[t] = undefined; });
+            if (!titles.length) return out;
+            try {
+                let d = await wikiJSON(`action=query&titles=${encodeURIComponent(titles.join('|'))}&redirects=1&prop=pageimages|pageprops&ppprop=disambiguation&pithumbsize=400&pilimit=50`);
+                let q = (d && d.query) || {}, norm = {}, redir = {}, pages = {};
+                (q.normalized || []).forEach(x => { norm[x.from] = x.to; });
+                (q.redirects || []).forEach(x => { redir[x.from] = x.to; });
+                (q.pages || []).forEach(p => { pages[p.title] = p; });
+                titles.forEach(t => {
+                    let n = norm[t] || t, f = redir[n] || n, p = pages[f];
+                    if (p && !p.missing && !(p.pageprops && 'disambiguation' in p.pageprops) && p.thumbnail) out[t] = p.thumbnail.source;
+                });
+            } catch (e) { titles.forEach(t => { out[t] = null; }); }
+            return out;
+        }
         // null = ağ hatası (önbelleğe yazılmaz, sonra tekrar denenir) · '' = fotoğraf yok
         async function fetchSpeciesImage(sci) {
             try {
@@ -3069,6 +3099,11 @@
             let token = ++photoRetryToken, cache = loadImgCache(), changed = false;
             let todo = [...new Set(obsData.map(d => d.sci_name))].filter(sci => !MY_PHOTOS[sci] && !WIKI_IMAGES[sci] && !Object.prototype.hasOwnProperty.call(cache, sci));
             for (let round = 0; round < 2 && todo.length; round++) {
+                for (let i = 0; i < todo.length; i += 50) {
+                    let res = await fetchSpeciesImagesBatch(todo.slice(i, i + 50));
+                    Object.entries(res).forEach(([sci, url]) => { if (url) { cache[sci] = url; WIKI_IMAGES[sci] = url; obsData.forEach(d => { if (d.sci_name === sci) d.img = url; }); liferArray.forEach(l => { if (l.sci_name === sci) l.img = url; }); changed = true; } });
+                }
+                todo = todo.filter(sci => !cache[sci]);
                 let left = [], fails = 0;
                 for (let i = 0; i < todo.length; i++) {
                     let sci = todo[i];
