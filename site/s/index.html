@@ -73,11 +73,28 @@ async function unpack(h) {
   if (pre === 'z') { let s = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(await new Response(s).text()); }
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-function spName(s) { return (L_ === 'en' ? s[2] : s[1]) || s[2] || s[1] || s[0]; }
+function spName(s) { return s.length < 3 ? (s[1] || s[0]) : ((L_ === 'en' ? s[2] : s[1]) || s[2] || s[1] || s[0]); }
+// v2: o = [günFarkı, [[yer, tür | [tür, birey], ...], ...], ...] → v1 biçimine aç
+function flatObs(D) {
+  if (D.v !== 2) return D.o;
+  let out = [], dn = 0;
+  for (let i = 0; i < D.o.length; i += 2) { dn += D.o[i]; (D.o[i + 1] || []).forEach(g => { let pi = g[0]; g.slice(1).forEach(x => out.push(Array.isArray(x) ? [x[0], pi, dn, x[1]] : [x, pi, dn, 0])); }); }
+  return out;
+}
+let LINK_INFO = null;
 function render() {
   let out = document.getElementById('out');
-  if (!DATA) { out.innerHTML = `<div class="err"><b>${T('Bu bağlantı açılamadı.', 'This link could not be opened.')}</b><br>${T('Bağlantı eksik kopyalanmış olabilir; paylaşan kişiden yeniden göndermesini iste.', 'The link may have been copied incompletely; ask the sender to share it again.')}</div>`; return; }
-  let D = DATA, days = new Set(), spAgg = D.s.map(() => ({ n: 0, b: 0, d: new Set(), first: 1e9 })), plAgg = D.p.map(() => ({ sp: new Set(), n: 0 }));
+  if (!DATA) {
+    let I = LINK_INFO || {}, cut = I.want && I.got < I.want;
+    out.innerHTML = `<div class="err"><b>${T('Bu bağlantı açılamadı.', 'This link could not be opened.')}</b><br>${cut
+      ? T(`Bağlantının yalnızca bir kısmı ulaştı (%${Math.round(I.got / I.want * 100)}). Bağlantıyı gönderdiğin ya da açtığın uygulama uzun bağlantıyı kısaltmış olabilir. Paylaşan kişi bağlantıyı "Kopyala" ile kopyalayıp başka bir uygulamadan (ör. e-posta, Telegram) göndermeyi deneyebilir.`, `Only part of the link arrived (${Math.round(I.got / I.want * 100)}%). The app used to send or open it may have shortened the long link. The sender can copy it with "Copy" and try another app (e.g. email, Telegram).`)
+      : T('Bağlantı eksik kopyalanmış olabilir; paylaşan kişiden yeniden göndermesini iste.', 'The link may have been copied incompletely; ask the sender to share it again.')}
+      <div style="font-size:12px; color:#8a97a8; margin-top:6px;">${T('Ulaşan uzunluk', 'Received length')}: ${I.got || 0}${I.want ? ' / ' + I.want : ''}</div></div>`;
+    return;
+  }
+  let D = DATA;
+  if (!D.__flat) { D.o = flatObs(D); D.v = 1; D.__flat = true; }
+  let days = new Set(), spAgg = D.s.map(() => ({ n: 0, b: 0, d: new Set(), first: 1e9 })), plAgg = D.p.map(() => ({ sp: new Set(), n: 0 }));
   D.o.forEach(([si, pi, dn, b]) => { days.add(dn); let a = spAgg[si]; a.n++; a.b += b || 0; a.d.add(dn); a.first = Math.min(a.first, dn); if (pi >= 0) { plAgg[pi].sp.add(si); plAgg[pi].n++; } });
   let dl = [...days].sort((a, b) => a - b), range = dl.length ? (dl.length === 1 ? dateOf(dl[0]) : `${dateOf(dl[0])} – ${dateOf(dl[dl.length - 1])}`) : '';
   let order = D.s.map((s, i) => i).sort((a, b) => D.k === 'lifer' ? spAgg[a].first - spAgg[b].first : (spAgg[b].n - spAgg[a].n || spName(D.s[a]).localeCompare(spName(D.s[b]), L_)));
@@ -108,6 +125,11 @@ function setLang(l) {
 }
 (async () => {
   let h = location.hash.slice(1);
+  try { h = decodeURIComponent(h); } catch (e) {}
+  h = h.replace(/[\s"'<>)\]]+$/g, '').replace(/\s+/g, '');
+  let tl = h.indexOf('~');
+  if (tl > 0 && tl < 8) { LINK_INFO = { want: parseInt(h.slice(0, tl), 36), got: h.length - tl - 1 }; h = h.slice(tl + 1); if (LINK_INFO.got > LINK_INFO.want) { h = h.slice(0, LINK_INFO.want); LINK_INFO.got = LINK_INFO.want; } }
+  else LINK_INFO = { got: h.length };
   try { if (h) DATA = await unpack(h); } catch (e) { DATA = null; }
   let saved = null; try { saved = localStorage.getItem('app_lang'); } catch (e) {}
   setLang(saved || (DATA && DATA.l) || ((navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en'));

@@ -5163,9 +5163,16 @@
             // il düzeyinde: koordinat o ildeki noktaların ortalaması, 0.1° yuvarlanır (≈10 km)
             let rnd = priv === 'province' ? 1 : 3, f = Math.pow(10, rnd);
             let places = pl.map(p => [p.n, p.la.length ? Math.round(p.la.reduce((a, b) => a + b, 0) / p.la.length * f) / f : null, p.lo.length ? Math.round(p.lo.reduce((a, b) => a + b, 0) / p.lo.length * f) / f : null]);
-            let payload = { v: 1, k: lifers ? 'lifer' : st.type, t: title, l: LANG, s: sp, p: places, o, g: (st.sign || '').trim().slice(0, 40) };
-            let url = SHARE_BASE + '#' + await packB64(JSON.stringify(payload));
-            return url;
+            // v2 (daha kısa): tür adı yalnızca paylaşanın dilinde; gözlemler güne göre gruplu, günler farkla yazılır
+            let s2 = sp.map(([sci, tr, en]) => { let n = (LANG === 'en' ? en : tr) || en || tr || ''; return n && n !== sci ? [sci, n] : [sci]; });
+            let byDay = new Map();
+            o.forEach(([si, pi, dn, b]) => { if (!byDay.has(dn)) byDay.set(dn, new Map()); let m = byDay.get(dn); if (!m.has(pi)) m.set(pi, [pi]); m.get(pi).push(b ? [si, b] : si); });
+            let o2 = [], prev = 0;
+            [...byDay.keys()].sort((a, b) => a - b).forEach(dn => { o2.push(dn - prev, [...byDay.get(dn).values()]); prev = dn; });
+            let payload = { v: 2, k: lifers ? 'lifer' : st.type, t: title, l: LANG, s: s2, p: places, o: o2, g: (st.sign || '').trim().slice(0, 40) };
+            let data = await packB64(JSON.stringify(payload));
+            // baştaki "uzunluk~": bağlantı yolda kısaltılırsa açan sayfa bunu anlayıp söyleyebilsin
+            return SHARE_BASE + '#' + data.length.toString(36) + '~' + data;
         }
         window.shareLink = async function() {
             let url = await buildShareLink();
