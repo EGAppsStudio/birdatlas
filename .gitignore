@@ -1,6 +1,8 @@
 # bağımlılıklar ve derleme çıktıları
 node_modules/
 www/lib/
+www/data/ebird-taxonomy.json
+package-lock.json.bak
 dist/
 android/app/build/
 android/.gradle/

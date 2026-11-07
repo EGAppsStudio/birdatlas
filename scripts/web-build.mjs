@@ -24,5 +24,10 @@ cpSync(www, join(dist, 'app'), { recursive: true });
 const ver = (process.env.CF_PAGES_COMMIT_SHA || Date.now().toString(36)).slice(0, 10);
 const sw = join(dist, 'app', 'sw.js');
 writeFileSync(sw, readFileSync(sw, 'utf8').replace('__VERSION__', ver));
+// Veri dosyaları sürüm ekiyle istensin: eski/eksik bir kopya tarayıcıda takılı kalmasın
+const appHtml = join(dist, 'app', 'index.html');
+writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
+  .replace("fetch('data/ebird-taxonomy.json')", `fetch('data/ebird-taxonomy.json?v=${ver}')`)
+  .replace("fetch('data/ornek-veri.csv')", `fetch('data/ornek-veri.csv?v=${ver}')`));
 
 console.log('✓ dist/ hazır (sürüm ' + ver + ')');
