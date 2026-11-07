@@ -138,6 +138,18 @@
         #tour .tl button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 10px; border: 1.5px solid #cfd8e3; background: #fff; font: inherit; font-size: 13.5px; color: #0A3E70; cursor: pointer; }
         #tour .tl button.on { border-color: #1662B6; background: #EAF2FC; font-weight: bold; }
         #tour .tback { padding: 7px 10px; }
+        /* Sekme penceresi telefona tam sığsın (iç satırlar genişliği zorlamasın) */
+        #filter-panels { overflow-x: hidden !important; }
+        #filter-panels > *, #filter-panels .panel-content, #filter-panels .panel-content > * { min-width: 0 !important; max-width: 100%; box-sizing: border-box; }
+        #filter-panels .panel-content button { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        /* Alt sekmeler ve başlık kaydırınca üstte kalsın */
+        #obs-seg, #sheet-head { position: sticky; top: -10px; z-index: 3; }
+        #sheet-head { background: #FDFDFD; padding-top: 2px; }
+        #obs-seg { box-shadow: 0 0 0 6px #FDFDFD; }
+        #obs-seg .sx, #sheet-head .sh-x { flex: 0 0 auto; border: none; background: none; color: #5B6B7E; font-size: 16px; padding: 4px 8px; cursor: pointer; border-radius: 8px; }
+        #sheet-head .sh-x { margin-left: auto; font-size: 18px; }
+        /* ☰ açılan pencerelerin üstünde görünmesin */
+        body:has(:is(.ov, #settings-overlay, #share-overlay, #merge-overlay, #guide-overlay, #photo-viewer)[style*="display: flex"]) #menu-btn { z-index: 50 !important; }
         #tour .twait { display: inline-block; animation: tourpulse 1.4s ease-in-out infinite; }
         @keyframes tourpulse { 50% { opacity: .35; } }
         .upload-card { margin: auto; }
@@ -299,7 +311,7 @@
         <button id="hide-panels-btn" onclick="window.togglePanels()">☰ Panelleri Göster</button>
         <div id="filter-panels" style="display:none;">
         <div id="obs-seg" data-no-i18n></div>
-        <div id="sheet-head" data-no-i18n><span class="sh-t"></span></div>
+        <div id="sheet-head" data-no-i18n><span class="sh-t"></span><button class="sh-x" onclick="closeTabs()" aria-label="Kapat">✕</button></div>
         
         <div class="panel-container">
             <button id="toggle-calendar" class="panel-btn"><span>📅 Takvim</span> <span>▼</span></button>
@@ -514,7 +526,7 @@
             
             <label style="font-weight: bold; font-size: 13px; color: #0A3E70;">eBird API Anahtarı:</label>
             <input type="text" id="input-ebird-api" class="settings-input">
-            <span class="settings-help">Çevreyi keşfet özelliği için gereklidir. Almak için: <a href="https://ebird.org/api/keygen" target="_blank" style="color:#1662B6;">eBird API Keygen</a></span>
+            <span class="settings-help" id="ebird-key-help" data-no-i18n></span>
             
             <div id="ai-settings" data-no-i18n></div>
             
@@ -560,6 +572,7 @@
         if (NativePlugins.App) {
             NativePlugins.App.addListener('backButton', function() {
                 let byId = id => document.getElementById(id);
+                if (typeof tourIdx !== 'undefined' && tourIdx >= 0) return endTour(false);
                 if (byId('guide-overlay').style.display === 'flex') return closeGuide();
                 if (byId('settings-overlay').style.display === 'flex') return closeSettings();
                 if (byId('share-overlay').style.display === 'flex') return closeShare();
@@ -1248,7 +1261,13 @@
         let liferArray = []; 
         let currentLiferCalDate = new Date(); currentLiferCalDate.setDate(1);
 
-        function openSettings() { document.getElementById('input-ebird-api').value = EBIRD_API; renderAISettings(); document.getElementById('settings-overlay').style.display = 'flex'; }
+        function renderEbirdHelp() {
+            let el = document.getElementById('ebird-key-help'); if (!el) return;
+            let a = `<a href="https://ebird.org/api/keygen" target="_blank" style="color:#1662B6;">eBird API Keygen</a>`;
+            el.innerHTML = LT(`Çevreyi Keşfet için gerekir, ücretsizdir. <b>Nasıl alınır:</b> 1) ebird.org'da hesabınla giriş yap (hesabın yoksa ücretsiz aç). 2) ${a} sayfasını aç, kullanım amacını kısaca yaz (ör. "kişisel kullanım") ve şartları onayla. 3) Çıkan kısa kodu kopyalayıp buraya yapıştır, Kaydet'e dokun.`,
+                `Needed for Explore Nearby; it's free. <b>How to get one:</b> 1) Sign in at ebird.org (create a free account if needed). 2) Open ${a}, briefly describe your use (e.g. "personal use") and accept the terms. 3) Copy the short code shown, paste it here and tap Save.`);
+        }
+        function openSettings() { document.getElementById('input-ebird-api').value = EBIRD_API; renderAISettings(); renderEbirdHelp(); document.getElementById('settings-overlay').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settings-overlay').style.display = 'none'; }
         function saveSettings() { EBIRD_API = document.getElementById('input-ebird-api').value.trim(); localStorage.setItem('user_ebird_api', EBIRD_API); saveAISettings(); closeSettings(); updateAIGreeting(); alert("API Şifreleri başarıyla kaydedildi!"); }
 
@@ -1586,7 +1605,7 @@
             let imgCache = loadImgCache();
             // v1.11: önceden yoğunluk yüzünden "fotoğraf yok" kaydedilmiş türleri bir kez yeniden dene
             try { if (!localStorage.getItem('img_empty_retry_v1')) { Object.keys(imgCache).forEach(k => { if (!imgCache[k]) delete imgCache[k]; }); localStorage.setItem('img_empty_retry_v1', '1'); } } catch (e) {}
-            const batchSize = 5;
+            const batchSize = 3;
             for(let i=0; i<uniqueSci.length; i+=batchSize) {
                 const batch = uniqueSci.slice(i, i+batchSize);
                 await Promise.all(batch.map(async sci => {
@@ -2798,7 +2817,7 @@
         async function wikiJSON(params) {
             let ctrl = new AbortController(); let t = setTimeout(() => ctrl.abort(), 9000);
             try {
-                let res = await fetch('https://en.wikipedia.org/w/api.php?format=json&formatversion=2&origin=*&' + params, { signal: ctrl.signal });
+                let res = await fetch('https://en.wikipedia.org/w/api.php?format=json&formatversion=2&origin=*&' + params, { signal: ctrl.signal, headers: { 'Api-User-Agent': 'BirdAtlas/' + APP_VERSION + ' (https://birdatlas.app; egapps.support@gmail.com)' } });
                 if (res.status === 404) return null;
                 if (!res.ok) throw new Error('wiki ' + res.status);   // 429/5xx: geçici → önbelleğe yazılmaz, sonra tekrar denenir
                 return await res.json();
@@ -3046,19 +3065,21 @@
             let token = ++photoRetryToken, cache = loadImgCache(), changed = false;
             let todo = [...new Set(obsData.map(d => d.sci_name))].filter(sci => !MY_PHOTOS[sci] && !WIKI_IMAGES[sci] && !Object.prototype.hasOwnProperty.call(cache, sci));
             for (let round = 0; round < 2 && todo.length; round++) {
-                let left = [];
-                for (let sci of todo) {
+                let left = [], fails = 0;
+                for (let i = 0; i < todo.length; i++) {
+                    let sci = todo[i];
                     if (token !== photoRetryToken) return;
+                    if (fails >= 6) { left.push(...todo.slice(i)); break; }   // art arda başarısız: internet yok ya da çok yoğun, sonra
                     let url = await fetchSpeciesImage(sci);
-                    if (url === null) left.push(sci);
-                    else {
+                    if (url === null) { left.push(sci); fails++; } else fails = 0;
+                    if (url !== null) {
                         cache[sci] = url;
                         if (url) { WIKI_IMAGES[sci] = url; obsData.forEach(d => { if (d.sci_name === sci) d.img = url; }); liferArray.forEach(l => { if (l.sci_name === sci) l.img = url; }); changed = true; }
                     }
                     await new Promise(r => setTimeout(r, 1200));
                 }
                 saveImgCache(cache); todo = left;
-                if (todo.length) await new Promise(r => setTimeout(r, 20000));
+                if (todo.length) await new Promise(r => setTimeout(r, fails >= 6 ? 90000 : 20000));
             }
             if (!changed || token !== photoRetryToken) return;
             let apply = () => { if (tourIdx >= 0) return setTimeout(apply, 3000); renderAll(); };
@@ -4657,7 +4678,7 @@
             bar.innerHTML = NAV_TABS().map(([k, ic, n]) => `<button class="tb${navTab === k ? ' on' : ''}" data-tab="${k}" onclick="openTab('${k}')"><b>${ic}</b><span>${n}</span></button>`).join('');
             let seg = document.getElementById('obs-seg');
             if (seg) seg.innerHTML = [['calendar', LT('📅 Takvim', '📅 Calendar')], ['locations', LT('📍 Konumlar', '📍 Places')], ['species', LT('🐦 Türler', '🐦 Species')]]
-                .map(([k, n]) => `<button class="${obsSub === k ? 'on' : ''}" onclick="setObsSub('${k}')">${n}</button>`).join('');
+                .map(([k, n]) => `<button class="${obsSub === k ? 'on' : ''}" onclick="setObsSub('${k}')">${n}</button>`).join('') + `<button class="sx" onclick="closeTabs()" aria-label="${LT('Kapat', 'Close')}">✕</button>`;
             let head = document.getElementById('sheet-head');
             if (head) {
                 let t = { obs: '', lifer: LT('🏆 Kertikler', '🏆 Lifers'), explore: LT('🌍 Çevreyi Keşfet', '🌍 Explore nearby'), data: LT('🗄️ Verilerim', '🗄️ My data'), feedback: LT('💬 Geri bildirim', '💬 Feedback') }[navTab] || '';
@@ -4701,6 +4722,11 @@
             renderNav(); updateFilterBar(); updateExploreDock();
         };
         window.setObsSub = function(k) { obsSub = k; if (navTab === 'obs') showSheet('obs'); renderNav(); };
+        // Verilerim / Geri bildirim açıkken haritaya dokununca kapansın (haritadan nokta seçerken değil)
+        (function bindSheetOutside() {
+            if (!mapObj || !mapObj.on) return setTimeout(bindSheetOutside, 500);
+            mapObj.on('click', () => { if ((navTab === 'feedback' || navTab === 'data') && !pickingMode && !(typeof tourIdx !== 'undefined' && tourIdx >= 0)) closeTabs(); });
+        })();
         // Eski "Panelleri Göster" çağrıları (geri tuşu vb.) yeni sekmelere yönlensin
         window.togglePanels = function() { if (navTab) closeTabs(); else openTab('obs'); };
 
@@ -4803,10 +4829,23 @@
                 },
                 title: LT('Gözlemlerim → Takvim', 'My sightings → Calendar'),
                 text: LT('Renkli günler gözlem yaptığın günler. Bir güne dokun: harita o güne süzülür, altta o gün hangi yerde hangi türleri gördüğün çıkar. Ben senin için son gününü seçtim. En altta yıllık grafik var.', "Colored days are days you went birding. Tap a day: the map filters to it and below you'll see which species you saw where. I picked your latest day. The year chart is at the bottom.") });
+            s.push({ id: 'locations', target: () => $t('filter-panels'),
+                enter: () => { ensureTab('obs'); setObsSub('locations'); },
+                title: LT('Gözlemlerim → Konumlar', 'My sightings → Places'),
+                text: LT('Gittiğin yerler, en çok tür gördüğün yer en üstte. Bir konuma dokununca harita oraya gider. Altındaki "📅 gün · 🐦 tür" yazısı orada gün gün neler gördüğünü açar. Üstteki düğmelerle sırala, il bazında grupla.', 'The places you visited, the one with the most species first. Tap a place to fly the map there. The "📅 days · 🐦 species" line under it opens what you saw there day by day. Sort with the buttons on top, or group by province.') });
             s.push({ id: 'species', target: () => $t('filter-panels'),
                 enter: () => { ensureTab('obs'); setObsSub('species'); },
-                title: LT('Konumlar ve Türler', 'Places and Species'),
-                text: LT('Üstteki küçük sekmelerle Konumlar ve Türler listesine geç. Bir türe dokununca harita yalnız onu gösterir. Fotoğrafa dokun: büyür ve istersen kendi fotoğrafını koyarsın.', 'Switch to Places or Species with the small tabs on top. Tap a species to show only it on the map. Tap its photo to enlarge it and use your own picture.') });
+                title: LT('Gözlemlerim → Türler', 'My sightings → Species'),
+                text: LT('Gördüğün bütün türler. Bir türe dokununca harita yalnız onu gösterir; "📍 konum · 📅 gün" yazısı nerede ve ne zaman gördüğünü açar. Aramayı Türkçe, İngilizce ya da Latince yapabilirsin.', 'Every species you saw. Tap one to show only it on the map; the "📍 places · 📅 days" line shows where and when. Search in Turkish, English or Latin.') });
+            s.push({ id: 'myphoto', target: () => document.querySelector('#photo-viewer .pv-card'),
+                enter: () => {
+                    ensureTab('obs'); setObsSub('species');
+                    let sci = (obsData.find(d => d.img) || obsData[0] || {}).sci_name;
+                    if (sci) openPhotoViewer(sci);
+                },
+                leave: () => closePhotoViewer(),
+                title: LT('Kendi fotoğrafın', 'Your own photo'),
+                text: LT('Listede bir türün fotoğrafına dokununca böyle büyür. "✏️ Kendi fotoğrafını koy" ile galeriden kendi çektiğin fotoğrafı seç: listede, haritada ve paylaşım kartlarında artık seninki görünür. Fotoğraf yalnızca bu cihazda kalır.', 'Tap a species photo in the list to enlarge it like this. "✏️ Use your own photo" lets you pick your own shot from the gallery; it then appears in lists, on the map and on share cards. The photo stays on this device.') });
             s.push({ id: 'chips', target: () => $t('filter-bar'),
                 enter: () => { let first = document.querySelector('#species-list .species-item'); if (first) first.click(); closeTabs(); },
                 leave: () => { clearFilter('all'); },
@@ -4815,7 +4854,12 @@
             s.push({ id: 'lifer', target: () => $t('filter-panels'), enter: () => ensureTab('lifer'),
                 title: LT('Kertikler', 'Lifers'),
                 text: LT('Kertik, bir türü ilk kez gördüğün an. "Kertik Haritasını Aç" ile hepsini fotoğraflı haritada gör; takvimde yeşil günler kertik günlerin.', 'A lifer is the first time you saw a species. "Open Lifer Map" shows them all with photos; green days in the calendar are lifer days.') });
-            s.push({ id: 'explore', target: () => $t('filter-panels'), enter: () => { ensureTab('explore'); demoExplore(); },
+            s.push({ id: 'lifermap', target: () => $t('filter-bar'), place: 'bottom',
+                enter: () => { setExplore(false); closeTabs(); if (!liferMode) toggleLiferMode(); },
+                leave: () => { if (liferMode) toggleLiferMode(); },
+                title: LT('Kertik haritası', 'Lifer map'),
+                text: LT('Her tür, ilk gördüğün yerde fotoğrafıyla duruyor. Uzaktan bakınca sayı baloncukları çıkar; dokununca yakınlaşır. Bir fotoğrafa dokun: türü, tarihi ve "Kertiği paylaş" çıkar. Kapatmak için üstteki "Kertik haritası ✕".', 'Each species sits where you first saw it, with its photo. Zoomed out you see number bubbles; tap to zoom in. Tap a photo for the species, date and "Share lifer". Close it with "Lifer map ✕" on top.') });
+            s.push({ id: 'explore', target: () => $t('filter-panels'), enter: () => { if (liferMode) toggleLiferMode(); ensureTab('explore'); demoExplore(); },
                 title: LT('Çevreyi keşfet', 'Explore nearby'),
                 text: LT('Keşfet sekmesinde arama çapını seç, sonra haritada bir noktaya dokun: o çaptaki son 30 günün eBird kayıtları listelenir. Bu liste tur için uyduruldu.', 'In the Explore tab pick a radius, then tap a point on the map: eBird sightings from the last 30 days within it are listed. This list is made up for the tour.') });
             s.push({ id: 'explore2', target: () => $t('explore-dock'), enter: () => { if (!exploreMode || !exploreData.length) { ensureTab('explore'); demoExplore(); } exploreDockDismissed = false; closeTabs(); try { mapObj.setView([lastExploreLat, lastExploreLng], 10); } catch (e) {} },
@@ -4857,7 +4901,7 @@
                 dim.style.display = 'none';
                 let tw = Math.min(360, innerWidth - 24), th = tip.offsetHeight || 180;
                 let below = top + h + 12, above = top - th - 12;
-                let ty = below + th < H - 12 ? below : above > 8 + T0 ? above : Math.max(8 + T0, H - th - 16);
+                let ty = st.place === 'bottom' ? Math.max(8 + T0, H - th - 16) : below + th < H - 12 ? below : above > 8 + T0 ? above : Math.max(8 + T0, H - th - 16);
                 Object.assign(tip.style, { width: tw + 'px', top: ty + 'px', left: Math.max(12, Math.min(innerWidth - tw - 12, left + w / 2 - tw / 2)) + 'px' });
             } else {
                 spot.style.display = 'none'; dim.style.display = 'block';
