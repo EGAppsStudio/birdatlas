@@ -721,6 +721,7 @@
                     `Kartın altına küçük bir Instagram imzası (@birdatlas.app) eklenir; istemezsen kutuyu kaldır.`,
                     `Kart telefonunda üretilir; sen paylaşmadıkça hiçbir yere gitmez.`]],
                 [`🐦 Maviş (asistan)`, [
+                    `Maviş, uygulamanın maskotu: bir <b>Mavi Baştankara</b> (logodaki kuş). Adını tepesindeki ve kanatlarındaki maviden alıyor.`,
                     `Sağ alttaki <b>Maviş'e Sor</b> düğmesi. Dürbünlü maskotumuz Maviş anahtarsız da çalışır; soruları doğrudan cihazındaki verinden hesaplar.`,
                     `Örnek: "Kızılgerdanı nerede gördüm", "2025'te Mogan'da neler gördüm", "geçen hafta", "en büyük sürüm", "kaç flamingo saydım", "son kertiklerim".`,
                     `Daha serbest sohbet için ücretsiz bir Gemini anahtarı girebilirsin (bkz. API anahtarları).`]],
@@ -782,6 +783,7 @@
                     `A small Instagram tag (@birdatlas.app) is added at the bottom; untick it if you prefer.`,
                     `The card is made on your phone and goes nowhere unless you share it.`]],
                 [`🐦 Maviş (assistant)`, [
+                    `Maviş (say "mah-VEESH") is our mascot, a <b>Eurasian Blue Tit</b> (the bird in our logo). The name is a cute Turkish nickname meaning roughly "little blue one".`,
                     `The <b>Ask Maviş</b> button at the bottom right. Maviş works without any key, computing answers from data on your device.`,
                     `Try: "Where did I see European Robin", "what did I see at Mogan in 2025", "last week", "largest flock", "how many flamingos did I count", "latest lifers".`,
                     `For free-form chat you can add a free Gemini key (see API keys).`]],
@@ -3026,12 +3028,16 @@
             } catch (e) {}
             chatHistory = [];
         }
+        function todayStr(l) {
+            let d = new Date(), iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            return `${d.getDate()} ${(l === 'en' ? MONTHS.enNice : MONTHS.trNice)[d.getMonth()]} ${d.getFullYear()} (${iso})`;
+        }
         function aiSystemPrompt() {
             let ctx = getBirdingContext();
             if (ctx.length > 120000) ctx = ctx.slice(0, 120000) + ' …';
             return LT(
-                `Sen Maviş'sin: dürbünlü, neşeli ve meraklı bir Mavi Baştankara olan kuş gözlem asistanısın. Kullanıcının aşağıdaki kendi gözlem verisine dayanarak samimi, kısa ve doğru cevap ver; veride olmayan şeyi uydurma. Arada bir kuş esprisi yapabilirsin.\nKESİN KURAL: Yalnızca Türkçe yaz; tür adlarını Türkçe adlarıyla ver. İngilizce cümle kurma.\nCevabın sonuna '|||' ekle, ardından kullanıcının sorabileceği 3 kısa TÜRKÇE soruyu '|' ile ayırarak yaz.\n\n${ctx}`,
-                `You are Maviş, a cheerful, curious Blue Tit with binoculars and a birding assistant. Answer warmly, briefly and accurately based on the user's own sighting data below; never invent anything that is not in the data. An occasional bird pun is welcome.\nSTRICT RULE: Write only in English and use English species names. Do not write any Turkish.\nEnd your answer with '|||' followed by 3 short questions IN ENGLISH the user could ask next, separated by '|'.\n\n${ctx}`);
+                `Sen Maviş'sin: dürbünlü, neşeli ve meraklı bir Mavi Baştankara olan kuş gözlem asistanısın. Kullanıcının aşağıdaki kendi gözlem verisine dayanarak samimi, kısa ve doğru cevap ver; veride olmayan şeyi uydurma.\nŞAKA: Şaka zorunlu değil. Yapacaksan kısa, anlamı açık ve konuyla ilgili olsun (ör. tatlı bir kuş benzetmesi ya da veriden hafif bir gözlem). Kelime oyunu, çeviriden gelen espri ve "… bilir misin? Çünkü …" tarzı bilmece şakaları YAPMA.\nBugünün tarihi: ${todayStr('tr')}. "Bugün", "geçen yıl bugün", "dün", "bu ay" gibi ifadeleri bu tarihe göre hesapla.\nKESİN KURAL: Yalnızca Türkçe yaz; tür adlarını Türkçe adlarıyla ver. İngilizce cümle kurma.\nCevabın sonuna '|||' ekle, ardından kullanıcının sorabileceği 3 kısa TÜRKÇE soruyu '|' ile ayırarak yaz.\n\n${ctx}`,
+                `You are Maviş, a cheerful, curious Blue Tit with binoculars and a birding assistant. Answer warmly, briefly and accurately based on the user's own sighting data below; never invent anything that is not in the data.\nHUMOR: Jokes are optional. If you add one, keep it short, clear and relevant (e.g. a gentle bird comparison or a light observation about the data). No puns, no riddle jokes like "Why do …? Because …".\nToday's date is ${todayStr('en')}. Work out "today", "this day last year", "yesterday", "this month" from this date.\nSTRICT RULE: Write only in English and use English species names. Do not write any Turkish.\nEnd your answer with '|||' followed by 3 short questions IN ENGLISH the user could ask next, separated by '|'.\n\n${ctx}`);
         }
         async function postJSON(url, headers, body) {
             let H = NativePlugins.CapacitorHttp;
