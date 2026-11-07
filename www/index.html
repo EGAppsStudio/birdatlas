@@ -217,6 +217,55 @@
         body:has(#photo-viewer[style*="display: flex"]) :is(#animated-logo, #lang-toggle, #guide-btn, #lang-menu) { z-index: 50 !important; }
         .sp-photo { cursor: zoom-in; }
         body.no-birds #sort-birds { display: none !important; }
+        /* ===== v1.12 yeni düzen ===== */
+        #tabbar, #menu-btn { display: none; }
+        body:has(#animated-logo.on-map) #tabbar { display: flex; }
+        body:has(#animated-logo.on-map) #menu-btn { display: grid; }
+        body:has(#animated-logo.on-map) :is(#lang-toggle, #guide-btn, #hide-panels-btn) { display: none !important; }
+        body:has(#upload-overlay[style*="display: flex"]) :is(#tabbar, #menu-btn, #main-menu) { display: none !important; }
+        #tabbar { position: fixed; z-index: 1002; top: calc(12px + env(safe-area-inset-top)); left: calc(10px + env(safe-area-inset-left)); right: calc(92px + env(safe-area-inset-right)); max-width: 460px;
+            gap: 4px; padding: 4px; background: rgba(255,255,255,0.97); border: 1.5px solid #1662B6; border-radius: 14px; box-shadow: 0 3px 10px rgba(10,62,112,0.15); box-sizing: border-box; }
+        #tabbar .tb { flex: 1 1 0; min-width: 0; border: none; background: none; border-radius: 10px; padding: 3px 2px 2px; cursor: pointer; color: #0A3E70; font: inherit; font-size: 10.5px; font-weight: bold; line-height: 1.2; }
+        #tabbar .tb b { display: block; font-size: 17px; font-weight: normal; line-height: 1.25; }
+        #tabbar .tb span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #tabbar .tb.on { background: #1662B6; color: #fff; }
+        #menu-btn { position: fixed; z-index: 999998; top: calc(88px + env(safe-area-inset-top)); right: calc(25px + env(safe-area-inset-right)); width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #1662B6;
+            border: 2px solid #1662B6; font-size: 22px; line-height: 1; place-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 0; }
+        #menu-btn.on { background: #1662B6; color: #fff; }
+        #main-menu { display: none; position: fixed; z-index: 999999; top: calc(138px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); width: 250px; max-width: calc(100vw - 24px);
+            max-height: calc(100vh - 160px); overflow-y: auto; background: #fff; border: 1.5px solid #1662B6; border-radius: 16px; box-shadow: 0 10px 26px rgba(10,62,112,0.25); padding: 6px; box-sizing: border-box; }
+        #main-menu button, #main-menu a { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; border: none; background: none; border-radius: 10px; font: inherit; font-size: 14px; color: #0A3E70; text-decoration: none; cursor: pointer; text-align: left; box-sizing: border-box; }
+        #main-menu button:hover, #main-menu a:hover { background: #F0F5FB; }
+        #main-menu .mx { margin-left: auto; font-size: 11px; color: #5B6B7E; white-space: nowrap; }
+        #main-menu .mh { height: 1px; background: #E6ECF3; margin: 4px 6px; }
+        #panels-wrapper { position: fixed !important; top: calc(76px + env(safe-area-inset-top)); left: calc(10px + env(safe-area-inset-left)); right: calc(10px + env(safe-area-inset-right)); z-index: 1001; }
+        #filter-panels { width: 100% !important; max-width: 420px; grid-template-columns: 1fr !important; gap: 0 !important; background: #FDFDFD; border: 1.5px solid #1662B6; border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(10,62,112,0.18); padding: 10px 12px 12px; box-sizing: border-box; max-height: calc(100vh - 170px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important; }
+        #filter-panels .panel-btn { display: none !important; }
+        #filter-panels .panel-content { border: none; box-shadow: none; margin: 0; padding: 4px 0 0; max-height: none; background: transparent; }
+        #filter-panels .panels-last { margin-bottom: 0; }
+        #filter-panels #update-data-btn { display: flex !important; margin-top: 12px; }
+        #obs-seg { display: flex; gap: 3px; background: #EEF3FA; border-radius: 10px; padding: 3px; margin: 0 60px 8px 0; }
+        #obs-seg button { flex: 1; border: none; background: none; border-radius: 8px; padding: 6px 2px; font: inherit; font-size: 12px; font-weight: bold; color: #0A3E70; cursor: pointer; white-space: nowrap; }
+        #obs-seg button.on { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+        #sheet-head { display: none; align-items: center; margin: 0 60px 6px 0; font-weight: bold; color: #0A3E70; font-size: 15px; min-height: 30px; }
+        @media (min-width: 700px) { #obs-seg, #sheet-head { margin-right: 0; } #panels-wrapper { right: auto; width: 420px; } }
+        #filter-bar { top: calc(74px + env(safe-area-inset-top)) !important; }
+        #explore-dock { top: calc(74px + env(safe-area-inset-top)) !important; }
+        /* İlk açılış turu */
+        #tour { display: none; position: fixed; inset: 0; z-index: 1000005; }
+        #tour .tour-dim { position: absolute; inset: 0; background: rgba(8,22,44,0.62); }
+        #tour .tour-spot { position: absolute; border-radius: 14px; box-shadow: 0 0 0 3px #E9C440, 0 0 0 9999px rgba(8,22,44,0.62); pointer-events: none; transition: all .25s ease; }
+        #tour .tour-tip { position: absolute; background: #fff; border-radius: 16px; padding: 14px 16px 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: #0A3E70; font-size: 14px; line-height: 1.5; box-sizing: border-box; }
+        #tour .tt { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        #tour .tm { width: 34px; height: 34px; flex: none; display: inline-block; }
+        #tour .tx { color: #2B3B52; }
+        #tour .tb { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 12px; }
+        #tour .tbs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+        #tour .tc { font-size: 12px; color: #5B6B7E; white-space: nowrap; }
+        #tour .tp { background: #1662B6; color: #fff; border: none; border-radius: 999px; padding: 8px 16px; font: inherit; font-weight: bold; font-size: 13.5px; cursor: pointer; }
+        #tour .tg { background: none; color: #5B6B7E; border: 1px solid #cfd8e3; border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+        @media (prefers-reduced-motion: reduce) { #tour .tour-spot { transition: none; } }
     </style>
 </head>
 <body>
@@ -233,10 +282,15 @@
         </div>
     </div>
     <button id="lang-toggle" data-no-i18n onclick="toggleLangMenu(event)">TR ▾</button>
+    <nav id="tabbar" data-no-i18n aria-label="Sekmeler"></nav>
+    <button id="menu-btn" data-no-i18n onclick="toggleMainMenu(event)" aria-label="Menü">☰</button>
+    <div id="main-menu" data-no-i18n></div>
 
     <div id="panels-wrapper" style="display:none;">
         <button id="hide-panels-btn" onclick="window.togglePanels()">☰ Panelleri Göster</button>
         <div id="filter-panels" style="display:none;">
+        <div id="obs-seg" data-no-i18n></div>
+        <div id="sheet-head" data-no-i18n><span class="sh-t"></span></div>
         
         <div class="panel-container">
             <button id="toggle-calendar" class="panel-btn"><span>📅 Takvim</span> <span>▼</span></button>
@@ -273,7 +327,7 @@
                 <div class="sort-row">
                     <button id="sort-date" style="flex:1; padding: 5px; cursor:pointer; font-size:11px; border-radius:4px; border:1px solid #1662B6; background:#1662B6; color:white; font-weight:bold;">Tarih ↓</button>
                     <button id="sort-desc" style="flex:1; padding: 5px; cursor:pointer; font-size:11px; border-radius:4px; border:1px solid #ccc; background:#fff; color:#282629;">Sayı ↓</button>
-                    <button id="sort-loc" style="flex:1; padding: 5px; cursor:pointer; font-size:11px; border-radius:4px; border:1px solid #ccc; background:#fff; color:#282629;">Konum ↓</button>
+                    <button id="sort-loc" style="flex:1; padding: 5px; cursor:pointer; font-size:11px; border-radius:4px; border:1px solid #ccc; background:#fff; color:#282629;">Yer ↓</button>
                     <button id="sort-birds" style="flex:1; padding: 5px; cursor:pointer; font-size:11px; border-radius:4px; border:1px solid #ccc; background:#fff; color:#282629;">Birey ↓</button>
                     <button id="sort-alpha" style="flex:1; padding: 5px; cursor:pointer; font-size:11px; border-radius:4px; border:1px solid #ccc; background:#fff; color:#282629;">A→Z</button>
                 </div>
@@ -507,9 +561,9 @@
                 if (pickingMode) return toggleMapPicking();
                 if (expandedLocation) return window.collapseLocation();
                 if (liferMode) return window.toggleLiferMode();
-                let openPanel = [...document.querySelectorAll('.panel-content')].find(p => p.style.display === 'block');
-                if (openPanel) return openPanel.previousElementSibling.click();
-                if (byId('filter-panels').style.display === 'grid') return window.togglePanels();
+                if (typeof tourIdx !== 'undefined' && tourIdx >= 0) return endTour(false);
+                if (byId('main-menu').style.display === 'block') return closeMainMenu();
+                if (byId('filter-panels').style.display === 'grid') return closeTabs();
                 if (byId('upload-overlay').style.display !== 'none' && byId('skip-upload-btn').innerText.startsWith('İptal')) return skipUpload();
                 NativePlugins.App.exitApp();
             });
@@ -567,7 +621,7 @@
             "Pzt": "Mon", "Sal": "Tue", "Çar": "Wed", "Per": "Thu", "Cum": "Fri", "Cmt": "Sat", "Paz": "Sun",
             "< Önceki": "< Prev", "Sonraki >": "Next >", "📅 Tarihler": "📅 Dates",
             "🧪 Örnek veriyle dene": "🧪 Try with sample data", "Birey 🔽": "Birds 🔽", "Tarih ↓": "Date ↓", "Sayı ↓": "Count ↓", "Konum ↓": "Places ↓", "Birey ↓": "Birds ↓", "Adet (boş bırakırsan X):": "Count (leave empty for X):", "Örn: 12": "e.g. 12",
-            "📷 Instagram'da takip et": "📷 Follow us on Instagram", "Birey sayısı": "Bird counts",
+            "📷 Instagram'da takip et": "📷 Follow us on Instagram", "Birey sayısı": "Bird counts", "Yer ↓": "Places ↓",
             "Tür": "Species", "Konum": "Location", "Kaynak": "Source", "İşlemler": "Actions", "Düzenle": "Edit", "Sil": "Delete", "Manuel": "Manual", "Kayıt yok.": "No records.",
             "eBird'e bağlanılıyor... ⏳": "Connecting to eBird... ⏳", "Hata: Ağa bağlanılamadı.": "Error: Could not connect.",
             "Son 30 günde kayıt bulunamadı.": "No records in the last 30 days.", "Son 30 Gün": "Last 30 Days", "Bulunan Tür:": "Species Found:",
@@ -656,7 +710,7 @@
             if (c === 'ar') return W('0 0 30 20', '<rect width="30" height="20" fill="#006C35"/><rect x="8" y="12" width="14" height="1.4" rx=".7" fill="#fff"/><rect x="9" y="6.5" width="12" height="3" rx="1" fill="#fff" opacity=".85"/>');
             return '';
         }
-        function updateLangBtn() { let b = document.getElementById('lang-toggle'); if (b) b.innerHTML = LANG === 'en' ? flagSvg('en') + ' EN ▾' : flagSvg('tr') + ' TR ▾'; }
+        function updateLangBtn() { let b = document.getElementById('lang-toggle'); if (b) b.innerHTML = LANG === 'en' ? flagSvg('en') + ' EN ▾' : flagSvg('tr') + ' TR ▾'; if (window.renderNav) { renderNav(); closeMainMenu(); } }
         window.setLang = function(l) {
             LANG = l; try { localStorage.setItem('app_lang', l); } catch (e) {}
             document.documentElement.lang = l;
@@ -682,7 +736,7 @@
             tr: { title: '📖 Kullanım Kılavuzu', sections: [
                 [`🐦 Kuş Atlası nedir?`, [
                     `Kuş gözlemcileri gördükleri kuşları <b>eBird</b>'e (Cornell Üniversitesi'nin ücretsiz kuş gözlem kayıt sistemi) kaydeder. Kuş Atlası bu kayıtları senin <b>kişisel haritana</b> çevirir: nerede, ne zaman, hangi türleri gördüğün; ilk kez gördüğün türler (kertikler), takvimler, grafikler ve paylaşım kartları.`,
-                    `eBird hesabın yok mu? Açılış ekranındaki <b>🧪 Örnek veriyle dene</b> ile uygulamayı kurgusal bir gözlemcinin verisiyle gezebilirsin. Kendi gözlemlerini <b>Veri Yönetimi</b>'nden elle de ekleyebilirsin.`,
+                    `eBird hesabın yok mu? Açılış ekranındaki <b>🧪 Örnek veriyle dene</b> ile uygulamayı kurgusal bir gözlemcinin verisiyle gezebilirsin. Kendi gözlemlerini <b>☰ → Verilerim</b>'den elle de ekleyebilirsin.`,
                     `Verilerin yalnızca bu telefonda kalır; uygulamanın bir sunucusu yoktur.`]],
                 [`🚀 Başlarken`, [
                     `Açılış ekranındaki <b>"eBird'den Veri İndir"</b> düğmesiyle eBird'den veri talebi oluştur.`,
@@ -695,26 +749,29 @@
                     `Daireye dokun: o konumda gördüğün türler, fotoğrafları, gözlem sayıları ve <b>📅 Burada</b> satırında hangi tarihlerde gördüğün açılır.`,
                     `<b>🌍📅 Tüm gözlemlerim</b>: o türü gördüğün bütün konumlar ve tarihler (filtrelerden bağımsız). <b>Konuma göre / Tarihe göre</b> sıralayabilirsin; bulunduğun konum ★ ile en üsttedir.`,
                     `<b>🔍 Tam Konumları Göster</b> aynı adlı konumdaki farklı gözlem noktalarını ayrı ayrı gösterir.`,
-                    `Paneller kapalıyken açık filtreler (gün, tür, konum, il, kertik haritası) haritanın üstünde etiket olarak görünür. Etiketin ✕'i o filtreyi, <b>Tümünü temizle</b> hepsini kapatır.`]],
-                [`🎛️ Paneller (yukarıdan aşağıya)`, [
-                    `Sol üstteki <b>☰ Panelleri Göster</b> ile panelleri aç/kapat. Altı çizili (kesikli) yazılara dokununca küçük bir liste açılır.`,
+                    `Sekmeler kapalıyken açık filtreler (gün, tür, konum, il, kertik haritası) haritanın üstünde etiket olarak görünür. Etiketin ✕'i o filtreyi, <b>Tümünü temizle</b> hepsini kapatır.`]],
+                [`🧭 Sekmeler ve menü`, [
+                    `Üstte dört sekme var: <b>🗺️ Gözlemlerim</b>, <b>🏆 Kertikler</b>, <b>🌍 Keşfet</b>, <b>📤 Paylaş</b>. Açık sekmeye tekrar dokununca kapanır, harita tam ekran olur.`,
+                    `Sağ üstteki <b>☰</b> menüde: kılavuz, turu yeniden başlat, dil, <b>Verilerim</b> (yükleme ekranı, elle kayıt, veri tablosu), <b>Ayarlar</b> (API anahtarları), geri bildirim, değerlendirme, Instagram ve gizlilik.`,
+                    `Altı çizili (kesikli) yazılara dokununca küçük bir liste açılır.`]],
+                [`🗺️ Gözlemlerim`, [
+                    `Üstteki küçük sekmelerle <b>📅 Takvim</b>, <b>📍 Konumlar</b> ve <b>🐦 Türler</b> arasında geç.`,
                     `<b>📅 Takvim:</b> bir güne dokun; o gün hangi konumda hangi türleri gördüğün altta listelenir ve harita o güne göre süzülür. Birden fazla gün seçebilirsin. <b>📤 Bu günü / Bu ayı paylaş</b> ile kart hazırla.`,
-                    `<b>📊 Yıllık görünüm</b> (takvimin altında): ölçü olarak tür, gözlem, gün ya da birey; aylık ya da haftalık; <b>Yılları karşılaştır</b>. Çubuğa dokununca o ayın/haftanın özeti açılır. Haritada bir konum ya da tür seçiliyse grafik ona göre çizilir.`,
+                    `<b>📊 Yıllık görünüm</b> (takvimin altında): ölçü olarak tür, gözlem, gün ya da birey; aylık ya da haftalık; <b>Yılları karşılaştır</b>. Çubuğa dokununca o ayın/haftanın özeti açılır.`,
                     `<b>📍 Konumlar:</b> tür, gözlem, ada veya nadirliğe göre sırala; il bazında gruplayabilirsin. Konumun altındaki <b>📅 gün · 🐦 tür</b> yazısı gün gün neler gördüğünü açar. Yazımı biraz farklı aynı yerler otomatik birleşir; emin olunamayanlar <b>🔗 Benzer konumlar</b> olarak sorulur.`,
-                    `<b>🐦 Kuş Türleri:</b> bir türe dokununca harita yalnızca o türü gösterir. Türün altındaki <b>📍 konum · 📅 gün</b> yazısı nerede ve ne zaman gördüğünü açar. Fotoğrafa dokununca büyür (bkz. Kendi fotoğrafların).`,
-                    `<b>Birey sayısı:</b> eBird'de saydığın kuş adedi (100 leylek = 100 birey). <b>Gözlem</b> ise kayıt sayısıdır. Birey sayılarını görmek için Kuş Türleri ya da Konumlar panelinde <b>Birey sayısı</b> kutusunu işaretle; "Birey ↓" sıralaması da o zaman çıkar. Sayı yerine "X" girilen kayıtlar bireye eklenmez.`,
-                    `<b>🏆 Kertikler</b>, <b>🗄️ Veri Yönetimi</b>, <b>🌍 Çevreyi Keşfet</b>, <b>⚙️ API Ayarları</b> ve <b>💬 Geri Bildirim</b> aşağıda ayrıca anlatılıyor.`]],
+                    `<b>🐦 Türler:</b> bir türe dokununca harita yalnızca o türü gösterir. Türün altındaki <b>📍 konum · 📅 gün</b> yazısı nerede ve ne zaman gördüğünü açar. Fotoğrafa dokununca büyür (bkz. Kendi fotoğrafların).`,
+                    `<b>Birey sayısı:</b> eBird'de saydığın kuş adedi (100 leylek = 100 birey). <b>Gözlem</b> ise kayıt sayısıdır. Birey sayılarını görmek için Türler ya da Konumlar listesinde <b>Birey sayısı</b> kutusunu işaretle; "Birey ↓" sıralaması da o zaman çıkar. Sayı yerine "X" girilen kayıtlar bireye eklenmez.`]],
                 [`🏆 Kertikler`, [
                     `Kertik, bir türü ilk kez gördüğün gözlemdir.`,
                     `<b>Kertik Haritasını Aç</b> ile her türün ilk görüldüğü yer fotoğraflı baloncuklarla gösterilir. Uzaktan bakınca sayı baloncuğu çıkar; dokununca yakınlaşır.`,
                     `Baloncuğa dokun: tarih, yer, toplamda kaç konumda/günde gördüğün ve <b>📤 Kertiği paylaş</b>.`,
-                    `Panel içindeki takvimde yeşil günler kertik günleridir; altında yıllara/aylara göre kertik grafiği vardır.`]],
+                    `Kertikler sekmesindeki takvimde yeşil günler kertik günleridir; altında yıllara/aylara göre kertik grafiği vardır.`]],
                 [`📷 Kendi fotoğrafların`, [
-                    `Kuş Türleri panelinde (ya da konum penceresinde) bir türün fotoğrafına dokun; fotoğraf büyür.`,
+                    `Gözlemlerim → Türler listesinde (ya da konum penceresinde) bir türün fotoğrafına dokun; fotoğraf büyür.`,
                     `<b>✏️ Kendi fotoğrafını koy</b> ile galeriden kendi çektiğin fotoğrafı seç. Artık listelerde, haritada ve paylaşım kartlarında Wikipedia fotoğrafı yerine seninki kullanılır.`,
                     `<b>↩️ Wikipedia fotoğrafına dön</b> ile eskisine dönebilirsin. Fotoğrafın yalnızca bu telefonda saklanır; içindeki konum (GPS) bilgisi silinir.`]],
                 [`📤 Paylaşım kartları`, [
-                    `Panellerdeki <b>📤 Paylaş</b> düğmeleriyle güzel bir görsel hazırla. Kart türleri:`,
+                    `Üstteki <b>📤 Paylaş</b> sekmesiyle ya da listelerdeki 📤 düğmeleriyle güzel bir görsel hazırla. <b>🔗 Bağlantı</b> ile aynı özeti, uygulaması olmayan biri de tarayıcıda açabilir (veri bağlantının içinde taşınır, sunucuda saklanmaz). Kart türleri:`,
                     `<b>📆 Yıl</b> özeti · <b>🗓️ Ay</b> takvimi · <b>📅 Gün</b> (gösterilecek türleri seçebilirsin) · <b>🧳 Gezi</b> (tarih aralığı, il ve başlık; ör. "Urfa turu") · <b>🐦 Tür</b> (harita, aylara ya da yıllara göre görünüm) · <b>📍 Konum</b> · <b>🏆 Kertik</b> (herhangi bir kertik; 50., 100. gibi dönüm noktaları ⭐) · <b>📊 Grafik</b> (istersen tek bir konum ya da tür için) · <b>📸 Gözlem</b>.`,
                     `<b>📸 Gözlem</b> kartında kendi fotoğrafını kullan: bir parmakla kaydır, iki parmakla yakınlaştır/uzaklaştır.`,
                     `Biçim: Instagram hikâyesi, kare gönderi ya da PDF. <b>Konum bilgisi:</b> tam konum, sadece il ya da gizli; nadir türlerin ve yuva yerlerinin yerini paylaşmak istemezsen "Sadece il" ya da "Gizli"yi seç.`,
@@ -726,9 +783,9 @@
                     `Örnek: "Kızılgerdanı nerede gördüm", "2025'te Mogan'da neler gördüm", "geçen hafta", "en büyük sürüm", "kaç flamingo saydım", "son kertiklerim".`,
                     `Daha serbest sohbet için ücretsiz bir Gemini anahtarı girebilirsin (bkz. API anahtarları).`]],
                 [`➕ Elle kayıt`, [
-                    `<b>Veri Yönetimi → Yeni Ekle:</b> eBird dışı bir gözlemi tür, tarih, adet ve haritadan seçtiğin noktayla ekle. Adedi boş bırakırsan "X" (sayılmadı) olarak kaydedilir. <b>Veri Tablosu</b>'ndan düzenle veya sil.`]],
+                    `<b>☰ → Verilerim → Yeni Ekle:</b> eBird dışı bir gözlemi tür, tarih, adet ve haritadan seçtiğin noktayla ekle. Adedi boş bırakırsan "X" (sayılmadı) olarak kaydedilir. <b>Veri Tablosu</b>'ndan düzenle veya sil.`]],
                 [`🌍 Çevreyi Keşfet`, [
-                    `<b>Çevreyi Keşfet:</b> paneli açıp haritaya dokun; seçtiğin çaptaki son 30 günün eBird kayıtları listelenir (eBird API anahtarı gerekir).`]],
+                    `<b>Çevreyi Keşfet:</b> 🌍 Keşfet sekmesini açıp haritaya dokun; seçtiğin çaptaki son 30 günün eBird kayıtları listelenir (eBird API anahtarı gerekir).`]],
                 [`🔑 API anahtarları (isteğe bağlı)`, [
                     `Uygulamanın temel özellikleri anahtarsız çalışır. Anahtarlar ücretsizdir ve <b>⚙️ API Ayarları</b>'na yapıştırılır.`,
                     `<b>eBird API anahtarı</b> – <b>🌍 Çevreyi Keşfet</b> için gerekir. <a href="https://ebird.org/api/keygen" target="_blank" style="color:#1662B6; font-weight:bold;">ebird.org/api/keygen</a> adresinde eBird hesabınla giriş yap, formu doldur. Kullanım amacı olarak <b>ticari olmayan / kişisel kullanım</b>ı seç; açıklamaya kısaca şunu yazabilirsin: <i>"Kuş Atlası uygulamasında, kişisel ve ticari olmayan kullanım için çevremdeki son kuş gözlemlerini görmek."</i> Çıkan anahtarı kopyala.`,
@@ -739,13 +796,13 @@
                     `Tüm verileri silmek için: Android Ayarlar → Uygulamalar → Kuş Atlası → Depolama → Verileri temizle.`,
                     `<a href="https://birdatlas.app/privacy/?lang=tr" target="_blank" style="color:#1662B6; font-weight:bold;">Gizlilik politikasının tamamı 🔗</a>`]],
                 [`💬 Geri bildirim`, [
-                    `Panellerin en altındaki <b>💬 Geri Bildirim</b>: <b>🐞 Hata bildir</b> ve <b>💡 Öneri gönder</b> e-posta uygulamanı hazır bir mesajla açar; sen göndermeden hiçbir şey gitmez. Ekran görüntüsü eklersen çok yardımcı olur.`,
+                    `<b>☰ → 💬 Geri bildirim</b>: <b>🐞 Hata bildir</b> ve <b>💡 Öneri gönder</b> e-posta uygulamanı hazır bir mesajla açar; sen göndermeden hiçbir şey gitmez. Ekran görüntüsü eklersen çok yardımcı olur.`,
                     `<b>⭐ Uygulamayı değerlendir</b> ile Google Play'de puan verebilir, <b>📷 Instagram</b>'da bizi takip edebilirsin.`]]
             ]},
             en: { title: '📖 User Guide', sections: [
                 [`🐦 What is Bird Atlas?`, [
                     `Birders log the birds they see in <b>eBird</b> (the free bird-recording platform of the Cornell Lab of Ornithology). Bird Atlas turns those records into your <b>personal map</b>: where, when and which species you saw, your first sightings (lifers), calendars, charts and share cards.`,
-                    `No eBird account? Use <b>🧪 Try with sample data</b> on the start screen to explore the app with a fictional birder's data. You can also add your own sightings manually in <b>Data Management</b>.`,
+                    `No eBird account? Use <b>🧪 Try with sample data</b> on the start screen to explore the app with a fictional birder's data. You can also add your own sightings manually in <b>☰ → My data</b>.`,
                     `Your data stays on this phone; the app has no server.`]],
                 [`🚀 Getting started`, [
                     `Use <b>"Download Data from eBird"</b> on the start screen to request your data from eBird.`,
@@ -758,26 +815,29 @@
                     `Tap a circle to see its species, photos, counts, and the <b>📅 Here</b> line with the dates you saw them there.`,
                     `<b>🌍📅 All my sightings</b>: every place and date you saw that species (ignoring filters). Sort <b>By place / By date</b>; the current place is starred at the top.`,
                     `<b>🔍 Show Exact Points</b> splits a location into its individual observation points.`,
-                    `With panels closed, active filters (days, species, location, province, lifer map) appear as tags on the map. Tap ✕ to remove one, or <b>Clear all</b>.`]],
-                [`🎛️ Panels (top to bottom)`, [
-                    `Toggle panels with <b>☰ Show Panels</b> at the top left. Dashed-underlined text opens a small list when tapped.`,
+                    `With tabs closed, active filters (days, species, location, province, lifer map) appear as tags on the map. Tap ✕ to remove one, or <b>Clear all</b>.`]],
+                [`🧭 Tabs and menu`, [
+                    `Four tabs at the top: <b>🗺️ My sightings</b>, <b>🏆 Lifers</b>, <b>🌍 Explore</b>, <b>📤 Share</b>. Tap an open tab again to close it and see the full map.`,
+                    `The <b>☰</b> menu at the top right holds the guide, restart tour, language, <b>My data</b> (upload screen, manual records, data table), <b>Settings</b> (API keys), feedback, rating, Instagram and privacy.`,
+                    `Dashed-underlined text opens a small list when tapped.`]],
+                [`🗺️ My sightings`, [
+                    `Switch between <b>📅 Calendar</b>, <b>📍 Places</b> and <b>🐦 Species</b> with the small tabs on top.`,
                     `<b>📅 Calendar:</b> tap a day to list which species you saw at which place, and filter the map. You can select several days. Use <b>📤 Share this day / month</b> for a card.`,
-                    `<b>📊 Year view</b> (below the calendar): species, sightings, days or birds; monthly or weekly; <b>Compare years</b>. Tap a bar for that month/week. If a place or species is selected, the chart follows it.`,
-                    `<b>📍 Locations:</b> sort by species, sightings, name or rarity; group by province. The <b>📅 days · 🐦 species</b> line under a place opens a day-by-day list. Similar spellings merge automatically; uncertain ones appear as <b>🔗 Similar locations</b>.`,
-                    `<b>🐦 Bird Species:</b> tap a species to show only it on the map. The <b>📍 places · 📅 days</b> line shows where and when. Tap the photo to enlarge it (see Your own photos).`,
-                    `<b>Bird counts:</b> how many individuals you counted in eBird (100 storks = 100 birds). <b>Sightings</b> are records. Tick <b>Bird counts</b> in Bird Species or Locations to show them; the "Birds ↓" sort appears too. Records with "X" are not added.`,
-                    `<b>🏆 Lifers</b>, <b>🗄️ Data Management</b>, <b>🌍 Explore Nearby</b>, <b>⚙️ API Settings</b> and <b>💬 Feedback</b> are explained below.`]],
+                    `<b>📊 Year view</b> (below the calendar): species, sightings, days or birds; monthly or weekly; <b>Compare years</b>. Tap a bar for that month/week.`,
+                    `<b>📍 Places:</b> sort by species, sightings, name or rarity; group by province. The <b>📅 days · 🐦 species</b> line under a place opens a day-by-day list. Similar spellings merge automatically; uncertain ones appear as <b>🔗 Similar locations</b>.`,
+                    `<b>🐦 Species:</b> tap a species to show only it on the map. The <b>📍 places · 📅 days</b> line shows where and when. Tap the photo to enlarge it (see Your own photos).`,
+                    `<b>Bird counts:</b> how many individuals you counted in eBird (100 storks = 100 birds). <b>Sightings</b> are records. Tick <b>Bird counts</b> in Species or Places to show them; the "Birds ↓" sort appears too. Records with "X" are not added.`]],
                 [`🏆 Lifers`, [
                     `A lifer is the first time you recorded a species.`,
                     `<b>Open Lifer Map</b> shows where each species was first seen, as photo bubbles. Zoomed out, number bubbles appear; tap to zoom in.`,
                     `Tap a bubble for date, place, how many places/days you've seen it, and <b>📤 Share this lifer</b>.`,
-                    `Green days in the panel calendar are lifer days; below it is a lifer chart by month or year.`]],
+                    `Green days in the Lifers tab calendar are lifer days; below it is a lifer chart by month or year.`]],
                 [`📷 Your own photos`, [
                     `Tap a species photo in Bird Species (or in a location popup) to enlarge it.`,
                     `<b>✏️ Use your own photo</b> lets you pick your own shot from the gallery. It then replaces the Wikipedia photo in lists, on the map and on share cards.`,
                     `<b>↩️ Back to Wikipedia photo</b> undoes it. Your photo stays on this phone only and its GPS data is removed.`]],
                 [`📤 Share cards`, [
-                    `Use the <b>📤 Share</b> buttons in the panels to make an image. Card types:`,
+                    `Use the <b>📤 Share</b> tab or the 📤 buttons in the lists to make an image. <b>🔗 Link</b> lets someone without the app open the same summary in a browser (the data travels inside the link; nothing is stored on a server). Card types:`,
                     `<b>📆 Year</b> · <b>🗓️ Month</b> calendar · <b>📅 Day</b> (pick the species shown) · <b>🧳 Trip</b> (date range, province, title) · <b>🐦 Species</b> (map, by month or by year) · <b>📍 Place</b> · <b>🏆 Lifer</b> (any lifer; milestones like 50th, 100th ⭐) · <b>📊 Chart</b> (optionally for one place or species) · <b>📸 Sighting</b>.`,
                     `On a <b>📸 Sighting</b> card use your own photo: drag with one finger, pinch with two to zoom.`,
                     `Formats: Instagram story, square post or PDF. <b>Location detail:</b> exact, province only or hidden — choose "Province only" or "Hidden" to protect rare species and nest sites.`,
@@ -789,9 +849,9 @@
                     `Try: "Where did I see European Robin", "what did I see at Mogan in 2025", "last week", "largest flock", "how many flamingos did I count", "latest lifers".`,
                     `For free-form chat you can add a free Gemini key (see API keys).`]],
                 [`➕ Manual records`, [
-                    `<b>Data Management → Add New:</b> add a non-eBird sighting with species, date, count and a point picked on the map. Leave count empty for "X" (not counted). Edit or delete in <b>Data Table</b>.`]],
+                    `<b>☰ → My data → Add New:</b> add a non-eBird sighting with species, date, count and a point picked on the map. Leave count empty for "X" (not counted). Edit or delete in <b>Data Table</b>.`]],
                 [`🌍 Explore Nearby`, [
-                    `<b>Explore Nearby:</b> open the panel and tap the map to list eBird sightings from the last 30 days in the chosen radius (needs an eBird API key).`]],
+                    `<b>Explore Nearby:</b> open the 🌍 Explore tab and tap the map to list eBird sightings from the last 30 days in the chosen radius (needs an eBird API key).`]],
                 [`🔑 API keys (optional)`, [
                     `The main features work without keys. Keys are free and go into <b>⚙️ API Settings</b>.`,
                     `<b>eBird API key</b> – needed for <b>🌍 Explore Nearby</b>. Sign in at <a href="https://ebird.org/api/keygen" target="_blank" style="color:#1662B6; font-weight:bold;">ebird.org/api/keygen</a> with your eBird account and fill in the form. Choose <b>non-commercial / personal use</b>; as a description you can write: <i>"Seeing recent bird sightings near me in the Bird Atlas app, for personal, non-commercial use."</i> Copy the key it gives you.`,
@@ -802,7 +862,7 @@
                     `To erase everything: Android Settings → Apps → Bird Atlas → Storage → Clear data.`,
                     `<a href="https://birdatlas.app/privacy/?lang=en" target="_blank" style="color:#1662B6; font-weight:bold;">Full privacy policy 🔗</a>`]],
                 [`💬 Feedback`, [
-                    `<b>💬 Feedback</b> at the bottom of the panels: <b>🐞 Report a problem</b> and <b>💡 Send an idea</b> open your email app with a ready message; nothing is sent until you send it. A screenshot helps a lot.`,
+                    `<b>☰ → 💬 Feedback</b>: <b>🐞 Report a problem</b> and <b>💡 Send an idea</b> open your email app with a ready message; nothing is sent until you send it. A screenshot helps a lot.`,
                     `<b>⭐ Rate the app</b> on Google Play, and follow us on <b>📷 Instagram</b>.`]]
             ]}
         };
@@ -1252,6 +1312,7 @@
             if(lastUpload) document.getElementById('last-upload-info').innerText = "Son Yükleme: " + lastUpload;
             else document.getElementById('last-upload-info').innerText = "";
             updateSampleBtn();
+            if (!canCancel) setTimeout(() => maybeStartTour(false), 0);
         }
 
         function skipUpload() {
@@ -2972,6 +3033,7 @@
         function reachedMilestones() { return MILESTONES.filter(m => m <= liferArray.length); }
         function afterDataLoaded() {
             bindMiniFollow();
+            maybeStartTour(true);
             if (isSample()) return;
             let reached = reachedMilestones(); let top = reached.length ? reached[reached.length - 1] : 0;
             let seen = NaN; try { seen = parseInt(localStorage.getItem('milestone_seen'), 10); } catch (e) {}
@@ -3589,7 +3651,8 @@
             h += `<div class="sh-row"><label>${LT('İmza (isteğe bağlı)', 'Signature (optional)')}</label><input type="text" maxlength="28" value="${escHtml(st.sign)}" placeholder="${LT('ör. adın ya da kullanıcı adın', 'e.g. your name or handle')}" oninput="setShare('sign', this.value, true)"></div>`;
             h += `<div class="sh-row"><label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" ${st.ig !== false ? 'checked' : ''} onchange="setShare('ig', this.checked)"> <span style="color:#C13584;">${IG_SVG}</span> @birdatlas.app</label></div>`;
             h += `<div id="share-preview-wrap"><canvas id="share-preview"></canvas><div class="sh-busy" id="share-busy">${mavisSVG(40, 'think')} &nbsp;${LT('Hazırlanıyor...', 'Preparing...')}</div></div>`;
-            h += `<div style="display:flex; flex-wrap:wrap;"><button class="sh-btn primary" onclick="exportShare('share')">📤 ${LT('Paylaş', 'Share')}</button>${NativeCap ? '' : `<button class="sh-btn" onclick="exportShare('save')">💾 ${LT('İndir', 'Download')}</button>`}</div>`;
+            h += `<div style="display:flex; flex-wrap:wrap;"><button class="sh-btn primary" onclick="exportShare('share')">📤 ${LT('Paylaş', 'Share')}</button>${NativeCap ? '' : `<button class="sh-btn" onclick="exportShare('save')">💾 ${LT('İndir', 'Download')}</button>`}<button class="sh-btn" onclick="shareLink()">🔗 ${LT('Bağlantı', 'Link')}</button></div>
+                <div style="font-size:11px; color:#5B6B7E; margin-top:4px;">🔗 ${LT('Bağlantıyı açan kişi bu görünümü uygulama kurmadan tarayıcıda görür. Veriler bağlantının içinde taşınır, sunucumuzda saklanmaz.', 'Anyone with the link sees this view in a browser, no app needed. The data travels inside the link and is not stored on our server.')}</div>`;
             h += `<div style="font-size:11px; color:#5B6B7E; margin-top:4px;">${LT('Kart telefonunda üretilir; sen paylaşmadıkça hiçbir yere gitmez.', 'The card is made on your phone and goes nowhere unless you share it.')}</div>`;
             $id('share-body').innerHTML = h;
             bindPreviewDrag();
@@ -4536,6 +4599,351 @@
             if (hp) hp.addEventListener('click', () => { try { if (mapObj) mapObj.closePopup(); } catch (e) {} let p = document.getElementById('mini-popup'); if (p) p.style.display = 'none'; });
             window.addEventListener('load', () => { let o = document.getElementById('upload-overlay'); if (o && o.style.display !== 'none') coverShownAt = Date.now(); });
         })();
+
+        // ===== v1.12: Yeni düzen – üstte 4 sekme, sağ üstte logo + ☰ menü =====
+        let navTab = null, obsSub = 'calendar';
+        const NAV_TABS = () => [
+            ['obs', '🗺️', LT('Gözlemlerim', 'My sightings')],
+            ['lifer', '🏆', LT('Kertikler', 'Lifers')],
+            ['explore', '🌍', LT('Keşfet', 'Explore')],
+            ['share', '📤', LT('Paylaş', 'Share')]
+        ];
+        // Hangi sekmede hangi eski panel kutuları görünür
+        const NAV_PANELS = {
+            obs: () => ({ calendar: ['toggle-calendar'], locations: ['toggle-locations'], species: ['toggle-species'] })[obsSub],
+            lifer: () => ['toggle-lifers'],
+            explore: () => ['toggle-explore'],
+            data: () => ['toggle-database', 'update-data-btn'],
+            feedback: () => ['toggle-feedback']
+        };
+        function navContainers() { return [...document.querySelectorAll('#filter-panels > .panel-container')]; }
+        function containerOf(id) { let el = document.getElementById(id); return el ? el.closest('.panel-container') : null; }
+        window.renderNav = function() {
+            let bar = document.getElementById('tabbar'); if (!bar) return;
+            bar.innerHTML = NAV_TABS().map(([k, ic, n]) => `<button class="tb${navTab === k ? ' on' : ''}" data-tab="${k}" onclick="openTab('${k}')"><b>${ic}</b><span>${n}</span></button>`).join('');
+            let seg = document.getElementById('obs-seg');
+            if (seg) seg.innerHTML = [['calendar', LT('📅 Takvim', '📅 Calendar')], ['locations', LT('📍 Konumlar', '📍 Places')], ['species', LT('🐦 Türler', '🐦 Species')]]
+                .map(([k, n]) => `<button class="${obsSub === k ? 'on' : ''}" onclick="setObsSub('${k}')">${n}</button>`).join('');
+            let head = document.getElementById('sheet-head');
+            if (head) {
+                let t = { obs: '', lifer: LT('🏆 Kertikler', '🏆 Lifers'), explore: LT('🌍 Çevreyi Keşfet', '🌍 Explore nearby'), data: LT('🗄️ Verilerim', '🗄️ My data'), feedback: LT('💬 Geri bildirim', '💬 Feedback') }[navTab] || '';
+                head.querySelector('.sh-t').textContent = t;
+                head.style.display = navTab && navTab !== 'obs' ? 'flex' : 'none';
+            }
+            let mb = document.getElementById('menu-btn'); if (mb) mb.setAttribute('aria-label', LT('Menü', 'Menu'));
+        };
+        function setExplore(on) {
+            if (exploreMode === on) return;
+            exploreMode = on;
+            if (on) document.getElementById('explore-content').innerHTML = `<div style="font-size: 13px; color: #282629;">${LT('Haritada herhangi bir noktaya dokun; seçtiğin çap içindeki son 30 günün eBird kayıtları listelensin.', 'Tap anywhere on the map to list eBird sightings from the last 30 days within the chosen radius.')}</div>`;
+            else { if (exploreCircle) { mapObj.removeLayer(exploreCircle); exploreCircle = null; } exploreData = []; updateExploreDock(); }
+        }
+        function showSheet(tab) {
+            let fp = document.getElementById('filter-panels');
+            let ids = NAV_PANELS[tab] ? NAV_PANELS[tab]() : [];
+            let show = new Set(ids.map(containerOf).filter(Boolean));
+            navContainers().forEach(c => { c.style.display = show.has(c) ? '' : 'none'; });
+            ids.forEach(id => { let b = document.getElementById(id); if (b && b.nextElementSibling && b.nextElementSibling.classList.contains('panel-content')) b.nextElementSibling.style.display = 'block'; });
+            document.getElementById('obs-seg').style.display = tab === 'obs' ? 'flex' : 'none';
+            fp.style.display = 'grid';
+            fp.scrollTop = 0;
+        }
+        window.openTab = function(tab) {
+            if (tab === 'share') { closeTabs(); openShare(); return; }
+            if (navTab === tab) { closeTabs(); return; }
+            closeMainMenu();
+            try { if (mapObj) mapObj.closePopup(); } catch (e) {}
+            let mp = document.getElementById('mini-popup'); if (mp) mp.style.display = 'none';
+            setExplore(tab === 'explore');
+            navTab = tab;
+            showSheet(tab);
+            renderNav(); updateFilterBar(); updateExploreDock();
+        };
+        window.closeTabs = function() {
+            let fp = document.getElementById('filter-panels');
+            fp.style.display = 'none';
+            // Keşfet sonuçları paneller kapalıyken haritadaki küçük kutuda kalsın (eskisi gibi)
+            navTab = null;
+            renderNav(); updateFilterBar(); updateExploreDock();
+        };
+        window.setObsSub = function(k) { obsSub = k; if (navTab === 'obs') showSheet('obs'); renderNav(); };
+        // Eski "Panelleri Göster" çağrıları (geri tuşu vb.) yeni sekmelere yönlensin
+        window.togglePanels = function() { if (navTab) closeTabs(); else openTab('obs'); };
+
+        // ----- ☰ menü -----
+        window.toggleMainMenu = function(e) {
+            if (e) e.stopPropagation();
+            let m = document.getElementById('main-menu');
+            if (m.style.display === 'block') return closeMainMenu();
+            let it = (ic, t, fn, extra) => `<button onclick="closeMainMenu(); ${fn}">${ic} <span class="mt">${t}</span>${extra ? `<span class="mx">${extra}</span>` : ''}</button>`;
+            m.innerHTML =
+                it('📖', LT('Kılavuz', 'User guide'), 'openGuide()') +
+                it('🎓', LT('Turu yeniden başlat', 'Restart the tour'), 'startTour(true)') +
+                '<div class="mh"></div>' +
+                `<button onclick="toggleLangMenu(event)">🌐 <span class="mt">${LT('Dil', 'Language')}</span><span class="mx">${flagSvg(LANG === 'en' ? 'en' : 'tr')} ${LANG.toUpperCase()} ▸</span></button>` +
+                '<div class="mh"></div>' +
+                it('🗄️', LT('Verilerim', 'My data'), "openTab('data')", LT('yükle · elle kayıt', 'upload · manual')) +
+                it('⚙️', LT('Ayarlar', 'Settings'), 'openSettings()', 'API') +
+                '<div class="mh"></div>' +
+                it('💬', LT('Geri bildirim', 'Feedback'), "openTab('feedback')") +
+                it('⭐', LT('Değerlendir', 'Rate the app'), 'rateApp()') +
+                `<a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">📷 <span class="mt">Instagram</span><span class="mx">@birdatlas.app</span></a>` +
+                `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'en' ? 'en' : 'tr'}" target="_blank" onclick="closeMainMenu()">🔒 <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>`;
+            m.style.display = 'block';
+            document.getElementById('menu-btn').classList.add('on');
+            setTimeout(() => document.addEventListener('click', function close(ev) { if (!m.contains(ev.target) && !(document.getElementById('lang-menu') || {}).contains?.(ev.target)) { closeMainMenu(); document.removeEventListener('click', close); } }), 0);
+        };
+        window.closeMainMenu = function() {
+            let m = document.getElementById('main-menu'); if (m) m.style.display = 'none';
+            let b = document.getElementById('menu-btn'); if (b) b.classList.remove('on');
+        };
+        renderNav();
+
+        // ===== v1.12: İlk açılış turu (Maviş anlatır) =====
+        let tourIdx = -1, tourSteps = [], tourAfterData = false;
+        const $t = id => document.getElementById(id);
+        function tourDone() { try { return localStorage.getItem('tour_done') === '1'; } catch (e) { return true; } }
+        function setTourFlag(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+        function onMapReady(fn) {
+            let n = 0, iv = setInterval(() => {
+                let l = $t('animated-logo');
+                if ((l && l.classList.contains('on-map') && $t('upload-overlay').style.display === 'none') || ++n > 80) { clearInterval(iv); setTimeout(fn, 500); }
+            }, 150);
+        }
+        function latestDay() { let ds = obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor').sort(); return ds[ds.length - 1]; }
+        function demoExplore() {
+            // Yalnızca tur için uydurulmuş örnek sonuçlar (eBird'e bağlanılmaz)
+            let c = mapObj.getCenter();
+            lastExploreLat = c.lat; lastExploreLng = c.lng;
+            if (exploreCircle) mapObj.removeLayer(exploreCircle);
+            exploreCircle = L.circle([c.lat, c.lng], { radius: currentRadius * 1000, color: '#FED008', fillColor: '#FED008', fillOpacity: 0.25 }).addTo(mapObj);
+            const S = [['Phoenicopterus roseus', 'Flamingo', 'Greater Flamingo', 'grefla3', 64], ['Fulica atra', 'Sakarmeke', 'Eurasian Coot', 'eurcoo', 38],
+                ['Larus michahellis', 'Sarı Bacaklı Martı', 'Yellow-legged Gull', 'yelgul1', 21], ['Podiceps cristatus', 'Bahri', 'Great Crested Grebe', 'grcgre1', 12],
+                ['Ardea cinerea', 'Gri Balıkçıl', 'Gray Heron', 'graher1', 6], ['Passer domesticus', 'Serçe', 'House Sparrow', 'houspa', 30],
+                ['Pica pica', 'Saksağan', 'Eurasian Magpie', 'eurmag1', 9], ['Erithacus rubecula', 'Kızılgerdan', 'European Robin', 'eurrob1', 4]];
+            exploreData = S.map(([sci, tr, en, code, n]) => ({ name: LANG === 'en' ? en : tr, count: n, code, sciName: sci }));
+            renderExploreData();
+            let ec = $t('explore-content');
+            if (ec) ec.insertAdjacentHTML('afterbegin', `<div style="background:#FFF6D6; border:1px dashed #E9C440; border-radius:8px; padding:6px 8px; font-size:11.5px; margin-bottom:8px;">🎓 ${LT('Tur örneği: bu liste gerçek değil, yalnızca nasıl göründüğünü göstermek için.', 'Tour example: this list is made up, just to show how it looks.')}</div>`);
+        }
+        function askMavisLocal(q) {
+            let cw = $t('chat-window'); if (cw.style.display !== 'flex') toggleChat();
+            let box = $t('chat-messages');
+            box.innerHTML += `<div class="chat-msg chat-user"><span class="msg-bubble">${escHtml(q)}</span></div>`;
+            let r = localAssistant(q);
+            box.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}</span>${suggestionButtons(r.suggestions)}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+        function buildTourSteps(preData) {
+            let s = [];
+            if (preData) {
+                s.push({ id: 'welcome', pre: true, title: LT('Merhaba, ben Maviş! 👋', "Hi, I'm Maviş! 👋"),
+                    text: LT('Kuş Atlası, eBird gözlemlerini kişisel haritana dönüştürür. Seni bir dakikada gezdireyim.', 'Bird Atlas turns your eBird sightings into your personal map. Let me show you around in a minute.') });
+                s.push({ id: 'ask', pre: true, title: LT('eBird hesabın ve kayıtların var mı?', 'Do you have an eBird account with sightings?'),
+                    text: LT('Varsa kendi verini nasıl yükleyeceğini göstereyim. Yoksa örnek veriyle gezelim; istediğin zaman kendi verine geçebilirsin.', "If so, I'll show you how to load your own data. If not, let's explore with sample data; you can switch to your own any time."),
+                    buttons: [[LT('Evet, verim var', 'Yes, I have data'), 'tourOwnData()', true], [LT('Hayır, örnekle dene', 'No, try sample data'), 'tourSample()']] });
+            } else {
+                s.push({ id: 'welcome', title: LT('Merhaba, ben Maviş! 👋', "Hi, I'm Maviş! 👋"),
+                    text: LT('Kuş Atlası\'nın yeni düzenini birlikte gezelim. Bir dakika sürer; istersen "Geç" de.', "Let's walk through Bird Atlas together. It takes a minute; tap \"Skip\" if you like.") });
+            }
+            s.push({ id: 'map', title: LT('Haritan', 'Your map'),
+                text: LT('Her daire bir gözlem alanı; büyüdükçe ve kırmızıya döndükçe orada daha çok tür görmüşsün. Bir daireye dokununca türler, tarihler ve "Tüm gözlemlerim" açılır.', 'Each circle is a birding spot; bigger and redder means more species. Tap a circle to see its species, dates and "All my sightings".') });
+            s.push({ id: 'tabs', target: () => $t('tabbar'), title: LT('Dört sekme', 'Four tabs'),
+                text: LT('Gözlemlerim · Kertikler · Keşfet · Paylaş. Açık sekmeye tekrar dokununca kapanır, harita tam ekran olur.', 'My sightings · Lifers · Explore · Share. Tap an open tab again to close it and see the full map.') });
+            s.push({ id: 'calendar', target: () => $t('filter-panels'),
+                enter: () => {
+                    openTab('obs'); setObsSub('calendar');
+                    let d = latestDay();
+                    if (d) { currentCalDate = new Date(+d.slice(0, 4), +d.slice(5, 7) - 1, 1); selectedDates.clear(); selectedDates.add(d); lastClickedDay = d; renderAll(); }
+                },
+                title: LT('Gözlemlerim → Takvim', 'My sightings → Calendar'),
+                text: LT('Renkli günler gözlem yaptığın günler. Bir güne dokun: harita o güne süzülür, altta o gün hangi yerde hangi türleri gördüğün çıkar. Ben senin için son gününü seçtim. En altta yıllık grafik var.', "Colored days are days you went birding. Tap a day: the map filters to it and below you'll see which species you saw where. I picked your latest day. The year chart is at the bottom.") });
+            s.push({ id: 'species', target: () => $t('filter-panels'),
+                enter: () => { setObsSub('species'); },
+                title: LT('Konumlar ve Türler', 'Places and Species'),
+                text: LT('Üstteki küçük sekmelerle Konumlar ve Türler listesine geç. Bir türe dokununca harita yalnız onu gösterir. Fotoğrafa dokun: büyür ve istersen kendi fotoğrafını koyarsın.', 'Switch to Places or Species with the small tabs on top. Tap a species to show only it on the map. Tap its photo to enlarge it and use your own picture.') });
+            s.push({ id: 'chips', target: () => $t('filter-bar'),
+                enter: () => { let first = document.querySelector('#species-list .species-item'); if (first) first.click(); closeTabs(); },
+                leave: () => { clearFilter('all'); },
+                title: LT('Açık filtreler', 'Active filters'),
+                text: LT('Seçtiğin gün ve tür haritanın üstünde etiket olarak durur. ✕ ile birini, "Tümünü temizle" ile hepsini kaldırırsın.', 'The day and species you picked stay on the map as tags. Tap ✕ to remove one, "Clear all" for all.') });
+            s.push({ id: 'lifer', target: () => $t('filter-panels'), enter: () => openTab('lifer'),
+                title: LT('Kertikler', 'Lifers'),
+                text: LT('Kertik, bir türü ilk kez gördüğün an. "Kertik Haritasını Aç" ile hepsini fotoğraflı haritada gör; takvimde yeşil günler kertik günlerin.', 'A lifer is the first time you saw a species. "Open Lifer Map" shows them all with photos; green days in the calendar are lifer days.') });
+            s.push({ id: 'explore', target: () => $t('filter-panels'), enter: () => { openTab('explore'); demoExplore(); },
+                title: LT('Çevreyi keşfet', 'Explore nearby'),
+                text: LT('Keşfet sekmesinde arama çapını seç, sonra haritada bir noktaya dokun: o çaptaki son 30 günün eBird kayıtları listelenir. Bu liste tur için uyduruldu.', 'In the Explore tab pick a radius, then tap a point on the map: eBird sightings from the last 30 days within it are listed. This list is made up for the tour.') });
+            s.push({ id: 'explore2', target: () => $t('explore-dock'), enter: () => { exploreDockDismissed = false; closeTabs(); try { mapObj.setView([lastExploreLat, lastExploreLng], 10); } catch (e) {} },
+                leave: () => { setExplore(false); closeTabs(); },
+                title: LT('Keşfet: haritada', 'Explore: on the map'),
+                text: LT('Sarı daire aradığın alan; sonuçlar üstteki kutuda kalır, haritada gezinirken de görürsün. Gerçek sonuçlar için ücretsiz eBird API anahtarı gerekir (☰ → Ayarlar); anahtar girince dokunduğun yerin gerçek, güncel kayıtları gelir.', 'The yellow circle is the searched area; results stay in the box on top while you move around. Real results need a free eBird API key (☰ → Settings); with a key you get real, recent sightings for the spot you tap.') });
+            s.push({ id: 'share', target: () => document.querySelector('#share-overlay .ov-card'), enter: () => { closeTabs(); openShare(); },
+                leave: () => closeShare(),
+                title: LT('Paylaşım kartları', 'Share cards'),
+                text: LT('Yıl, ay, gün, gezi, tür, kertik ya da grafik kartı seç; hikâye, kare veya PDF olarak paylaş. Konumu gizleyebilir, 🔗 bağlantıyla arkadaşına uygulamasız da gösterebilirsin.', 'Pick a year, month, day, trip, species, lifer or chart card and share it as a story, square post or PDF. You can hide locations, or send a 🔗 link friends can open without the app.') });
+            s.push({ id: 'mavis', target: () => $t('chat-window'), enter: () => askMavisLocal(LT('En iyi günüm hangisi?', 'Which was my best day?')),
+                leave: () => { if ($t('chat-window').style.display === 'flex') toggleChat(); },
+                title: LT('Bana sor', 'Ask me'),
+                text: LT('Verine dair soruları cihazında yanıtlarım, anahtar gerekmez. İstersen ücretsiz Gemini anahtarı ekle, serbest sohbet edelim (☰ → Ayarlar).', 'I answer questions about your data right on your device, no key needed. Add a free Gemini key for free-form chat (☰ → Settings).') });
+            s.push({ id: 'menu', target: () => $t('main-menu'), enter: () => { if ($t('main-menu').style.display !== 'block') toggleMainMenu(); },
+                leave: () => closeMainMenu(),
+                title: LT('☰ Menü · hepsi bu! 🔭', '☰ Menu · that\'s it! 🔭'),
+                text: LT('Kılavuz, dil, verilerin, ayarlar ve geri bildirim burada; bu turu da buradan yeniden başlatırsın. ', 'Guide, language, your data, settings and feedback live here; you can restart this tour here too. ')
+                    + (isSample() ? LT('Kendi verin için ☰ → Verilerim ya da haritadaki "Örnek veri" etiketine dokun.', 'For your own data tap ☰ → My data or the "Sample data" tag on the map.') : LT('İyi gözlemler!', 'Happy birding!')),
+                buttons: [[LT('Bitir', 'Finish'), 'endTour(true)', true]] });
+            return s;
+        }
+        function ensureTourDom() {
+            let r = $t('tour'); if (r) return r;
+            r = document.createElement('div'); r.id = 'tour'; r.setAttribute('data-no-i18n', '');
+            r.innerHTML = '<div class="tour-dim"></div><div class="tour-spot"></div><div class="tour-tip"></div>';
+            document.body.appendChild(r);
+            window.addEventListener('resize', () => { if (tourIdx >= 0) placeTour(); });
+            return r;
+        }
+        function placeTour() {
+            let st = tourSteps[tourIdx], r = $t('tour'); if (!st || !r) return; let spot = r.querySelector('.tour-spot'), tip = r.querySelector('.tour-tip'), dim = r.querySelector('.tour-dim');
+            let el = st.target ? st.target() : null, rect = el && el.getClientRects().length ? el.getBoundingClientRect() : null;
+            if (rect && rect.width && rect.height) {
+                let pad = 6, top = Math.max(4, rect.top - pad), left = Math.max(4, rect.left - pad);
+                let w = Math.min(innerWidth - 8, rect.width + pad * 2), h = Math.min(innerHeight - top - 4, rect.height + pad * 2);
+                Object.assign(spot.style, { display: 'block', top: top + 'px', left: left + 'px', width: w + 'px', height: h + 'px' });
+                dim.style.display = 'none';
+                let tw = Math.min(360, innerWidth - 24), th = tip.offsetHeight || 180;
+                let below = top + h + 12, above = top - th - 12;
+                let ty = below + th < innerHeight - 8 ? below : above > 8 ? above : Math.max(8, innerHeight - th - 12);
+                Object.assign(tip.style, { width: tw + 'px', top: ty + 'px', left: Math.max(12, Math.min(innerWidth - tw - 12, left + w / 2 - tw / 2)) + 'px' });
+            } else {
+                spot.style.display = 'none'; dim.style.display = 'block';
+                let tw = Math.min(360, innerWidth - 24);
+                Object.assign(tip.style, { width: tw + 'px', left: (innerWidth - tw) / 2 + 'px', top: Math.max(12, innerHeight / 2 - (tip.offsetHeight || 200) / 2) + 'px' });
+            }
+        }
+        function renderTourStep() {
+            let st = tourSteps[tourIdx], r = ensureTourDom(), tip = r.querySelector('.tour-tip');
+            let main = tourSteps.filter(x => x.id !== 'welcome' && !x.pre), k = main.indexOf(st);
+            let btns = st.buttons ? st.buttons.map(([t, fn, primary]) => `<button class="${primary ? 'tp' : 'tg'}" onclick="${fn}">${t}</button>`).join('')
+                : `<button class="tg" onclick="endTour(true)">${LT('Geç', 'Skip')}</button><button class="tp" onclick="nextTour()">${tourIdx === 0 ? LT('Başla', 'Start') : LT('İleri', 'Next')}</button>`;
+            tip.innerHTML = `<div class="tt"><span class="tm">${mavisSVG(34, st.id === 'done' ? 'wave' : 'idle')}</span><span>${st.title}</span></div>
+                <div class="tx">${st.text}</div>
+                <div class="tb">${k >= 0 ? `<span class="tc">${k + 1} / ${main.length}</span>` : '<span></span>'}<span class="tbs">${btns}</span></div>`;
+            r.style.display = 'block';
+            placeTour(); setTimeout(placeTour, 350); setTimeout(placeTour, 900);
+        }
+        async function goTour(i) {
+            let cur = tourSteps[tourIdx];
+            if (cur && cur.leave) { try { cur.leave(); } catch (e) {} }
+            tourIdx = i;
+            let st = tourSteps[i]; if (!st) return endTour(true);
+            if (st.enter) { try { await st.enter(); } catch (e) {} }
+            setTimeout(renderTourStep, st.enter ? 250 : 0);
+        }
+        window.nextTour = () => goTour(tourIdx + 1);
+        window.endTour = function(done) {
+            let cur = tourSteps[tourIdx];
+            if (cur && cur.leave) { try { cur.leave(); } catch (e) {} }
+            tourIdx = -1; let r = $t('tour'); if (r) r.style.display = 'none';
+            if (done) { setTourFlag('tour_done', '1'); setTourFlag('tour_resume', null); }
+        };
+        // Veri yokken: kendi verisi
+        window.tourOwnData = function() {
+            endTour(false); setTourFlag('tour_resume', '1');
+            let r = ensureTourDom(), tip = r.querySelector('.tour-tip');
+            tourSteps = [{ id: 'upload', pre: true, target: () => $t('upload-btn-label'), title: LT('Kendi verin', 'Your own data'),
+                text: LT('1) "eBird\'den Veri İndir" ile talep oluştur. 2) E-postana gelen ZIP\'i indir. 3) ZIP\'i açmadan buradan seç. Verin yüklenince tura kaldığımız yerden devam ederim.', '1) Request your data with "Download Data from eBird". 2) Download the ZIP from your email. 3) Choose the ZIP here without unzipping. Once it loads, the tour continues.'),
+                buttons: [[LT('Anladım', 'Got it'), 'endTour(false)', true], [LT('Örnekle dene', 'Try sample'), 'tourSample()']] }];
+            tourIdx = 0; renderTourStep();
+        };
+        window.tourSample = function() { endTour(false); setTourFlag('tour_resume', '1'); loadSampleData(); };
+        window.startTour = function(force) {
+            if (!force && tourDone()) return;
+            closeMainMenu(); closeTabs();
+            let hasData = obsData.length > 0;
+            tourSteps = buildTourSteps(!hasData);
+            ensureTourDom(); goTour(0);
+        };
+        // Açılışta: veri yoksa kapakta sor; veri varsa harita açılınca başla
+        function maybeStartTour(fromData) {
+            if (tourIdx >= 0) return;
+            let resume = false; try { resume = localStorage.getItem('tour_resume') === '1'; } catch (e) {}
+            if (tourDone() && !resume) return;
+            if (fromData) {
+                onMapReady(() => {
+                    if (tourIdx >= 0) return;
+                    setTourFlag('tour_resume', null);
+                    tourSteps = buildTourSteps(false);
+                    if (resume) tourSteps = tourSteps.filter(x => x.id !== 'welcome');
+                    ensureTourDom(); goTour(0);
+                });
+            } else if (!obsData.length && !resume) {
+                setTimeout(() => { if (tourIdx < 0 && !obsData.length) startTour(false); }, 900);
+            }
+        }
+
+        // ===== v1.12: Anonim paylaşım bağlantısı (sunucusuz) =====
+        // Seçilen görünümün özeti sıkıştırılıp bağlantının # kısmına yazılır. # kısmı tarayıcıdan sunucuya hiç gönderilmez:
+        // bağlantıyı açan kişi veriyi kendi tarayıcısında okur, biz hiçbir şey saklamayız.
+        const SHARE_BASE = 'https://birdatlas.app/s/';
+        function dayNum(iso) { return Math.round((Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) - Date.UTC(2000, 0, 1)) / 86400000); }
+        async function packB64(str) {
+            let bytes, pre = 'j';
+            if (window.CompressionStream) {
+                try { bytes = new Uint8Array(await new Response(new Blob([str]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()); pre = 'z'; } catch (e) { bytes = null; }
+            }
+            if (!bytes) bytes = new TextEncoder().encode(str);
+            let bin = ''; for (let i = 0; i < bytes.length; i += 8192) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+            return pre + btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+        function shareLinkRows() {
+            let st = shareState, ex = (typeof chartExtra === 'function') ? chartExtra() : {};
+            let flt = r => (!ex.loc || r.loc === ex.loc) && (!ex.sci || r.sci_name === ex.sci);
+            let ok = d => d.date && d.date !== 'Bilinmiyor';
+            switch (st.type) {
+                case 'day': return { rows: obsData.filter(d => d.date === st.date), title: formatDisplayDate(st.date) };
+                case 'trip': return { rows: tripRows(st), title: (st.title || '').trim() || (st.from === st.to ? formatDisplayDate(st.from) : `${formatDisplayDate(st.from)} – ${formatDisplayDate(st.to)}`) };
+                case 'month': return { rows: obsData.filter(d => ok(d) && d.date.startsWith(st.month) && flt(d)), title: `${monthName(+st.month.slice(5))} ${st.month.slice(0, 4)}` };
+                case 'species': { let r = obsData.filter(d => d.sci_name === st.sci && ok(d)); return { rows: r, title: r[0] ? spName(r[0]) : '' }; }
+                case 'location': return { rows: obsData.filter(d => d.loc === st.loc && ok(d)), title: st.privacy === 'exact' ? st.loc : (st.privacy === 'province' ? provShort((obsData.find(d => d.loc === st.loc) || {}).province) : LT('Gözlem alanım', 'My birding spot')) };
+                case 'milestone': { let lo = liferOrder().slice(0, +st.n || liferArray.length); return { rows: lo.map(l => ({ ...l, count: 1, birds: 0 })), title: LT(`İlk ${lo.length} türüm`, `My first ${lo.length} species`), lifers: true }; }
+                case 'chart': { let y = (chartState[st.chartKind] || {}).year; return { rows: (st.chartKind === 'lifer' ? liferArray : obsData).filter(d => ok(d) && (!y || y === 'all' || d.date.startsWith(y)) && flt(d)), title: (y && y !== 'all' ? y : LT('Tüm yıllar', 'All years')), lifers: st.chartKind === 'lifer' }; }
+                case 'obs': { let r = st.obsCtx || {}; return { rows: obsData.filter(d => d.sci_name === (r.sci || st.sci) && d.loc === (r.loc || st.loc) && (!r.date || d.date === r.date)).slice(0, 1), title: '' }; }
+                default: return { rows: obsData.filter(d => ok(d) && d.date.startsWith(String(st.year))), title: String(st.year) };
+            }
+        }
+        async function buildShareLink() {
+            let st = shareState, { rows, title, lifers } = shareLinkRows();
+            if (!rows.length) return null;
+            let priv = st.privacy || 'exact', sp = [], spIx = {}, pl = [], plIx = {}, o = [];
+            rows.forEach(d => {
+                if (!(d.sci_name in spIx)) { spIx[d.sci_name] = sp.length; sp.push([d.sci_name, d.tr_name || '', d.en_name || '']); }
+                let pk = -1;
+                if (priv !== 'hidden') {
+                    let key = priv === 'province' ? (provShort(d.province) || '?') : d.loc;
+                    if (!(key in plIx)) { plIx[key] = pl.length; pl.push({ n: key, la: [], lo: [] }); }
+                    pk = plIx[key];
+                    if (d.lat && d.lon) { pl[pk].la.push(+d.lat); pl[pk].lo.push(+d.lon); }
+                }
+                o.push([spIx[d.sci_name], pk, dayNum(d.date), d.birds || 0]);
+            });
+            // il düzeyinde: koordinat o ildeki noktaların ortalaması, 0.1° yuvarlanır (≈10 km)
+            let rnd = priv === 'province' ? 1 : 3, f = Math.pow(10, rnd);
+            let places = pl.map(p => [p.n, p.la.length ? Math.round(p.la.reduce((a, b) => a + b, 0) / p.la.length * f) / f : null, p.lo.length ? Math.round(p.lo.reduce((a, b) => a + b, 0) / p.lo.length * f) / f : null]);
+            let payload = { v: 1, k: lifers ? 'lifer' : st.type, t: title, l: LANG, s: sp, p: places, o, g: (st.sign || '').trim().slice(0, 40) };
+            let url = SHARE_BASE + '#' + await packB64(JSON.stringify(payload));
+            return url;
+        }
+        window.shareLink = async function() {
+            let url = await buildShareLink();
+            if (!url) { showToast(LT('Bu kartta paylaşılacak kayıt yok.', 'Nothing to share on this card.'), [{ label: 'OK', ghost: true }], 4000); return; }
+            if (url.length > 60000) { showToast(LT('Bu görünüm bağlantı için çok büyük; daha dar bir tarih aralığı ya da tek tür seç.', 'This view is too large for a link; pick a shorter date range or a single species.'), [{ label: 'OK', ghost: true }], 7000); return; }
+            let text = LT('Kuş Atlası\'ndaki gözlemlerim 🐦', 'My sightings on Bird Atlas 🐦');
+            try {
+                if (NativePlugins.Share && NativePlugins.Share.share) { await NativePlugins.Share.share({ title: text, text, url, dialogTitle: LT('Bağlantıyı paylaş', 'Share link') }); return; }
+                if (navigator.share) { await navigator.share({ title: text, text, url }); return; }
+            } catch (e) { if (e && /cancel|abort/i.test(String(e.message || e.name))) return; }
+            try { await navigator.clipboard.writeText(url); showToast(LT('Bağlantı kopyalandı 🔗', 'Link copied 🔗'), [{ label: 'OK', ghost: true }], 3500); }
+            catch (e) { prompt(LT('Bağlantıyı kopyala:', 'Copy the link:'), url); }
+        };
 
         document.getElementById('chat-btn-mavis').innerHTML = mavisSVG(28, 'idle');
         document.getElementById('chat-head-mavis').innerHTML = mavisSVG(30, 'idle');

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="tr" data-lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuş Atlası · Bird Atlas – paylaşılan gözlemler</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#10325C">
+<meta property="og:title" content="Bird Atlas – shared sightings">
+<meta property="og:description" content="Open to see these bird sightings on a map. Kuş Atlası ile paylaşılan gözlemler.">
+<meta property="og:image" content="https://birdatlas.app/img/og-en.jpg">
+<link rel="icon" type="image/png" href="/img/favicon-64.png">
+<link rel="stylesheet" href="/app/lib/leaflet/leaflet.css">
+<style>
+@font-face { font-family: "Poppins"; font-weight: 400; font-display: swap; src: url("/app/lib/fonts/poppins-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-024F; }
+@font-face { font-family: "Poppins"; font-weight: 400; font-display: swap; src: url("/app/lib/fonts/poppins-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+@font-face { font-family: "Poppins"; font-weight: 700; font-display: swap; src: url("/app/lib/fonts/poppins-latin-ext-700-normal.woff2") format("woff2"); unicode-range: U+0100-024F; }
+@font-face { font-family: "Poppins"; font-weight: 700; font-display: swap; src: url("/app/lib/fonts/poppins-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+:root { --navy: #10325C; --blue: #1F5FB0; --yellow: #F1C93B; --paper: #F5F8FC; --ink: #42536A; --line: #D9E3F0; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.6 "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--blue); }
+main { width: min(760px, 100% - 32px); margin: 0 auto; padding: 20px 0 48px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--navy); font-weight: 700; text-decoration: none; }
+.brand img { width: 38px; height: 38px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(16,50,92,.15); }
+.langs button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: #fff; color: var(--navy); padding: 3px 11px; border-radius: 999px; cursor: pointer; }
+.langs button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+h1 { color: var(--navy); font-size: clamp(26px, 5vw, 38px); line-height: 1.15; margin: 28px 0 4px; text-wrap: balance; }
+.by { font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.stats span { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 14px; color: var(--navy); }
+.stats b { font-weight: 700; }
+#map { height: min(52vh, 420px); border-radius: 16px; border: 1px solid var(--line); background: #e6edf5; }
+h2 { color: var(--navy); font-size: 20px; margin: 28px 0 8px; }
+ol.sp { list-style: none; padding: 0; margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+ol.sp li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--line); }
+ol.sp li:first-child { border-top: 0; }
+.sci { font-style: italic; font-size: 13px; color: #6A7A90; }
+.meta { font-size: 13px; text-align: right; white-space: nowrap; color: var(--navy); }
+.cta { margin-top: 32px; background: var(--navy); color: #D5E2F3; border-radius: 18px; padding: 22px; }
+.cta h3 { color: #fff; margin: 0 0 6px; font-size: 20px; }
+.cta a.btn { display: inline-block; margin-top: 12px; background: var(--yellow); color: var(--navy); font-weight: 700; padding: 10px 18px; border-radius: 12px; text-decoration: none; }
+.note { font-size: 13px; color: #6A7A90; margin-top: 18px; }
+.err { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-top: 28px; }
+html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <a class="brand" href="/"><img src="/img/logo-180.png" alt=""><span><span data-l="tr">Kuş Atlası</span><span data-l="en">Bird Atlas</span></span></a>
+    <div class="langs"><button data-set="tr" aria-pressed="true">TR</button> <button data-set="en" aria-pressed="false">EN</button></div>
+  </header>
+  <div id="out"></div>
+  <div class="cta">
+    <h3><span data-l="tr">Kendi kuş haritanı oluştur</span><span data-l="en">Make your own bird map</span></h3>
+    <p style="margin:0"><span data-l="tr">eBird gözlemlerini yükle; nerede, ne zaman ne gördüğün, kertiklerin ve grafiklerin tek yerde. Verilerin cihazında kalır.</span><span data-l="en">Upload your eBird sightings: where and when you saw what, your lifers and charts, all in one place. Your data stays on your device.</span></p>
+    <a class="btn" href="/app/"><span data-l="tr">Kuş Atlası'nı aç</span><span data-l="en">Open Bird Atlas</span></a>
+  </div>
+  <p class="note"><span data-l="tr">Bu sayfadaki gözlemler bağlantının içinde taşınır ve yalnızca senin tarayıcında açılır; sunucumuza gönderilmez ve saklanmaz.</span><span data-l="en">The sightings on this page travel inside the link and are opened only in your browser; they are never sent to or stored on our server.</span> · <a href="/privacy/"><span data-l="tr">Gizlilik</span><span data-l="en">Privacy</span></a></p>
+</main>
+<script src="/app/lib/leaflet/leaflet.js"></script>
+<script>
+const MON = { tr: ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'], en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] };
+let L_ = 'tr', DATA = null, map = null;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const T = (tr, en) => L_ === 'en' ? en : tr;
+function dateOf(n) { let d = new Date(Date.UTC(2000, 0, 1) + n * 86400000); return `${d.getUTCDate()} ${MON[L_][d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
+async function unpack(h) {
+  let pre = h[0], b64 = h.slice(1).replace(/-/g, '+').replace(/_/g, '/');
+  let bin = atob(b64), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  if (pre === 'z') { let s = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(await new Response(s).text()); }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function spName(s) { return (L_ === 'en' ? s[2] : s[1]) || s[2] || s[1] || s[0]; }
+function render() {
+  let out = document.getElementById('out');
+  if (!DATA) { out.innerHTML = `<div class="err"><b>${T('Bu bağlantı açılamadı.', 'This link could not be opened.')}</b><br>${T('Bağlantı eksik kopyalanmış olabilir; paylaşan kişiden yeniden göndermesini iste.', 'The link may have been copied incompletely; ask the sender to share it again.')}</div>`; return; }
+  let D = DATA, days = new Set(), spAgg = D.s.map(() => ({ n: 0, b: 0, d: new Set(), first: 1e9 })), plAgg = D.p.map(() => ({ sp: new Set(), n: 0 }));
+  D.o.forEach(([si, pi, dn, b]) => { days.add(dn); let a = spAgg[si]; a.n++; a.b += b || 0; a.d.add(dn); a.first = Math.min(a.first, dn); if (pi >= 0) { plAgg[pi].sp.add(si); plAgg[pi].n++; } });
+  let dl = [...days].sort((a, b) => a - b), range = dl.length ? (dl.length === 1 ? dateOf(dl[0]) : `${dateOf(dl[0])} – ${dateOf(dl[dl.length - 1])}`) : '';
+  let order = D.s.map((s, i) => i).sort((a, b) => D.k === 'lifer' ? spAgg[a].first - spAgg[b].first : (spAgg[b].n - spAgg[a].n || spName(D.s[a]).localeCompare(spName(D.s[b]), L_)));
+  let title = D.t || T('Kuş gözlemlerim', 'My bird sightings');
+  out.innerHTML = `<h1>${esc(title)}</h1>
+    <div class="by">${esc(range)}${D.g ? ` · ${T('paylaşan', 'shared by')} ${esc(D.g)}` : ''}</div>
+    <div class="stats"><span><b>${D.s.length}</b> ${T('tür', 'species')}</span><span><b>${days.size}</b> ${T('gün', days.size === 1 ? 'day' : 'days')}</span>${D.p.length ? `<span><b>${D.p.length}</b> ${T('yer', D.p.length === 1 ? 'place' : 'places')}</span>` : ''}<span><b>${D.o.length}</b> ${T('gözlem', 'sightings')}</span></div>
+    ${D.p.some(p => p[1] != null) ? '<div id="map" role="img" aria-label="map"></div>' : `<p class="by">${T('Paylaşan kişi konumları gizlemiş.', 'The sender hid the locations.')}</p>`}
+    <h2>${D.k === 'lifer' ? T('Kertikler (ilk görülen türler)', 'Lifers (first sightings)') : T('Türler', 'Species')}</h2>
+    <ol class="sp">${order.map((i, k) => { let s = D.s[i], a = spAgg[i]; return `<li><div>${D.k === 'lifer' ? `<b>${k + 1}.</b> ` : ''}${esc(spName(s))}<div class="sci">${esc(s[0])}</div></div><div class="meta">${D.k === 'lifer' ? dateOf(a.first) : `${a.d.size} ${T('gün', a.d.size === 1 ? 'day' : 'days')}${a.b ? `<br>${a.b.toLocaleString(L_)} ${T('birey', 'birds')}` : ''}`}</div></li>`; }).join('')}</ol>`;
+  if (document.getElementById('map') && window.L) {
+    if (map) { map.remove(); map = null; }
+    map = L.map('map', { scrollWheelZoom: false });
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '© OpenStreetMap' }).addTo(map);
+    let pts = [], max = Math.max(1, ...plAgg.map(p => p.sp.size));
+    D.p.forEach((p, i) => { if (p[1] == null) return; let n = plAgg[i].sp.size, t = n / max;
+      let col = t > .75 ? '#E74C3C' : t > .5 ? '#FED008' : t > .25 ? '#2ECC71' : '#1662B6';
+      L.circleMarker([p[1], p[2]], { radius: 7 + 14 * t, color: '#10325C', weight: 1.5, fillColor: col, fillOpacity: .75 }).addTo(map).bindPopup(`<b>${esc(p[0])}</b><br>${n} ${T('tür', 'species')}`);
+      pts.push([p[1], p[2]]); });
+    if (pts.length === 1) map.setView(pts[0], 10); else map.fitBounds(pts, { padding: [30, 30], maxZoom: 11 });
+  }
+}
+function setLang(l) {
+  L_ = l; document.documentElement.lang = l; document.documentElement.dataset.lang = l;
+  document.querySelectorAll('.langs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+  try { localStorage.setItem('app_lang', l); } catch (e) {}
+  render();
+}
+(async () => {
+  let h = location.hash.slice(1);
+  try { if (h) DATA = await unpack(h); } catch (e) { DATA = null; }
+  let saved = null; try { saved = localStorage.getItem('app_lang'); } catch (e) {}
+  setLang(saved || (DATA && DATA.l) || ((navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en'));
+})();
+document.querySelectorAll('.langs button').forEach(b => b.onclick = () => setLang(b.dataset.set));
+</script>
+</body>
+</html>
