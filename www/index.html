@@ -132,7 +132,8 @@
         /* v1.9: kapakta TR/EN ve ? en sağ üstte; logo yerine oturunca altına kayarlar */
         #animated-logo.on-map { position: fixed !important; top: calc(15px + env(safe-area-inset-top)) !important; right: calc(15px + env(safe-area-inset-right)) !important; left: auto !important; width: 65px !important; height: 65px !important; border: 4px solid white !important; box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important; margin: 0 !important; z-index: 999999 !important; }
         #upload-overlay { overflow-y: auto; justify-content: flex-start !important; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); box-sizing: border-box; }
-        #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/cover-map.jpg') center / cover no-repeat, #fff !important; }
+        #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/bg-map-tall.svg') center / cover no-repeat, #fff !important; }
+        @media (min-width: 700px) { #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/bg-map-wide.svg') center / cover no-repeat, #fff !important; } }
         #guide-btn { display: none !important; }
         body:has(#upload-btn-label[style*="display: none"]) #lang-toggle { display: none !important; }
         /* Tur açıkken dil zaten Maviş'in kartında seçiliyor: sağ üstteki dil düğmesi gizli */
