@@ -133,6 +133,7 @@
         #upload-overlay { overflow-y: auto; justify-content: flex-start !important; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); box-sizing: border-box; }
         #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/cover-map.jpg') center / cover no-repeat, #fff !important; }
         #guide-btn { display: none !important; }
+        body:has(#upload-btn-label[style*="display: none"]) #lang-toggle { display: none !important; }
         #sa-probe { position: fixed; left: -9999px; top: 0; width: 1px; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); visibility: hidden; pointer-events: none; }
         #tour .tl { display: flex; gap: 8px; margin-top: 10px; }
         #tour .tl button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 10px; border: 1.5px solid #cfd8e3; background: #fff; font: inherit; font-size: 13.5px; color: #0A3E70; cursor: pointer; }
@@ -1438,7 +1439,10 @@
         // ===== /Harita altlığı =====
 
         function initMapBase() {
-            mapObj = L.map('map', { zoomControl: false }).setView([39.0, 35.0], 6);
+            mapObj = L.map('map', { zoomControl: false, maxBounds: [[-85.05, -720], [85.05, 720]], maxBoundsViscosity: 1.0 }).setView([39.0, 35.0], 6);
+            // Dünya haritası ekranın yüksekliğinden kısa kalmasın: en uzak yakınlaştırma ekrana göre
+            const fitMinZoom = () => { try { let hgt = mapObj.getSize().y || innerHeight; mapObj.setMinZoom(Math.max(1, Math.ceil(Math.log2(hgt / 256)))); } catch (e) {} };
+            fitMinZoom(); mapObj.on('resize', fitMinZoom);
             L.control.zoom({ position: 'bottomleft' }).addTo(mapObj);
             addBaseMap();
             markerLayerGroup = L.featureGroup().addTo(mapObj);
@@ -4762,6 +4766,19 @@
         // ===== v1.12: İlk açılış turu (Maviş anlatır) =====
         let tourIdx = -1, tourSteps = [], tourAfterData = false, tourPre = false, tourWaiting = false, tourWaitTimer = null, tourView = null;
         function ensureTab(t) { if (navTab !== t) openTab(t); }
+        // Haritayı bir noktaya getir ve o noktayı ekranda (x, y) pikseline yerleştir
+        function tourFocus(ll, z, x, y) {
+            try {
+                mapObj.setView(ll, z, { animate: false });
+                let sz = mapObj.getSize(); mapObj.panBy([sz.x / 2 - x, sz.y / 2 - y], { animate: false });
+            } catch (e) {}
+        }
+        // En çok tür görülen yer (Keşfet örneği için anlamlı bir nokta)
+        function tourHotspot() {
+            let m = {}; obsData.forEach(d => { if (d.lat && d.lon) { (m[d.loc] = m[d.loc] || { lat: d.lat, lon: d.lon, s: new Set() }).s.add(d.sci_name); } });
+            let best = Object.values(m).sort((a, b) => b.s.size - a.s.size)[0];
+            return best ? [best.lat, best.lon] : null;
+        }
         function tourSafe() { let p = $t('sa-probe'), cs = p ? getComputedStyle(p) : null; return { t: cs ? parseFloat(cs.paddingTop) || 0 : 0, b: cs ? parseFloat(cs.paddingBottom) || 0 : 0 }; }
         function saveTourView() { try { tourView = obsData.length && mapObj ? { c: mapObj.getCenter(), z: mapObj.getZoom() } : null; } catch (e) { tourView = null; } }
         function restoreTourView() {
@@ -4783,8 +4800,9 @@
         function latestDay() { let ds = obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor').sort(); return ds[ds.length - 1]; }
         function demoExplore() {
             // Yalnızca tur için uydurulmuş örnek sonuçlar (eBird'e bağlanılmaz)
-            let c = mapObj.getCenter();
+            let hs = tourHotspot(), c = hs ? L.latLng(hs[0], hs[1]) : mapObj.getCenter();
             lastExploreLat = c.lat; lastExploreLng = c.lng;
+            try { mapObj.setView(c, 10, { animate: false }); } catch (e) {}
             if (exploreCircle) mapObj.removeLayer(exploreCircle);
             exploreCircle = L.circle([c.lat, c.lng], { radius: currentRadius * 1000, color: '#FED008', fillColor: '#FED008', fillOpacity: 0.25 }).addTo(mapObj);
             const S = [['Phoenicopterus roseus', 'Flamingo', 'Greater Flamingo', 'grefla3', 64], ['Fulica atra', 'Sakarmeke', 'Eurasian Coot', 'eurcoo', 38],
@@ -4846,7 +4864,7 @@
                 leave: () => closePhotoViewer(),
                 title: LT('Kendi fotoğrafın', 'Your own photo'),
                 text: LT('Listede bir türün fotoğrafına dokununca böyle büyür. "✏️ Kendi fotoğrafını koy" ile galeriden kendi çektiğin fotoğrafı seç: listede, haritada ve paylaşım kartlarında artık seninki görünür. Fotoğraf yalnızca bu cihazda kalır.', 'Tap a species photo in the list to enlarge it like this. "✏️ Use your own photo" lets you pick your own shot from the gallery; it then appears in lists, on the map and on share cards. The photo stays on this device.') });
-            s.push({ id: 'chips', target: () => $t('filter-bar'),
+            s.push({ id: 'chips', target: () => $t('filter-bar'), fit: true,
                 enter: () => { let first = document.querySelector('#species-list .species-item'); if (first) first.click(); closeTabs(); },
                 leave: () => { clearFilter('all'); },
                 title: LT('Açık filtreler', 'Active filters'),
@@ -4854,15 +4872,29 @@
             s.push({ id: 'lifer', target: () => $t('filter-panels'), enter: () => ensureTab('lifer'),
                 title: LT('Kertikler', 'Lifers'),
                 text: LT('Kertik, bir türü ilk kez gördüğün an. "Kertik Haritasını Aç" ile hepsini fotoğraflı haritada gör; takvimde yeşil günler kertik günlerin.', 'A lifer is the first time you saw a species. "Open Lifer Map" shows them all with photos; green days in the calendar are lifer days.') });
-            s.push({ id: 'lifermap', target: () => $t('filter-bar'), place: 'bottom',
-                enter: () => { setExplore(false); closeTabs(); if (!liferMode) toggleLiferMode(); },
-                leave: () => { if (liferMode) toggleLiferMode(); },
+            s.push({ id: 'lifermap', target: () => $t('filter-bar'), place: 'bottom', fit: true, light: true,
+                enter: () => {
+                    setExplore(false); closeTabs(); if (!liferMode) toggleLiferMode();
+                    let by = {}; liferArray.forEach(l => { if (l.lat && l.lon) (by[l.loc] = by[l.loc] || []).push(l); });
+                    let grp = Object.values(by).sort((a, b) => Math.abs(a.length - 8) - Math.abs(b.length - 8))[0];
+                    if (!grp) return;
+                    let sz = mapObj.getSize(), big = sz.x >= 900 && sz.y >= 650;
+                    let ll = L.latLng(grp[0].lat, grp[0].lon);
+                    if (big) tourFocus(ll, 11, sz.x * 0.62, sz.y * 0.74);
+                    else tourFocus(ll, 11, sz.x / 2, (150 + (sz.y - 280)) / 2);
+                    if (big) setTimeout(() => {
+                        let best = null, bd = Infinity;
+                        markerLayerGroup.eachLayer(m => { if (m.getPopup && m.getPopup() && m.getLatLng) { let d = m.getLatLng().distanceTo(ll); if (d < bd) { bd = d; best = m; } } });
+                        if (best) best.openPopup();
+                    }, 700);
+                },
+                leave: () => { try { mapObj.closePopup(); } catch (e) {} if (liferMode) toggleLiferMode(); },
                 title: LT('Kertik haritası', 'Lifer map'),
                 text: LT('Her tür, ilk gördüğün yerde fotoğrafıyla duruyor. Uzaktan bakınca sayı baloncukları çıkar; dokununca yakınlaşır. Bir fotoğrafa dokun: türü, tarihi ve "Kertiği paylaş" çıkar. Kapatmak için üstteki "Kertik haritası ✕".', 'Each species sits where you first saw it, with its photo. Zoomed out you see number bubbles; tap to zoom in. Tap a photo for the species, date and "Share lifer". Close it with "Lifer map ✕" on top.') });
             s.push({ id: 'explore', target: () => $t('filter-panels'), enter: () => { if (liferMode) toggleLiferMode(); ensureTab('explore'); demoExplore(); },
                 title: LT('Çevreyi keşfet', 'Explore nearby'),
                 text: LT('Keşfet sekmesinde arama çapını seç, sonra haritada bir noktaya dokun: o çaptaki son 30 günün eBird kayıtları listelenir. Bu liste tur için uyduruldu.', 'In the Explore tab pick a radius, then tap a point on the map: eBird sightings from the last 30 days within it are listed. This list is made up for the tour.') });
-            s.push({ id: 'explore2', target: () => $t('explore-dock'), enter: () => { if (!exploreMode || !exploreData.length) { ensureTab('explore'); demoExplore(); } exploreDockDismissed = false; closeTabs(); try { mapObj.setView([lastExploreLat, lastExploreLng], 10); } catch (e) {} },
+            s.push({ id: 'explore2', light: true, target: () => $t('explore-dock'), enter: () => { if (!exploreMode || !exploreData.length) { ensureTab('explore'); demoExplore(); } exploreDockDismissed = false; closeTabs(); let sz = mapObj.getSize(); tourFocus([lastExploreLat, lastExploreLng], 10, sz.x / 2, sz.x < 700 ? sz.y * 0.72 : sz.y * 0.6); },
                 leave: () => { setExplore(false); closeTabs(); },
                 title: LT('Keşfet: haritada', 'Explore: on the map'),
                 text: LT('Sarı daire aradığın alan; sonuçlar üstteki kutuda kalır, haritada gezinirken de görürsün. Gerçek sonuçlar için ücretsiz eBird API anahtarı gerekir (☰ → Ayarlar); anahtar girince dokunduğun yerin gerçek, güncel kayıtları gelir.', 'The yellow circle is the searched area; results stay in the box on top while you move around. Real results need a free eBird API key (☰ → Settings); with a key you get real, recent sightings for the spot you tap.') });
@@ -4893,11 +4925,15 @@
         function placeTour() {
             let st = tourSteps[tourIdx], r = $t('tour'); if (!st || !r) return; let spot = r.querySelector('.tour-spot'), tip = r.querySelector('.tour-tip'), dim = r.querySelector('.tour-dim');
             let el = st.target ? st.target() : null, rect = el && el.getClientRects().length ? el.getBoundingClientRect() : null;
+            if (rect && st.fit) {
+                let rs = [...el.children].filter(c => c.getClientRects().length).map(c => c.getBoundingClientRect()).filter(q => q.width && q.height);
+                if (rs.length) { let L0 = Math.min(...rs.map(q => q.left)), T = Math.min(...rs.map(q => q.top)), R = Math.max(...rs.map(q => q.right)), B = Math.max(...rs.map(q => q.bottom)); rect = { left: L0, top: T, width: R - L0, height: B - T }; }
+            }
             if (rect && rect.width && rect.height) {
                 let sa = tourSafe(), H = innerHeight - sa.b, T0 = sa.t;
                 let pad = 6, top = Math.max(4 + T0, rect.top - pad), left = Math.max(4, rect.left - pad);
                 let w = Math.min(innerWidth - 8, rect.width + pad * 2), h = Math.min(H - top - 4, rect.height + pad * 2);
-                Object.assign(spot.style, { display: 'block', top: top + 'px', left: left + 'px', width: w + 'px', height: h + 'px' });
+                Object.assign(spot.style, { display: 'block', top: top + 'px', left: left + 'px', width: w + 'px', height: h + 'px', boxShadow: st.light ? '0 0 0 3px #E9C440, 0 0 0 9999px rgba(8,22,44,0.22)' : '' });
                 dim.style.display = 'none';
                 let tw = Math.min(360, innerWidth - 24), th = tip.offsetHeight || 180;
                 let below = top + h + 12, above = top - th - 12;
