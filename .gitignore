@@ -4,9 +4,8 @@ www/lib/
 www/data/ebird-taxonomy.json
 package-lock.json.bak
 dist/
-android/app/build/
-android/.gradle/
-android/build/
+# Android projesi kullanıcının bilgisayarında durur (depoya girmez)
+android/
 *.aab
 *.apk
 
