@@ -4957,16 +4957,20 @@
                     let by = {}; liferArray.forEach(l => { if (l.lat && l.lon) (by[l.loc] = by[l.loc] || []).push(l); });
                     let grp = Object.values(by).sort((a, b) => Math.abs(a.length - 8) - Math.abs(b.length - 8))[0];
                     tourLiferLL = grp ? L.latLng(grp[0].lat, grp[0].lon) : null;
-                    if (tourLiferLL) {
+                    // kertik haritası açılırken fitBounds yakınlaştırma animasyonu çalışıyor; bitince odaklan (yoksa animasyon görünümü geri alır)
+                    if (tourLiferLL) setTimeout(() => {
+                        if (!tourLiferLL) return;
+                        try { mapObj.stop && mapObj.stop(); } catch (e) {}
                         let [x, y] = tourFreeSpot(230); tourFocus(tourLiferLL, 11, x, y);
                         // baloncuk halkası simetrik değil: çizildikten sonra kutusunu boş alanın ortasına kaydır
                         setTimeout(() => { try {
                             let br = tourBubbleRect(tourLiferLL); if (!br) return;
                             // telefonda: baloncuklar pencerenin hemen altından başlasın (alt kısmı kartın altında kalabilir)
                             if (innerWidth < 900) { let fb = $t('filter-panels').getBoundingClientRect().bottom; y = fb + 18 + br.height / 2; }
+                            if (mapObj.getZoom() < 11) { tourFocus(tourLiferLL, 11, x, y); br = tourBubbleRect(tourLiferLL) || br; }
                             mapObj.panBy([br.left + br.width / 2 - x, br.top + br.height / 2 - y], { animate: false }); setTimeout(placeTour, 120);
                         } catch (e) {} }, 450);
-                    }
+                    }, 450);
                 },
                 leave: () => { document.body.classList.remove('tour-compact'); if (liferMode) toggleLiferMode(); tourLiferLL = null; },
                 title: LT('Kertikler', 'Lifers'),
