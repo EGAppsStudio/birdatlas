@@ -283,13 +283,16 @@
         #filter-panels .panels-last { margin-bottom: 0; }
         #filter-panels #update-data-btn { display: none !important; }
         #data-upload-card .du-main { display:block; width:100%; padding:11px; border:none; border-radius:10px; background:#1662B6; color:#fff; font:inherit; font-weight:bold; font-size:15px; cursor:pointer; }
-        #data-upload-card .du-sub { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:7px; font-size:12px; color:#3E5068; }
-        #data-upload-card .du-sub a { color:#1662B6; font-weight:bold; white-space:nowrap; }
-        #obs-seg { display: flex; gap: 3px; background: #EEF3FA; border-radius: 10px; padding: 3px; margin: 0 60px 8px 0; }
+        #data-upload-card .du-dl, #data-upload-card .du-sample { flex:1; text-align:center; padding:8px 10px; border-radius:20px; font:inherit; font-size:13px; font-weight:bold; text-decoration:none; cursor:pointer; box-sizing:border-box; }
+        #data-upload-card .du-dl { background:#FED008; color:#0A3E70; border:none; }
+        #data-upload-card .du-sample { background:#fff; color:#1662B6; border:1.5px dashed #1662B6; }
+        #obs-seg { display: flex; gap: 3px; background: #EEF3FA; border-radius: 10px; padding: 3px; margin: 0 0 8px 0; }
         #obs-seg button { flex: 1; border: none; background: none; border-radius: 8px; padding: 6px 2px; font: inherit; font-size: 12px; font-weight: bold; color: #0A3E70; cursor: pointer; white-space: nowrap; }
         #obs-seg button.on { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
-        #sheet-head { display: none; align-items: center; margin: 0 60px 6px 0; font-weight: bold; color: #0A3E70; font-size: 15px; min-height: 30px; }
-        @media (min-width: 700px) { #obs-seg, #sheet-head { margin-right: 0; } #panels-wrapper { right: auto; width: 420px; } }
+        #sheet-head { display: none; align-items: center; margin: 0 0 6px 0; font-weight: bold; color: #0A3E70; font-size: 15px; min-height: 30px; }
+        @media (min-width: 700px) { #panels-wrapper { right: auto; width: 420px; } }
+        /* Telefonda sekme penceresi açıkken ☰ gizlenir (pencerenin ✕'iyle çakışmasın); pencere kapanınca geri gelir */
+        @media (max-width: 699px) { body:has(#filter-panels[style*="display: grid"]) #menu-btn { display: none !important; } }
         #filter-bar { top: calc(74px + env(safe-area-inset-top)) !important; }
         #explore-dock { top: calc(74px + env(safe-area-inset-top)) !important; }
         /* İlk açılış turu */
@@ -395,11 +398,12 @@
         <div class="panel-container">
             <button id="toggle-database" class="panel-btn" style="border-color:#282629; color:#282629;"><span>🗄️ Veri Yönetimi</span> <span>▼</span></button>
             <div id="database-panel" class="panel-content">
-                <div id="data-upload-card" data-no-i18n style="background:#EAF2FC; border:1.5px solid #1662B6; border-radius:12px; padding:10px; margin-bottom:12px;"></div>
                 <div style="border-bottom: 2px solid #1662B6; margin-bottom: 10px; padding-bottom: 5px; display: flex; gap: 5px;">
-                    <button onclick="switchDbTab('add')" id="tab-add" style="flex:1; padding:6px; background:#1662B6; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">➕ Yeni Ekle</button>
+                    <button onclick="switchDbTab('ebird')" id="tab-ebird" style="flex:1; padding:6px; background:#1662B6; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">📂 eBird</button>
+                    <button onclick="switchDbTab('add')" id="tab-add" style="flex:1; padding:6px; background:#eee; color:#282629; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">➕ Yeni Ekle</button>
                     <button onclick="switchDbTab('list')" id="tab-list" style="flex:1; padding:6px; background:#eee; color:#282629; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">📋 Veri Tablosu</button>
                 </div>
+                <div id="data-upload-card" data-no-i18n></div>
                 
                 <div id="db-add-section">
                     <label style="font-size:11px; font-weight:bold; color:#0A3E70;">Tür Adı (Türkçe veya Latince):</label>
@@ -2589,6 +2593,9 @@
         }
 
         function switchDbTab(tab) {
+            document.getElementById('data-upload-card').style.display = tab === 'ebird' ? 'block' : 'none';
+            { let b = document.getElementById('tab-ebird'); b.style.background = tab === 'ebird' ? '#1662B6' : '#eee'; b.style.color = tab === 'ebird' ? 'white' : '#282629'; }
+            if (tab === 'ebird') renderDataUploadCard();
             document.getElementById('db-add-section').style.display = tab === 'add' ? 'block' : 'none';
             document.getElementById('db-list-section').style.display = tab === 'list' ? 'block' : 'none';
             document.getElementById('tab-add').style.background = tab === 'add' ? '#1662B6' : '#eee';
@@ -4738,8 +4745,16 @@
         function containerOf(id) { let el = document.getElementById(id); return el ? el.closest('.panel-container') : null; }
         function renderDataUploadCard() {
             let c = document.getElementById('data-upload-card'); if (!c) return;
-            c.innerHTML = `<button class="du-main" onclick="document.getElementById('csv-file').click()">📂 ${LT('eBird verini yükle / güncelle', 'Upload / update your eBird data')}</button>
-                <div class="du-sub"><span>${LT('ZIP ya da CSV · eBird\'den indirdiğin dosyayı seç', 'ZIP or CSV · pick the file you downloaded from eBird')}</span><a href="https://ebird.org/downloadMyData" target="_blank">📥 ${LT('eBird\'den indir', 'Get it from eBird')}</a></div>`;
+            let last = (document.getElementById('last-upload-info') || {}).innerText || '';
+            c.innerHTML = `<div style="text-align:center; font-size:13px; color:#282629; margin:4px 0 10px;">${LT('Tüm verileriniz yalnızca cihazınızda işlenir ve güvenle saklanır.', 'All your data is processed and stored only on your device.')}</div>
+                <button class="du-main" onclick="document.getElementById('csv-file').click()">📂 ${LT('eBird ZIP veya CSV Dosyasını Seç', 'Choose eBird ZIP or CSV File')}</button>
+                <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                    <a class="du-dl" href="https://ebird.org/downloadMyData" target="_blank">📥 ${LT('eBird\'den Veri İndir (Link)', 'Download Data from eBird (Link)')}</a>
+                    <button class="du-sample" onclick="closeTabs(); loadSampleData()">🧪 ${LT('Örnek veriyle dene', 'Try with sample data')}</button>
+                </div>
+                <div class="info-box" style="margin-top:10px; text-align:left; font-size:13px;"><b style="color:#0A3E70;">${LT('Nasıl Yapılır?', 'How To?')}</b><br>
+                    ${LT('1. Yukarıdaki bağlantıyla eBird\'den veri indirme talebi oluşturun.<br>2. E-postanıza gelen linke dokunup ZIP dosyasını indirin.<br>3. ZIP dosyasını açmadan mavi düğmeyle yükleyin.', '1. Request your data from eBird with the link above.<br>2. Tap the link in the email you receive and download the ZIP file.<br>3. Upload the ZIP with the blue button, without unzipping it.')}</div>
+                ${last ? `<div style="font-size:12px; color:#1662B6; font-weight:bold; margin-top:10px;">${last}</div>` : ''}`;
         }
         window.renderNav = function() {
             renderDataUploadCard();
@@ -4781,6 +4796,7 @@
             setExplore(tab === 'explore');
             navTab = tab;
             showSheet(tab);
+            if (tab === 'data') switchDbTab('ebird');
             renderNav(); updateFilterBar(); updateExploreDock();
         };
         window.closeTabs = function() {
