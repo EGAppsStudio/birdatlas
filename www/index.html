@@ -136,6 +136,8 @@
         #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/bg-map-tall.svg') center / cover no-repeat, #fff !important; }
         @media (min-width: 700px) { #upload-overlay { background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.7)), url('img/bg-map-wide.svg') center / cover no-repeat, #fff !important; } }
         #guide-btn { display: none !important; }
+        /* Dil: ilk açılışta Maviş'in kartında, sonra ☰ menüde; açılış/yükleme ekranında ayrı düğme yok */
+        #lang-toggle { display: none !important; }
         body:has(#upload-btn-label[style*="display: none"]) #lang-toggle { display: none !important; }
         /* Tur açıkken dil zaten Maviş'in kartında seçiliyor: sağ üstteki dil düğmesi gizli */
         body:has(#tour[style*="display: block"]) :is(#lang-toggle, #lang-menu) { display: none !important; }
