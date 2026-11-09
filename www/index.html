@@ -912,7 +912,7 @@
             document.getElementById('guide-title').textContent = g.title;
             document.getElementById('guide-body').innerHTML = g.sections.map((sec, i) =>
                 `<details${i === 0 ? ' open' : ''}><summary>${sec[0]}</summary><ul>${sec[1].map(li => `<li>${li}</li>`).join('')}</ul></details>`
-            ).join('') + `<div style="margin-top:12px; font-size:11px; color:#777; text-align:center;">${LT('Kuş Atlası', 'Bird Atlas')} v${APP_VERSION} · EG Apps Studio<br><a href="${INSTAGRAM_URL}" target="_blank" style="color:#1662B6; font-weight:bold; text-decoration:none; display:inline-block; margin-top:6px;">📷 @birdatlas.app</a></div>`;
+            ).join('') + `<div style="margin-top:12px; font-size:11px; color:#777; text-align:center;">${LT('Kuş Atlası', 'Bird Atlas')} v${APP_VERSION} · <a href="https://play.google.com/store/apps/dev?id=6200277267214996612" target="_blank" style="color:#1662B6;">EG Apps Studio</a><br><a href="${INSTAGRAM_URL}" target="_blank" style="color:#1662B6; font-weight:bold; text-decoration:none; display:inline-block; margin-top:6px;">📷 @birdatlas.app</a></div>`;
             document.getElementById('guide-overlay').style.display = 'flex';
         };
         window.closeGuide = function() { document.getElementById('guide-overlay').style.display = 'none'; };
