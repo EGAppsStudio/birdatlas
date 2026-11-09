@@ -780,7 +780,7 @@
                     `Yeni gözlemlerden sonra aynı işlemi tekrarla; elle eklediğin kayıtlar korunur.`,
                     `<b>🧪 Örnek veri</b> kullanırken haritada mor bir etiket görünür; kendi verini yükleyince örnek veri silinir.`]],
                 [`📊 eBird verin nasıl haritaya dönüşür?`, [
-                    `Uygulama eBird dosyandaki her satırı (tür, tarih, sayı, konum) cihazında okur. Aynı <b>konum adına</b> sahip kayıtlar tek nokta olur; koordinatlar kayıttan kayda biraz farklıysa haritadaki yer, bu koordinatların ortası (medyanı) alınarak bulunur. Paylaşım kartında "Tam konum" seçince bu nokta olduğu gibi gösterilir.`,
+                    `Uygulama eBird dosyandaki her satırı (tür, tarih, sayı, konum) cihazında okur. Aynı <b>konum adına</b> sahip kayıtlar tek nokta olur; koordinatlar kayıttan kayda farklıysa önce medyanları bulunur, bundan 3 km'den uzak (hatalı) kayıtlar dışarıda bırakılır ve kalanların ortalaması haritadaki yer olur. Paylaşım kartında "Tam konum" seçince bu nokta olduğu gibi gösterilir.`,
                     `Bir konumun adı ya da yeri yanlışsa düzeltmeyi eBird'de yap: <a href="https://ebird.org/mylocations" target="_blank">My Locations</a> (konum adı ve yeri) ya da <a href="https://ebird.org/mychecklists" target="_blank">My Checklists</a> (listeler). Sonra verini yeniden indirip yükle.`]],
                 [`🗺️ Harita`, [
                     `Her daire bir gözlem konumudur. Daire büyüdükçe ve kırmızıya yaklaştıkça o konumdaki tür sayısı artar. Uzaktan bakınca konumlar il baloncuklarında toplanır.`,
@@ -849,7 +849,7 @@
                     `Repeat after new outings; records you added manually are kept.`,
                     `While using <b>🧪 sample data</b> a purple tag appears on the map; uploading your own data replaces it.`]],
                 [`📊 How your eBird data becomes a map`, [
-                    `The app reads every row of your eBird file (species, date, count, location) on your device. Records with the same <b>location name</b> become one point; if their coordinates differ slightly, the point is placed at the middle (median) of them. Choosing "Exact location" on a share card shows that point as is.`,
+                    `The app reads every row of your eBird file (species, date, count, location) on your device. Records with the same <b>location name</b> become one point; if their coordinates differ, the app takes their median, leaves out records more than 3 km from it (likely errors) and places the point at the average of the rest. Choosing "Exact location" on a share card shows that point as is.`,
                     `If a location's name or position is wrong, fix it in eBird: <a href="https://ebird.org/mylocations" target="_blank">My Locations</a> (names and positions) or <a href="https://ebird.org/mychecklists" target="_blank">My Checklists</a> (your lists). Then download and upload your data again.`]],
                 [`🗺️ Map`, [
                     `Each circle is a location. Bigger and redder circles mean more species there. Zoomed out, locations are grouped into province bubbles.`,
