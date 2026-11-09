@@ -281,7 +281,10 @@
         #filter-panels .panel-btn { display: none !important; }
         #filter-panels .panel-content { border: none; box-shadow: none; margin: 0; padding: 4px 0 0; max-height: none; background: transparent; }
         #filter-panels .panels-last { margin-bottom: 0; }
-        #filter-panels #update-data-btn { display: flex !important; margin-top: 12px; }
+        #filter-panels #update-data-btn { display: none !important; }
+        #data-upload-card .du-main { display:block; width:100%; padding:11px; border:none; border-radius:10px; background:#1662B6; color:#fff; font:inherit; font-weight:bold; font-size:15px; cursor:pointer; }
+        #data-upload-card .du-sub { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:7px; font-size:12px; color:#3E5068; }
+        #data-upload-card .du-sub a { color:#1662B6; font-weight:bold; white-space:nowrap; }
         #obs-seg { display: flex; gap: 3px; background: #EEF3FA; border-radius: 10px; padding: 3px; margin: 0 60px 8px 0; }
         #obs-seg button { flex: 1; border: none; background: none; border-radius: 8px; padding: 6px 2px; font: inherit; font-size: 12px; font-weight: bold; color: #0A3E70; cursor: pointer; white-space: nowrap; }
         #obs-seg button.on { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
@@ -392,6 +395,7 @@
         <div class="panel-container">
             <button id="toggle-database" class="panel-btn" style="border-color:#282629; color:#282629;"><span>🗄️ Veri Yönetimi</span> <span>▼</span></button>
             <div id="database-panel" class="panel-content">
+                <div id="data-upload-card" data-no-i18n style="background:#EAF2FC; border:1.5px solid #1662B6; border-radius:12px; padding:10px; margin-bottom:12px;"></div>
                 <div style="border-bottom: 2px solid #1662B6; margin-bottom: 10px; padding-bottom: 5px; display: flex; gap: 5px;">
                     <button onclick="switchDbTab('add')" id="tab-add" style="flex:1; padding:6px; background:#1662B6; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">➕ Yeni Ekle</button>
                     <button onclick="switchDbTab('list')" id="tab-list" style="flex:1; padding:6px; background:#eee; color:#282629; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">📋 Veri Tablosu</button>
@@ -1535,6 +1539,7 @@
         document.getElementById('csv-file').addEventListener('change', async function(e) {
             const file = e.target.files[0]; if(!file) return;
             e.target.value = '';
+            { let ov = document.getElementById('upload-overlay'); if (ov.style.display === 'none') { if (window.closeTabs) closeTabs(); showUploadUI(true); } }
             document.getElementById('upload-btn-label').style.display = 'none'; document.getElementById('instructions-box').style.display = 'none';
             document.getElementById('skip-upload-btn').style.display = 'none'; document.getElementById('loading-status').style.display = 'block';
             { let sb = document.getElementById('sample-data-btn'); if (sb) sb.style.display = 'none'; }
@@ -4731,7 +4736,13 @@
         };
         function navContainers() { return [...document.querySelectorAll('#filter-panels > .panel-container')]; }
         function containerOf(id) { let el = document.getElementById(id); return el ? el.closest('.panel-container') : null; }
+        function renderDataUploadCard() {
+            let c = document.getElementById('data-upload-card'); if (!c) return;
+            c.innerHTML = `<button class="du-main" onclick="document.getElementById('csv-file').click()">📂 ${LT('eBird verini yükle / güncelle', 'Upload / update your eBird data')}</button>
+                <div class="du-sub"><span>${LT('ZIP ya da CSV · eBird\'den indirdiğin dosyayı seç', 'ZIP or CSV · pick the file you downloaded from eBird')}</span><a href="https://ebird.org/downloadMyData" target="_blank">📥 ${LT('eBird\'den indir', 'Get it from eBird')}</a></div>`;
+        }
         window.renderNav = function() {
+            renderDataUploadCard();
             let bar = document.getElementById('tabbar'); if (!bar) return;
             bar.innerHTML = NAV_TABS().map(([k, ic, n]) => `<button class="tb${navTab === k ? ' on' : ''}" data-tab="${k}" onclick="openTab('${k}')"><b>${ic}</b><span>${n}</span></button>`).join('');
             let seg = document.getElementById('obs-seg');
