@@ -779,9 +779,6 @@
                     `<b>"eBird ZIP veya CSV Dosyasını Seç"</b> ile ZIP'i açmadan yükle. Verilerin bir sonraki açılışta da hazır olur.`,
                     `Yeni gözlemlerden sonra aynı işlemi tekrarla; elle eklediğin kayıtlar korunur.`,
                     `<b>🧪 Örnek veri</b> kullanırken haritada mor bir etiket görünür; kendi verini yükleyince örnek veri silinir.`]],
-                [`📊 eBird verin nasıl haritaya dönüşür?`, [
-                    `Uygulama eBird dosyandaki her satırı (tür, tarih, sayı, konum) cihazında okur. Aynı <b>konum adına</b> sahip kayıtlar tek nokta olur; koordinatlar kayıttan kayda farklıysa önce medyanları bulunur, bundan 3 km'den uzak (hatalı) kayıtlar dışarıda bırakılır ve kalanların ortalaması haritadaki yer olur. Paylaşım kartında "Tam konum" seçince bu nokta olduğu gibi gösterilir.`,
-                    `Bir konumun adı ya da yeri yanlışsa düzeltmeyi eBird'de yap: <a href="https://ebird.org/mylocations" target="_blank">My Locations</a> (konum adı ve yeri) ya da <a href="https://ebird.org/mychecklists" target="_blank">My Checklists</a> (listeler). Sonra verini yeniden indirip yükle.`]],
                 [`🗺️ Harita`, [
                     `Her daire bir gözlem konumudur. Daire büyüdükçe ve kırmızıya yaklaştıkça o konumdaki tür sayısı artar. Uzaktan bakınca konumlar il baloncuklarında toplanır.`,
                     `Daireye dokun: o konumda gördüğün türler, fotoğrafları, gözlem sayıları ve <b>📅 Burada</b> satırında hangi tarihlerde gördüğün açılır.`,
@@ -820,10 +817,13 @@
                     `Sağ alttaki <b>Maviş'e Sor</b> düğmesi. Dürbünlü maskotumuz Maviş anahtarsız da çalışır; soruları doğrudan cihazındaki verinden hesaplar.`,
                     `Örnek: "Kızılgerdanı nerede gördüm", "2025'te Mogan'da neler gördüm", "geçen hafta", "en büyük sürüm", "kaç flamingo saydım", "son kertiklerim".`,
                     `Daha serbest sohbet için ücretsiz bir Gemini anahtarı girebilirsin (bkz. API anahtarları).`]],
-                [`➕ Elle kayıt`, [
-                    `<b>☰ → Verilerim → Yeni Ekle:</b> eBird dışı bir gözlemi tür, tarih, adet ve haritadan seçtiğin noktayla ekle. Adedi boş bırakırsan "X" (sayılmadı) olarak kaydedilir. <b>Veri Tablosu</b>'ndan düzenle veya sil.`]],
                 [`🌍 Çevreyi Keşfet`, [
                     `<b>Çevreyi Keşfet:</b> 🌍 Keşfet sekmesini açıp haritaya dokun; seçtiğin çaptaki son 30 günün eBird kayıtları listelenir (eBird API anahtarı gerekir).`]],
+                [`📊 eBird verin nasıl haritaya dönüşür?`, [
+                    `Uygulama eBird dosyandaki her satırı (tür, tarih, sayı, konum) cihazında okur. Aynı <b>konum adına</b> sahip kayıtlar tek nokta olur; koordinatlar kayıttan kayda farklıysa önce medyanları bulunur, bundan 3 km'den uzak (hatalı) kayıtlar dışarıda bırakılır ve kalanların ortalaması haritadaki yer olur. Paylaşım kartında "Tam konum" seçince bu nokta olduğu gibi gösterilir.`,
+                    `Bir konumun adı ya da yeri yanlışsa düzeltmeyi eBird'de yap: <a href="https://ebird.org/mylocations" target="_blank">My Locations</a> (konum adı ve yeri) ya da <a href="https://ebird.org/mychecklists" target="_blank">My Checklists</a> (listeler). Sonra verini yeniden indirip yükle.`]],
+                [`➕ Elle kayıt`, [
+                    `<b>☰ → Verilerim → Yeni Ekle:</b> eBird dışı bir gözlemi tür, tarih, adet ve haritadan seçtiğin noktayla ekle. Adedi boş bırakırsan "X" (sayılmadı) olarak kaydedilir. <b>Veri Tablosu</b>'ndan düzenle veya sil.`]],
                 [`🔑 API anahtarları (isteğe bağlı)`, [
                     `Uygulamanın temel özellikleri anahtarsız çalışır. Anahtarlar ücretsizdir ve <b>⚙️ API Ayarları</b>'na yapıştırılır.`,
                     `<b>eBird API anahtarı</b> – <b>🌍 Çevreyi Keşfet</b> için gerekir. <a href="https://ebird.org/api/keygen" target="_blank" style="color:#1662B6; font-weight:bold;">ebird.org/api/keygen</a> adresinde eBird hesabınla giriş yap, formu doldur. Kullanım amacı olarak <b>ticari olmayan / kişisel kullanım</b>ı seç; açıklamaya kısaca şunu yazabilirsin: <i>"Kuş Atlası uygulamasında, kişisel ve ticari olmayan kullanım için çevremdeki son kuş gözlemlerini görmek."</i> Çıkan anahtarı kopyala.`,
@@ -848,9 +848,6 @@
                     `Upload the ZIP as-is with <b>"Choose eBird ZIP or CSV File"</b>. Your data stays ready for next time.`,
                     `Repeat after new outings; records you added manually are kept.`,
                     `While using <b>🧪 sample data</b> a purple tag appears on the map; uploading your own data replaces it.`]],
-                [`📊 How your eBird data becomes a map`, [
-                    `The app reads every row of your eBird file (species, date, count, location) on your device. Records with the same <b>location name</b> become one point; if their coordinates differ, the app takes their median, leaves out records more than 3 km from it (likely errors) and places the point at the average of the rest. Choosing "Exact location" on a share card shows that point as is.`,
-                    `If a location's name or position is wrong, fix it in eBird: <a href="https://ebird.org/mylocations" target="_blank">My Locations</a> (names and positions) or <a href="https://ebird.org/mychecklists" target="_blank">My Checklists</a> (your lists). Then download and upload your data again.`]],
                 [`🗺️ Map`, [
                     `Each circle is a location. Bigger and redder circles mean more species there. Zoomed out, locations are grouped into province bubbles.`,
                     `Tap a circle to see its species, photos, counts, and the <b>📅 Here</b> line with the dates you saw them there.`,
@@ -889,10 +886,13 @@
                     `The <b>Ask Maviş</b> button at the bottom right. Maviş works without any key, computing answers from data on your device.`,
                     `Try: "Where did I see European Robin", "what did I see at Mogan in 2025", "last week", "largest flock", "how many flamingos did I count", "latest lifers".`,
                     `For free-form chat you can add a free Gemini key (see API keys).`]],
-                [`➕ Manual records`, [
-                    `<b>☰ → My data → Add New:</b> add a non-eBird sighting with species, date, count and a point picked on the map. Leave count empty for "X" (not counted). Edit or delete in <b>Data Table</b>.`]],
                 [`🌍 Explore Nearby`, [
                     `<b>Explore Nearby:</b> open the 🌍 Explore tab and tap the map to list eBird sightings from the last 30 days in the chosen radius (needs an eBird API key).`]],
+                [`📊 How your eBird data becomes a map`, [
+                    `The app reads every row of your eBird file (species, date, count, location) on your device. Records with the same <b>location name</b> become one point; if their coordinates differ, the app takes their median, leaves out records more than 3 km from it (likely errors) and places the point at the average of the rest. Choosing "Exact location" on a share card shows that point as is.`,
+                    `If a location's name or position is wrong, fix it in eBird: <a href="https://ebird.org/mylocations" target="_blank">My Locations</a> (names and positions) or <a href="https://ebird.org/mychecklists" target="_blank">My Checklists</a> (your lists). Then download and upload your data again.`]],
+                [`➕ Manual records`, [
+                    `<b>☰ → My data → Add New:</b> add a non-eBird sighting with species, date, count and a point picked on the map. Leave count empty for "X" (not counted). Edit or delete in <b>Data Table</b>.`]],
                 [`🔑 API keys (optional)`, [
                     `The main features work without keys. Keys are free and go into <b>⚙️ API Settings</b>.`,
                     `<b>eBird API key</b> – needed for <b>🌍 Explore Nearby</b>. Sign in at <a href="https://ebird.org/api/keygen" target="_blank" style="color:#1662B6; font-weight:bold;">ebird.org/api/keygen</a> with your eBird account and fill in the form. Choose <b>non-commercial / personal use</b>; as a description you can write: <i>"Seeing recent bird sightings near me in the Bird Atlas app, for personal, non-commercial use."</i> Copy the key it gives you.`,
