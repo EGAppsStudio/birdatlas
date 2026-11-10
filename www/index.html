@@ -4905,22 +4905,53 @@
             }, 150);
         }
         function latestDay() { let ds = obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor').sort(); return ds[ds.length - 1]; }
+        // Bir nokta denizde/gölde mi? (vektör haritanın su katmanından; bilinmiyorsa null)
+        function tourIsWater(ll) {
+            try {
+                let m = baseVector && baseVector.getMaplibreMap && baseVector.getMaplibreMap(); if (!m) return null;
+                let p = m.project([ll.lng, ll.lat]), cv = m.getCanvas();
+                if (p.x < 0 || p.y < 0 || p.x > cv.clientWidth || p.y > cv.clientHeight) return null;
+                return m.queryRenderedFeatures([p.x, p.y]).some(f => f.sourceLayer === 'water');
+            } catch (e) { return null; }
+        }
+        // Keşfet dairesi için karada, gözlem baloncuklarından uzak bir nokta
+        function tourExploreSpot(hs) {
+            let pts = obsData.filter(d => d.lat && d.lon).map(d => L.latLng(d.lat, d.lon)), cosl = Math.cos(hs.lat * Math.PI / 180);
+            let off = (o, km, ang) => L.latLng(o.lat + km / 111 * Math.cos(ang), o.lng + km / (111 * cosl) * Math.sin(ang));
+            let near = q => Math.min(...pts.map(x => x.distanceTo(q))) / 1000;
+            let r = currentRadius, best = null, bestD = -1;
+            [16, 22, 30, 40].forEach(km => { for (let k = 0; k < 12; k++) {
+                let q = off(hs, km, k * Math.PI / 6);
+                if (tourIsWater(q) !== false) continue;
+                let wet = 0; for (let j = 0; j < 8; j++) if (tourIsWater(off(q, r * 0.7, j * Math.PI / 4))) wet++;
+                if (wet > 2) continue;
+                let md = near(q) - wet * 3;
+                if (md > bestD) { bestD = md; best = q; }
+            } });
+            if (best && bestD > r * 0.8) return best;
+            // su bilgisi yoksa ya da uygun yer çıkmadıysa: gözlem yaptığın (karadaki) bir yer
+            let iso = null, isoD = -1;
+            pts.forEach(q => { let d = q.distanceTo(hs) / 1000; if (d < 8 || d > 80) return; let md = Math.min(...pts.filter(x => x.distanceTo(q) > 500).map(x => x.distanceTo(q))) / 1000; if (md > isoD) { isoD = md; iso = q; } });
+            return iso || hs;
+        }
         function demoExplore() {
             // Yalnızca tur için uydurulmuş örnek sonuçlar (eBird'e bağlanılmaz)
             let hs = tourHotspot(), c = hs ? L.latLng(hs[0], hs[1]) : mapObj.getCenter();
+            let z = innerWidth >= 900 ? 10 : 9;
+            const place = cc => {
+                if (!tourSteps[tourIdx] || tourSteps[tourIdx].id !== 'explore') return;
+                lastExploreLat = cc.lat; lastExploreLng = cc.lng;
+                if (exploreCircle) mapObj.removeLayer(exploreCircle);
+                exploreCircle = L.circle([cc.lat, cc.lng], { radius: currentRadius * 1000, color: '#FED008', fillColor: '#FED008', fillOpacity: 0.25 }).addTo(mapObj);
+                let [fx, fy] = tourFreeSpot(); tourFocus(cc, z, fx, fy);
+            };
             if (hs) {
-                // gözlem baloncuklarıyla üst üste binmesin: 22-30 km ötede, en yakın kaydın 14 km'den uzak olduğu nokta
-                let pts = obsData.filter(d => d.lat && d.lon).map(d => L.latLng(d.lat, d.lon)), best = null, bestD = -1;
-                [22, 30].forEach(km => { for (let k = 0; k < 8; k++) {
-                    let ang = k * Math.PI / 4, q = L.latLng(c.lat + km / 111 * Math.cos(ang), c.lng + km / (111 * Math.cos(c.lat * Math.PI / 180)) * Math.sin(ang));
-                    let md = Math.min(...pts.map(x => x.distanceTo(q))) / 1000;
-                    if (md > bestD) { bestD = md; best = q; }
-                } });
-                if (best && bestD > 14) c = best;
+                // önce bölgeyi aç, harita çizilince karada uygun yeri seç
+                tourFocus(c, z, innerWidth / 2, innerHeight / 2);
+                let m = baseVector && baseVector.getMaplibreMap && baseVector.getMaplibreMap(), done = false;
+                const go = () => { if (done) return; done = true; place(tourExploreSpot(c)); };
+                if (m && m.once) { m.once('idle', go); setTimeout(go, 2500); } else go();
             }
-            lastExploreLat = c.lat; lastExploreLng = c.lng;
-            if (exploreCircle) mapObj.removeLayer(exploreCircle);
-            exploreCircle = L.circle([c.lat, c.lng], { radius: currentRadius * 1000, color: '#FED008', fillColor: '#FED008', fillOpacity: 0.25 }).addTo(mapObj);
             const S = [['Phoenicopterus roseus', 'Flamingo', 'Greater Flamingo', 'grefla3', 64], ['Fulica atra', 'Sakarmeke', 'Eurasian Coot', 'eurcoo', 38],
                 ['Larus michahellis', 'Sarı Bacaklı Martı', 'Yellow-legged Gull', 'yelgul1', 21], ['Podiceps cristatus', 'Bahri', 'Great Crested Grebe', 'grcgre1', 12],
                 ['Ardea cinerea', 'Gri Balıkçıl', 'Gray Heron', 'graher1', 6], ['Passer domesticus', 'Serçe', 'House Sparrow', 'houspa', 30],
@@ -4929,7 +4960,7 @@
             renderExploreData();
             let ec = $t('explore-content');
             if (ec) ec.insertAdjacentHTML('afterbegin', `<div style="background:#FFF6D6; border:1px dashed #E9C440; border-radius:8px; padding:6px 8px; font-size:11.5px; margin-bottom:8px;">🎓 ${LT('Tur örneği: bu liste gerçek değil, yalnızca nasıl göründüğünü göstermek için.', 'Tour example: this list is made up, just to show how it looks.')}</div>`);
-            let [fx, fy] = tourFreeSpot(); tourFocus(c, innerWidth >= 900 ? 10 : 9, fx, fy);
+            if (!hs) place(c);
         }
         function askMavisLocal(q) {
             let cw = $t('chat-window'); if (cw.style.display !== 'flex') toggleChat();
@@ -4986,7 +5017,7 @@
                 leave: () => { clearFilter('all'); },
                 title: LT('Açık filtreler', 'Active filters'),
                 text: LT('Seçtiğin gün ve tür haritanın üstünde etiket olarak durur. ✕ ile birini, "Tümünü temizle" ile hepsini kaldırırsın.', 'The day and species you picked stay on the map as tags. Tap ✕ to remove one, "Clear all" for all.') });
-            s.push({ id: 'lifer', light: true, targets: () => [$t('filter-panels')],
+            s.push({ id: 'lifer', light: true, place: 'bottom', targets: () => [$t('filter-panels')],
                 enter: () => {
                     setExplore(false); ensureTab('lifer'); document.body.classList.add('tour-compact');
                     if (!liferMode) toggleLiferMode();
@@ -5011,7 +5042,7 @@
                 leave: () => { document.body.classList.remove('tour-compact'); if (liferMode) toggleLiferMode(); tourLiferLL = null; },
                 title: LT('Kertikler', 'Lifers'),
                 text: LT('Kertik, bir türü ilk kez gördüğün an. Takvimde yeşil günler kertik günlerin. "Kertik Haritası" açıkken her tür, ilk gördüğün yerde fotoğrafıyla durur; uzaktan sayı baloncuğu olur, dokununca yakınlaşır. Fotoğrafa dokun: tarih ve "Kertiği paylaş".', 'A lifer is the first time you saw a species; green calendar days are lifer days. With the "Lifer map" on, each species sits where you first saw it, with its photo; zoomed out it becomes a number bubble. Tap a photo for the date and "Share lifer".') });
-            s.push({ id: 'explore', light: true, targets: () => [$t('filter-panels'), tourCircleRect()],
+            s.push({ id: 'explore', light: true, place: 'bottom', targets: () => [$t('filter-panels')],
                 enter: () => { if (liferMode) toggleLiferMode(); ensureTab('explore'); demoExplore(); },
                 leave: () => { setExplore(false); closeTabs(); },
                 title: LT('Çevreyi keşfet', 'Explore nearby'),
