@@ -27,8 +27,8 @@ const clear = (w, h) => sharp({ create: { width: w, height: h, channels: 4, back
 await sharp(square).toFile('www/img/logo.png');
 // Eski Android sürümleri için düz ikon: beyaz zemin üzerinde yuvarlak logo
 await white(1024, 1024).composite([{ input: await sharp(round).resize(900, 900).toBuffer(), gravity: 'center' }]).png().toFile('assets/icon-only.png');
-// Yeni Android "uyarlanabilir" ikon: logo güvenli bölgede (%66), arka plan beyaz
-await clear(1024, 1024).composite([{ input: await sharp(round).resize(660, 660).toBuffer(), gravity: 'center' }]).png().toFile('assets/icon-foreground.png');
+// Yeni Android "uyarlanabilir" ikon: görünen alan ortadaki ~683 px; logo 670 px → büyük görünür, dış halka kesilmez
+await clear(1024, 1024).composite([{ input: await sharp(round).resize(670, 670).toBuffer(), gravity: 'center' }]).png().toFile('assets/icon-foreground.png');
 await white(1024, 1024).png().toFile('assets/icon-background.png');
 // Açılış ekranı
 await white(2732, 2732).composite([{ input: await sharp(round).resize(700, 700).toBuffer(), gravity: 'center' }]).png().toFile('assets/splash.png');
