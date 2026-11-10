@@ -4986,7 +4986,7 @@
                 leave: () => { clearFilter('all'); },
                 title: LT('Açık filtreler', 'Active filters'),
                 text: LT('Seçtiğin gün ve tür haritanın üstünde etiket olarak durur. ✕ ile birini, "Tümünü temizle" ile hepsini kaldırırsın.', 'The day and species you picked stay on the map as tags. Tap ✕ to remove one, "Clear all" for all.') });
-            s.push({ id: 'lifer', light: true, targets: () => [$t('filter-panels'), tourLiferLL ? tourBubbleRect(tourLiferLL) : null],
+            s.push({ id: 'lifer', light: true, targets: () => [$t('filter-panels')],
                 enter: () => {
                     setExplore(false); ensureTab('lifer'); document.body.classList.add('tour-compact');
                     if (!liferMode) toggleLiferMode();
