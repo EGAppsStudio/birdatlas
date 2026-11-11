@@ -17,3 +17,8 @@ gizli.env
 .env
 .env.*
 *.pem
+
+# Google Play service account anahtarı (Belgeler\kus-atlasi\ içinde durur, depoya ASLA girmez)
+*service-account*.json
+play-yayin*.json
+eg-apps-play*.json

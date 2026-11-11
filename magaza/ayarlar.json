@@ -1,0 +1,12 @@
+{
+  "paket": "tr.kusatlasi.app",
+  "aciklama": "Play mağaza sayfası dilleri: Play dil kodu → magaza/metinler/ altındaki klasör. Görseller: magaza/gorseller/<klasör>/",
+  "diller": {
+    "es-419": { "metin": "es", "gorsel": "en" },
+    "es-ES": { "metin": "es", "gorsel": "en" },
+    "pt-BR": { "metin": "pt-BR", "gorsel": "en" },
+    "de-DE": { "metin": "de", "gorsel": "en" },
+    "fr-FR": { "metin": "fr", "gorsel": "en" },
+    "fr-CA": { "metin": "fr", "gorsel": "en" }
+  }
+}

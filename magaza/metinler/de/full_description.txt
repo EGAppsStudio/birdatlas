@@ -1,0 +1,49 @@
+Bird Atlas verwandelt deine eBird-Beobachtungen in eine persönliche, anschauliche Karte. Sieh auf einen Blick, welche Vögel du wo und wann gesehen hast – erlebe jeden Beobachtungstag noch einmal und teile deine schönsten Momente.
+
+🗺️ ALLE BEOBACHTUNGEN AUF EINER KARTE
+• Jeder Ort ist ein farbiger Kreis, der mit der Zahl der dort gesehenen Arten wächst.
+• Herausgezoomt siehst du Übersichten nach Land und Region, hineingezoomt jeden einzelnen Ort.
+• Alles in vier Tabs: Meine Beobachtungen, Lifer, Entdecken und Teilen.
+• Orts- und Artenlisten: was du an einem Ort Tag für Tag gesehen hast oder alle Orte und Daten einer Art – mit einem Tipp.
+
+📅 KALENDER UND JAHRESDIAGRAMME
+• Tippe auf einen Tag und sieh sofort, welche Arten du an welchen Orten beobachtet hast.
+• Dein Vogeljahr in Monats- oder Wochendiagrammen: nach Arten, Beobachtungen, Tagen oder Individuen. Vergleiche Jahre.
+• Filtere nach Art, Ort, Region und Datum; suche nach englischem oder wissenschaftlichem Namen.
+
+🏆 LIFER-KARTE
+Verfolge auf der Karte, wo du jede Art zum ersten Mal gesehen hast – als Fotoblasen. Deine Geschichte als Vogelbeobachter auf einem Bildschirm.
+
+📤 KARTEN ZUM TEILEN
+Als Instagram-Story, quadratischer Beitrag oder PDF: Jahresrückblick, Monatskalender, Tag, Reise, Art, Ort, Diagramm und Lifer-Karten. Feiere Meilensteine wie deine 100. Art. Bei sensiblen Arten zeigst du den Ort nur auf Regionsebene oder blendest ihn ganz aus.
+🔗 Oder schick einen Link: Freunde sehen deine Beobachtungen auf einer Karte mit Artenliste – direkt im Browser, ohne App. Die Daten reisen im Link mit und werden nie auf unserem Server gespeichert.
+
+📷 DEINE EIGENEN FOTOS
+Tippe auf das Foto einer Art und ersetze das Wikipedia-Bild durch deine eigene Aufnahme. Es erscheint dann in Listen, auf der Karte und auf deinen Karten zum Teilen.
+
+🐦 MAVİŞ: DEIN ASSISTENT MIT FERNGLAS
+Unsere freundliche Blaumeise beantwortet Fragen zu deinen Daten:
+„Was ist mein bester Monat?", „Was habe ich 2025 am Bodensee gesehen?", „Was war mein größter Schwarm?", „Wie viele Flamingos habe ich gezählt?"
+Maviş läuft auf deinem Gerät – ohne Internet oder Schlüssel.
+
+🔒 DEINE DATEN BLEIBEN BEI DIR
+• Kein Konto, kein Server, keine Werbung, kein Tracking.
+• Beobachtungen und Fotos werden nur auf deinem Handy gespeichert; wir können sie nicht sehen.
+• Lade einfach die ZIP-Datei von eBird hoch – ohne sie zu entpacken.
+
+✨ UND MEHR
+• Beim ersten Start führt dich Maviş durch die App; kein eBird-Konto? Starte mit Beispieldaten.
+• Auch am Computer oder iPhone: birdatlas.app
+• Die App ist auf Englisch und Türkisch (weitere Sprachen folgen); Artnamen in beiden Sprachen
+• Beobachtungen von Hand hinzufügen und bearbeiten, mit Anzahl
+• In der Nähe entdecken: eBird-Meldungen der letzten 30 Tage rund um jeden Punkt (mit deinem kostenlosen eBird-API-Schlüssel)
+• Optional: freier Chat mit Maviş mit deinem kostenlosen Gemini-Schlüssel
+• Schritt-für-Schritt-Anleitung in der App
+
+SO GEHT'S LOS
+1. Fordere in deinem eBird-Konto „Meine Daten herunterladen" an.
+2. Lade die ZIP-Datei aus der E-Mail herunter.
+3. Wähle diese ZIP-Datei in Bird Atlas aus. Fertig!
+
+Bird Atlas ist eine unabhängige App und steht in keiner Verbindung zu eBird oder dem Cornell Lab of Ornithology.
+Feedback: egapps.support@gmail.com · Instagram: @birdatlas.app

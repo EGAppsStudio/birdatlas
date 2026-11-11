@@ -1,0 +1,49 @@
+Bird Atlas convierte tus avistamientos de eBird en un mapa personal y visual. Descubre de un vistazo qué aves viste, dónde y cuándo; revive cada salida de campo y comparte tus mejores momentos.
+
+🗺️ TODOS TUS AVISTAMIENTOS EN UN MAPA
+• Cada localidad es un círculo de color que crece con el número de especies que viste allí.
+• De lejos ves resúmenes por país y provincia; al acercarte, cada punto en detalle.
+• Todo en cuatro pestañas: Mis avistamientos, Lifers, Explorar y Compartir.
+• Listas de localidades y especies: lo que viste en un lugar día a día, o todos los lugares y fechas de una especie, con un toque.
+
+📅 CALENDARIO Y GRÁFICOS ANUALES
+• Toca un día y verás al instante qué especies viste y en qué localidades.
+• Tu año de pajareo en gráficos mensuales o semanales: por especies, avistamientos, días o número de individuos. Compara años.
+• Filtra por especie, lugar, provincia y fecha; busca por nombre en inglés o científico.
+
+🏆 MAPA DE LIFERS
+Sigue en el mapa, con burbujas de fotos, el lugar donde viste cada especie por primera vez. Tu historia como observador de aves en una sola pantalla.
+
+📤 TARJETAS PARA COMPARTIR
+Como historia de Instagram, publicación cuadrada o PDF: resumen del año, calendario del mes, día, viaje, especie, lugar, gráfico y tarjetas de lifers. Celebra hitos como tu especie número 100. Para especies sensibles, muestra la ubicación solo a nivel de provincia u ocúltala por completo.
+🔗 O envía un enlace: tus amigos ven tus avistamientos en un mapa con la lista de especies, en su navegador y sin instalar nada. Los datos viajan dentro del enlace y nunca se guardan en nuestro servidor.
+
+📷 TUS PROPIAS FOTOS
+Toca la foto de una especie y cambia la imagen de Wikipedia por una tuya. Aparecerá en las listas, en el mapa y en tus tarjetas.
+
+🐦 MAVİŞ: TU ASISTENTE CON PRISMÁTICOS
+Nuestro simpático herrerillo responde preguntas sobre tus datos:
+"¿Cuál es mi mejor mes?", "¿Qué vi en Doñana en 2025?", "¿Cuál es mi bando más grande?", "¿Cuántos flamencos conté?"
+Maviş funciona en tu dispositivo; no necesita internet ni clave.
+
+🔒 TUS DATOS SON TUYOS
+• Sin cuenta, sin servidor, sin anuncios, sin rastreo.
+• Tus avistamientos y fotos se guardan solo en tu teléfono; nosotros no podemos verlos.
+• Sube el ZIP que descargas de eBird tal cual, sin descomprimirlo.
+
+✨ Y MÁS
+• Al abrirla por primera vez, Maviş te hace un recorrido guiado; ¿sin cuenta de eBird? Empieza con datos de ejemplo.
+• También en tu ordenador o iPhone: birdatlas.app
+• La app está en inglés y turco (pronto más idiomas); nombres de especies en ambos idiomas
+• Añade y edita avistamientos a mano, con número de individuos
+• Explorar cerca: registros de eBird de los últimos 30 días alrededor de cualquier punto (con tu clave gratuita de la API de eBird)
+• Opcional: chatea libremente con Maviş usando tu clave gratuita de Gemini
+• Guía de uso paso a paso dentro de la app
+
+CÓMO EMPEZAR
+1. En tu cuenta de eBird, solicita "Descargar mis datos".
+2. Descarga el archivo ZIP del correo que recibes.
+3. Elige ese ZIP en Bird Atlas. ¡Listo!
+
+Bird Atlas es una app independiente y no está afiliada a eBird ni al Cornell Lab of Ornithology.
+Comentarios: egapps.support@gmail.com · Instagram: @birdatlas.app
