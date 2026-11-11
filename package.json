@@ -5,6 +5,7 @@
   "description": "Kuş Atlası / Bird Atlas – kişisel kuş gözlem haritası (Android + web)",
   "scripts": {
     "magaza": "node scripts/magaza.mjs",
+    "paylas": "node scripts/paylas.mjs",
     "copy-libs": "node scripts/copy-libs.mjs",
     "sync": "npm run copy-libs && npx cap sync android && node scripts/android-ayarlari.mjs",
     "open": "npx cap open android",

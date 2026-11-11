@@ -27,6 +27,7 @@ android/           depoda YOK (.gitignore); kullanıcının bilgisayarında duru
 - Web sitesi: Cloudflare Pages her push'ta kendisi derler (build: `npm install --omit=dev && npm run web`, çıktı: `dist`, ortam değişkeni `EBIRD_API_KEY`). 1-2 dakikada yayında.
 - Komutlar (proje klasöründe): `npm install` · `npm run sync` (kütüphaneleri kopyalar + `cap sync android` + ad/sürüm/yazı sınırı) · `npm run open` (Android Studio) · `npm run web` (dist/ – web) · `npm run taksonomi -- <eBird anahtarı>` (Türkçe tür adları dosyası).
 - Play mağaza sayfası (çeviriler): metinler `magaza/metinler/<dil>/`, görseller `magaza/gorseller/`, diller `magaza/ayarlar.json`. Kullanıcı çalıştırır: `npm run magaza -- --dene` (yalnız kontrol) → `npm run magaza` (yükler). Service account JSON proje DIŞINDA (`Documents\kus-atlasi\`), depoya asla girmez; izinleri: uygulama bilgisi görüntüle + mağaza varlığını yönet + test kanalları (üretim YOK).
+- Kendi denemesi (Enes): Android Studio → Generate Signed Bundle → `npm run paylas` → en yeni .aab'yi Play "Dahili uygulama paylaşımı"na yükler, kurulum linkini yazar (panoya da kopyalar). Sürüm kodu artmaz, kullanıcıya gitmez. Ortak kod: `scripts/play-ortak.mjs`.
 
 ## Android ve web aynı kod
 - Platform ayrımı `www/index.html` içindeki `NativeCap` ile: `const NativeCap = (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;`
