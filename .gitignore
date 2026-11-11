@@ -22,3 +22,10 @@ gizli.env
 *service-account*.json
 play-yayin*.json
 eg-apps-play*.json
+
+# npm run ikon çıktıları (her bilgisayarda yeniden üretilir, depoya girmez)
+assets/icon-only.png
+assets/icon-foreground.png
+assets/icon-background.png
+assets/splash.png
+play-store-ikon-512.png
