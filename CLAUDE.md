@@ -37,7 +37,8 @@ android/           depoda YOK (.gitignore); kullanıcının bilgisayarında duru
 - localStorage aynı alan adında ortak: tanıtım sayfası ve uygulama dil seçimi için aynı `app_lang` anahtarını kullanır.
 
 ## Kurallar
-- **Sürüm numarasını kullanıcı istemeden değiştirme.** Sürüm `package.json` → `version` (ör. 1.11.0) ve `www/index.html` → `APP_VERSION`; `npm run sync` versionCode'u maj*100+min olarak yazar (1.11 → 111). Play'e her yeni yüklemede versionCode +1 olmalı.
+- **Sürüm numarasını kullanıcı istemeden değiştirme.** Sürüm `package.json` → `version` (ör. 1.11.0) ve `www/index.html` → `APP_VERSION`; `npm run sync` versionCode'u maj*10000+min*100+yama olarak yazar (1.12 → 11200, 1.12.1 → 11201, 1.13 → 11300). Play'e her yüklemede versionCode büyümeli.
+- **Sürüm düzeni (12 Kasım 2026):** kullanıcıya giden yayınlar 1.13, 1.14…; Enes'in kendi denemeleri ara sürüm (1.12.1, 1.12.2…), Play'in Dahili uygulama paylaşımı ya da dahili test kanalıyla. Ara sürümü yalnız Enes isteyince ver (package.json version + APP_VERSION).
 - **Asla depoya girmeyecekler:** `.jks` / `.keystore`, `keystore.properties`, şifreler, `gizli.env`, `.env`, API anahtarları. `.gitignore` bunları engeller; GitHub Desktop'ta görünürlerse commit etme.
 - Kullanıcı verisi cihazda kalır; sunucu, hesap, çerez, analiz yok. Yeni bir dış servis eklenirse gizlilik politikası (`site/privacy/index.html` + Google Sites + Play Data safety) güncellenmeli.
 - Kişisel e-posta (enes…) hiçbir yerde görünmeyecek; yalnızca egapps.support@gmail.com.

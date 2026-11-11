@@ -1,6 +1,6 @@
 // npm run sync sonunda otomatik çalışır:
 //  1) Telefondaki uygulama adı: Türkçe telefonlarda "Kuş Atlası", diğer dillerde "Bird Atlas"
-//  2) Sürüm numarası package.json'dan alınır (ör. 1.8.0 → versionName "1.8", versionCode 108)
+//  2) Sürüm numarası package.json'dan alınır (ör. 1.12.0 → versionName "1.12", versionCode 11200; ara deneme 1.12.1 → "1.12.1", 11201)
 //     Böylece build.gradle'ı elle değiştirmeye gerek kalmaz.
 //  3) Telefonun yazı boyutu çok büyükse uygulama içi yazı en fazla %115 olur (taşmaları önler)
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'node:fs';
@@ -35,7 +35,8 @@ if (existsSync(def)) {
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 const [maj, min, patch] = pkg.version.split('.').map(Number);
 const versionName = patch ? `${maj}.${min}.${patch}` : `${maj}.${min}`;
-const versionCode = maj * 100 + min;          // 1.8 → 108, 1.9 → 109, 2.0 → 200
+// 1.12 → 11200, ara deneme 1.12.1 → 11201, sonraki yayın 1.13 → 11300 (her zaman büyür; eski 112'den de büyük)
+const versionCode = maj * 10000 + min * 100 + (patch || 0);
 const gradle = join(app, 'build.gradle');
 if (existsSync(gradle)) {
   let g = readFileSync(gradle, 'utf8');
