@@ -166,7 +166,7 @@
         #obs-seg .sx, #sheet-head .sh-x { flex: 0 0 auto; border: none; background: none; color: #5B6B7E; font-size: 16px; padding: 4px 8px; cursor: pointer; border-radius: 8px; }
         #sheet-head .sh-x { margin-left: auto; font-size: 18px; }
         /* ☰ açılan pencerelerin üstünde görünmesin */
-        body:has(:is(.ov, #settings-overlay, #share-overlay, #merge-overlay, #guide-overlay, #photo-viewer)[style*="display: flex"]) :is(#menu-btn, #fs-btn) { z-index: 50 !important; }
+        body:has(:is(.ov, #settings-overlay, #share-overlay, #merge-overlay, #guide-overlay, #photo-viewer)[style*="display: flex"]) #menu-btn { z-index: 50 !important; }
         #tour .twait { display: inline-block; animation: tourpulse 1.4s ease-in-out infinite; }
         @keyframes tourpulse { 50% { opacity: .35; } }
         .upload-card { margin: auto; }
@@ -258,12 +258,11 @@
         .sp-photo { cursor: zoom-in; }
         body.no-birds #sort-birds { display: none !important; }
         /* ===== v1.12 yeni düzen ===== */
-        #tabbar, #menu-btn, #fs-btn { display: none; }
+        #tabbar, #menu-btn { display: none; }
         body:has(#animated-logo.on-map) #tabbar { display: flex; }
         body:has(#animated-logo.on-map) #menu-btn { display: grid; }
-        body.fs-ok:has(#animated-logo.on-map) #fs-btn { display: grid; }
         body:has(#animated-logo.on-map) :is(#lang-toggle, #guide-btn, #hide-panels-btn) { display: none !important; }
-        body:has(#upload-overlay[style*="display: flex"]) :is(#tabbar, #menu-btn, #main-menu, #fs-btn) { display: none !important; }
+        body:has(#upload-overlay[style*="display: flex"]) :is(#tabbar, #menu-btn, #main-menu) { display: none !important; }
         #tabbar { position: fixed; z-index: 1002; top: calc(12px + env(safe-area-inset-top)); left: calc(10px + env(safe-area-inset-left)); right: calc(92px + env(safe-area-inset-right)); max-width: 460px;
             gap: 4px; padding: 4px; background: rgba(255,255,255,0.97); border: 1.5px solid #1662B6; border-radius: 14px; box-shadow: 0 3px 10px rgba(10,62,112,0.15); box-sizing: border-box; }
         #tabbar .tb { flex: 1 1 0; min-width: 0; border: none; background: none; border-radius: 10px; padding: 3px 2px 2px; cursor: pointer; color: #0A3E70; font: inherit; font-size: 10.5px; font-weight: bold; line-height: 1.2; }
@@ -273,11 +272,7 @@
         #menu-btn { position: fixed; z-index: 999998; top: calc(88px + env(safe-area-inset-top)); right: calc(25px + env(safe-area-inset-right)); width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #1662B6;
             border: 2px solid #1662B6; font-size: 22px; line-height: 1; place-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 0; }
         #menu-btn.on { background: #1662B6; color: #fff; }
-        /* Web: tam ekran düğmesi, ☰'in hemen altında (uygulamada ve desteklemeyen tarayıcıda görünmez) */
-        #fs-btn { position: fixed; z-index: 999997; top: calc(142px + env(safe-area-inset-top)); right: calc(29px + env(safe-area-inset-right)); width: 36px; height: 36px; border-radius: 50%;
-            background: #fff; color: #1662B6; border: 2px solid #1662B6; place-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 0; }
-        #fs-btn svg { width: 18px; height: 18px; display: block; }
-        body:has(#main-menu[style*="display: block"]) #fs-btn { display: none !important; }
+        #main-menu .fs-ic svg { width: 17px; height: 17px; display: block; color: #1662B6; }
         #main-menu { display: none; position: fixed; z-index: 999999; top: calc(138px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); width: 250px; max-width: calc(100vw - 24px);
             max-height: calc(100vh - 160px); overflow-y: auto; background: #fff; border: 1.5px solid #1662B6; border-radius: 16px; box-shadow: 0 10px 26px rgba(10,62,112,0.25); padding: 6px; box-sizing: border-box; }
         #main-menu button, #main-menu a { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; border: none; background: none; border-radius: 10px; font: inherit; font-size: 14px; color: #0A3E70; text-decoration: none; cursor: pointer; text-align: left; box-sizing: border-box; }
@@ -301,7 +296,7 @@
         #sheet-head { display: none; align-items: center; margin: 0 0 6px 0; font-weight: bold; color: #0A3E70; font-size: 15px; min-height: 30px; }
         @media (min-width: 700px) { #panels-wrapper { right: auto; width: 420px; } }
         /* Telefonda sekme penceresi açıkken ☰ gizlenir (pencerenin ✕'iyle çakışmasın); pencere kapanınca geri gelir */
-        @media (max-width: 699px) { body:has(#filter-panels[style*="display: grid"]) :is(#menu-btn, #fs-btn) { display: none !important; } }
+        @media (max-width: 699px) { body:has(#filter-panels[style*="display: grid"]) #menu-btn { display: none !important; } }
         #filter-bar { top: calc(74px + env(safe-area-inset-top)) !important; }
         #explore-dock { top: calc(74px + env(safe-area-inset-top)) !important; }
         /* İlk açılış turu */
@@ -335,7 +330,6 @@
     <button id="lang-toggle" data-no-i18n onclick="toggleLangMenu(event)">TR ▾</button>
     <nav id="tabbar" data-no-i18n aria-label="Sekmeler"></nav>
     <button id="menu-btn" data-no-i18n onclick="toggleMainMenu(event)" aria-label="Menü">☰</button>
-    <button id="fs-btn" data-no-i18n onclick="toggleFullscreen()" aria-label="Tam ekran"></button>
     <div id="main-menu" data-no-i18n></div>
 
     <div id="panels-wrapper" style="display:none;">
@@ -1542,19 +1536,11 @@
         // ----- Web: tam ekran -----
         const FS_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>';
         const FS_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>';
-        function syncFsBtn() {
-            let b = document.getElementById('fs-btn'); if (!b) return;
-            let on = !!document.fullscreenElement;
-            b.innerHTML = on ? FS_OFF : FS_ON;
-            b.title = on ? LT('Tam ekrandan çık', 'Exit full screen') : LT('Tam ekran', 'Full screen');
-            b.setAttribute('aria-label', b.title);
-        }
         window.toggleFullscreen = function () {
             try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch (e) {}
         };
         if (!NativeCap && document.fullscreenEnabled) {
-            document.body.classList.add('fs-ok'); syncFsBtn();
-            document.addEventListener('fullscreenchange', () => { syncFsBtn(); setTimeout(() => { try { mapObj.invalidateSize(); } catch (e) {} }, 200); });
+            document.addEventListener('fullscreenchange', () => setTimeout(() => { try { mapObj.invalidateSize(); } catch (e) {} }, 200));
         }
 
         const savedDataRaw = localStorage.getItem('ebird_saved_csv_data');
@@ -4883,6 +4869,7 @@
                 it('🎓', LT('Turu yeniden başlat', 'Restart the tour'), 'startTour(true)') +
                 '<div class="mh"></div>' +
                 `<button onclick="toggleLangMenu(event)">🌐 <span class="mt">${LT('Dil', 'Language')}</span><span class="mx">${flagSvg(LANG === 'en' ? 'en' : 'tr')} ${LANG.toUpperCase()} ▸</span></button>` +
+                ((!NativeCap && document.fullscreenEnabled) ? `<button onclick="closeMainMenu(); toggleFullscreen()"><span class="fs-ic">${document.fullscreenElement ? FS_OFF : FS_ON}</span> <span class="mt">${document.fullscreenElement ? LT('Tam ekrandan çık', 'Exit full screen') : LT('Tam ekran', 'Full screen')}</span></button>` : '') +
                 '<div class="mh"></div>' +
                 it('🗄️', LT('Verilerim', 'My data'), "openTab('data')", LT('yükle · elle kayıt', 'upload · manual')) +
                 it('⚙️', LT('Ayarlar', 'Settings'), 'openSettings()', 'API') +
