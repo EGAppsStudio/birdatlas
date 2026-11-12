@@ -1511,7 +1511,7 @@
 
         const savedDataRaw = localStorage.getItem('ebird_saved_csv_data');
         // Örnek veri güncellendiyse eski kopya yerine yenisini yükle (kendi verisi olanlara dokunmaz)
-        const SAMPLE_VER = '2026-11-12';
+        const SAMPLE_VER = '2026-11-12b';
         let staleSample = false; try { staleSample = !!savedDataRaw && localStorage.getItem('is_sample') === '1' && localStorage.getItem('sample_ver') !== SAMPLE_VER; } catch (e) {}
         if (staleSample) { setTimeout(() => window.loadSampleData(), 50); }
         else if (savedDataRaw) {
@@ -1567,6 +1567,7 @@
                     input = await entry.async('string');
                 }
                 statusEl.innerText = "CSV Okunuyor...";
+                if (typeof input === 'string') input = input.replace(/\r\n?/g, '\n');   // karışık satır sonları tek satıra birleşmesin
                 Papa.parse(input, {
                     header: true, skipEmptyLines: true,
                     complete: handleParsedCsv,
@@ -4302,7 +4303,7 @@
             ['upload-btn-label', 'instructions-box', 'skip-upload-btn', 'sample-data-btn'].forEach(id => { let el = document.getElementById(id); if (el) el.style.display = 'none'; });
             let st = document.getElementById('loading-status'); st.style.display = 'block'; st.innerText = LT('Örnek veri hazırlanıyor...', 'Preparing sample data...');
             try {
-                let txt = await (await fetch('data/ornek-veri.csv')).text();
+                let txt = (await (await fetch('data/ornek-veri.csv')).text()).replace(/\r\n?/g, '\n');
                 Papa.parse(txt, { header: true, skipEmptyLines: true, complete: res => {
                     handleParsedCsv(res);
                     _loadingSample = false;
