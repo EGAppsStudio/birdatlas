@@ -1458,7 +1458,7 @@
             try {
                 baseVector = L.maplibreGL({
                     style: 'https://tiles.openfreemap.org/styles/positron',
-                    padding: 0.5,   // hızlı kaydırırken kenarda boşluk kalmasın: ekranın yarısı kadar fazlası da çizilir
+                    padding: 0.25,  // hızlı kaydırırken kenarda boşluk azalsın (0.5 telefonu yoruyordu: yakınlaştırma sonrası kaydırma gecikiyordu)
                     attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
                 }).addTo(mapObj);
                 let m = baseVector.getMaplibreMap();
