@@ -1458,7 +1458,6 @@
             try {
                 baseVector = L.maplibreGL({
                     style: 'https://tiles.openfreemap.org/styles/positron',
-                    padding: 0.25,  // hızlı kaydırırken kenarda boşluk azalsın (0.5 telefonu yoruyordu: yakınlaştırma sonrası kaydırma gecikiyordu)
                     attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
                 }).addTo(mapObj);
                 let m = baseVector.getMaplibreMap();
@@ -1472,7 +1471,7 @@
         // ===== /Harita altlığı =====
 
         function initMapBase() {
-            mapObj = L.map('map', { zoomControl: false, maxBounds: [[-85.05, -720], [85.05, 720]], maxBoundsViscosity: 1.0 }).setView([39.0, 35.0], 6);
+            mapObj = L.map('map', { zoomControl: false, maxBounds: [[-85.05, -720], [85.05, 720]], maxBoundsViscosity: 1.0, inertiaMaxSpeed: 1800, easeLinearity: 0.3 }).setView([39.0, 35.0], 6);
             // Dünya haritası ekranın yüksekliğinden kısa kalmasın: en uzak yakınlaştırma ekrana göre
             const fitMinZoom = () => { try { let hgt = mapObj.getSize().y || innerHeight; mapObj.setMinZoom(Math.max(1, Math.ceil(Math.log2(hgt / 256)))); } catch (e) {} };
             fitMinZoom(); mapObj.on('resize', fitMinZoom);
