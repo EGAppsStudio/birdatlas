@@ -1491,13 +1491,15 @@
             (function wrapMarkers() {
                 const orig = mapObj.latLngToLayerPoint.bind(mapObj);
                 mapObj.latLngToLayerPoint = function (ll) {
-                    ll = L.latLng(ll); let c = this.getCenter().lng, lng = ll.lng;
+                    ll = L.latLng(ll); if (Math.abs(ll.lng) > 180) return orig(ll);   // harita sınırları (±720) gibi noktalar olduğu gibi kalsın
+                    let c = this.getCenter().lng, lng = ll.lng;
                     while (lng - c > 180) lng -= 360; while (lng - c < -180) lng += 360;
                     return orig(lng === ll.lng ? ll : L.latLng(ll.lat, lng));
                 };
                 const origNew = mapObj._latLngToNewLayerPoint.bind(mapObj);
                 mapObj._latLngToNewLayerPoint = function (ll, zoom, center) {
-                    ll = L.latLng(ll); let c = L.latLng(center).lng, lng = ll.lng;
+                    ll = L.latLng(ll); if (Math.abs(ll.lng) > 180) return origNew(ll, zoom, center);
+                    let c = L.latLng(center).lng, lng = ll.lng;
                     while (lng - c > 180) lng -= 360; while (lng - c < -180) lng += 360;
                     return origNew(L.latLng(ll.lat, lng), zoom, center);
                 };
