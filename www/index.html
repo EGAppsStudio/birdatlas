@@ -1510,7 +1510,11 @@
         initMapBase();
 
         const savedDataRaw = localStorage.getItem('ebird_saved_csv_data');
-        if (savedDataRaw) {
+        // Örnek veri güncellendiyse eski kopya yerine yenisini yükle (kendi verisi olanlara dokunmaz)
+        const SAMPLE_VER = '2026-11-12';
+        let staleSample = false; try { staleSample = !!savedDataRaw && localStorage.getItem('is_sample') === '1' && localStorage.getItem('sample_ver') !== SAMPLE_VER; } catch (e) {}
+        if (staleSample) { setTimeout(() => window.loadSampleData(), 50); }
+        else if (savedDataRaw) {
             document.getElementById('upload-btn-label').style.display = 'none';
             document.getElementById('instructions-box').style.display = 'none';
             document.getElementById('upload-desc').style.display = 'none';
@@ -4302,7 +4306,7 @@
                 Papa.parse(txt, { header: true, skipEmptyLines: true, complete: res => {
                     handleParsedCsv(res);
                     _loadingSample = false;
-                    try { localStorage.setItem('is_sample', '1'); } catch (e) {}
+                    try { localStorage.setItem('is_sample', '1'); localStorage.setItem('sample_ver', SAMPLE_VER); } catch (e) {}
                 }, error: err => { _loadingSample = false; failUpload(err.message); } });
             } catch (err) { _loadingSample = false; failUpload(LT('Örnek veri açılamadı: ', 'Could not open sample data: ') + err.message); }
         };
