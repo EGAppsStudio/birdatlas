@@ -215,6 +215,7 @@
         #filter-bar .fchip.clear { background: #0A3E70; color: #FED008; border-color: #0A3E70; padding-right: 10px; cursor: pointer; }
         #filter-bar .fchip.lifer { border-color: #2ecc71; color: #1e8449; }
         #filter-bar .fchip.expanded { background: #FFF6CC; border-color: #E9C440; }
+        .leaflet-bar a.fs-btn { font-size: 17px; line-height: 30px; color: #0A3E70; }
         #filter-bar .fchip.expanded span.t { max-width: 62vw; }
         .sp-pick { display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow-y: auto; padding: 2px; }
         .sp-pick button { padding: 5px 9px; border-radius: 14px; border: 1px solid #cbd5e1; background: #fff; color: #0A3E70; font-size: 11.5px; cursor: pointer; }
@@ -1474,12 +1475,45 @@
             const fitMinZoom = () => { try { let hgt = mapObj.getSize().y || innerHeight; mapObj.setMinZoom(Math.max(1, Math.ceil(Math.log2(hgt / 256)))); } catch (e) {} };
             fitMinZoom(); mapObj.on('resize', fitMinZoom);
             L.control.zoom({ position: 'bottomleft' }).addTo(mapObj);
+            // Web: tam ekran düğmesi (uygulamada gerek yok; desteklemeyen tarayıcıda görünmez)
+            if (!NativeCap && document.fullscreenEnabled) {
+                const FsCtl = L.Control.extend({ options: { position: 'bottomleft' }, onAdd() {
+                    let d = L.DomUtil.create('div', 'leaflet-bar'), a = L.DomUtil.create('a', 'fs-btn', d);
+                    a.href = '#'; a.setAttribute('role', 'button');
+                    const sync = () => { let on = !!document.fullscreenElement; a.innerHTML = on ? '🗗' : '⛶'; a.title = on ? LT('Tam ekrandan çık', 'Exit full screen') : LT('Tam ekran', 'Full screen'); a.setAttribute('aria-label', a.title); };
+                    sync(); document.addEventListener('fullscreenchange', () => { sync(); setTimeout(() => mapObj.invalidateSize(), 200); });
+                    L.DomEvent.disableClickPropagation(d);
+                    L.DomEvent.on(a, 'click', e => { L.DomEvent.preventDefault(e); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch (x) {} });
+                    return d; } });
+                new FsCtl().addTo(mapObj);
+            }
+            // Dünya tekrar ederken işaretler de görünsün: her nokta haritanın ortasına en yakın dünya kopyasında çizilir
+            (function wrapMarkers() {
+                const orig = mapObj.latLngToLayerPoint.bind(mapObj);
+                mapObj.latLngToLayerPoint = function (ll) {
+                    ll = L.latLng(ll); let c = this.getCenter().lng, lng = ll.lng;
+                    while (lng - c > 180) lng -= 360; while (lng - c < -180) lng += 360;
+                    return orig(lng === ll.lng ? ll : L.latLng(ll.lat, lng));
+                };
+                const origNew = mapObj._latLngToNewLayerPoint.bind(mapObj);
+                mapObj._latLngToNewLayerPoint = function (ll, zoom, center) {
+                    ll = L.latLng(ll); let c = L.latLng(center).lng, lng = ll.lng;
+                    while (lng - c > 180) lng -= 360; while (lng - c < -180) lng += 360;
+                    return origNew(L.latLng(ll.lat, lng), zoom, center);
+                };
+                let lastC = mapObj.getCenter().lng;
+                mapObj.on('moveend', () => {
+                    let c = mapObj.getCenter().lng; if (Math.abs(c - lastC) < 40) return; lastC = c;
+                    mapObj.eachLayer(l => { if (l instanceof L.GridLayer) return; try { if (l instanceof L.Marker) l.update(); else if (l._reset) l._reset(); } catch (e) {} });
+                    try { if (mapObj._popup && mapObj._popup._map) mapObj._popup.update(); } catch (e) {}
+                });
+            })();
             addBaseMap();
             markerLayerGroup = L.featureGroup().addTo(mapObj);
 
             mapObj.on('click', function(e) {
                 if (pickingMode) {
-                    pickedLat = e.latlng.lat.toFixed(5); pickedLng = e.latlng.lng.toFixed(5);
+                    let wll = e.latlng.wrap(); pickedLat = wll.lat.toFixed(5); pickedLng = wll.lng.toFixed(5);
                     document.getElementById('manual-coords').value = pickedLat + ", " + pickedLng;
                     if(tempMarker) mapObj.removeLayer(tempMarker);
                     tempMarker = L.marker([pickedLat, pickedLng]).addTo(mapObj);
@@ -1488,7 +1522,7 @@
                     return;
                 }
                 if (!exploreMode) return;
-                lastExploreLat = e.latlng.lat; lastExploreLng = e.latlng.lng;
+                let ell = e.latlng.wrap(); lastExploreLat = ell.lat; lastExploreLng = ell.lng;
                 fetchExploreData(lastExploreLat, lastExploreLng);
             });
 
