@@ -131,6 +131,16 @@
         .feedback-btn { border-color: #1662B6 !important; color: #1662B6 !important; justify-content: center !important; }
         .feedback-hint { font-size: 10.5px; color: #6b7a8c; margin-top: 6px; line-height: 1.35; }
         .ls-hide { display: none !important; }
+        #fbask { position: fixed; inset: 0; z-index: 1000001; background: rgba(10,30,60,.45); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+        #fbask .fa-card { background: #FDFDFD; border-radius: 18px; max-width: 360px; width: 100%; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.25); color: #0A3E70; }
+        #fbask .fa-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+        #fbask .fa-top svg { flex: 0 0 auto; }
+        #fbask .fa-top b { font-size: 17px; }
+        #fbask .fa-sub { font-size: 13px; color: #4A5B70; margin-top: 4px; line-height: 1.35; }
+        #fbask .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
+        #fbask .fa-btn.fa-rate { background: #1662B6; color: #fff; }
+        #fbask .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
+        #fbask .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
         /* Pencereleri tutamaçla boyutlandırma (sekme pencereleri + Maviş) */
         .rs-grip { display: none; justify-content: center; align-items: center; height: 22px; cursor: ns-resize; touch-action: none; pointer-events: auto; user-select: none; }
         .rs-grip span { width: 46px; height: 5px; border-radius: 3px; background: #1662B6; opacity: .55; box-shadow: 0 0 0 3px rgba(255,255,255,.85); }
@@ -3332,15 +3342,39 @@
             if (NativeCap) window.location.href = 'market://details?id=' + PLAY_ID;
             else window.open('https://play.google.com/store/apps/details?id=' + PLAY_ID, '_blank');
         };
-        // Herkese aynı soru, en fazla bir kez; hata bildiriminin hemen ardından asla
+        // Birkaç kullanımdan sonra bir kez: değerlendirme (yalnız Android) + hata / öneri penceresi.
+        // "Sonra" denirse 8 açılış sonra bir kez daha sorar; hata bildiriminin hemen ardından ya da turda asla.
         function maybeAskReview(reason) {
             try {
-                if (!NativeCap || isSample() || launchCount < 5 || localStorage.getItem('review_asked') || sessionStorage.getItem('fb_sent') || !obsData.length) return;
-                localStorage.setItem('review_asked', '1');
+                if (!obsData.length || sessionStorage.getItem('fb_sent') || (typeof tourIdx !== 'undefined' && tourIdx >= 0)) return;
+                if (localStorage.getItem('fbask_done')) return;
+                let next = parseInt(localStorage.getItem('fbask_next'), 10) || 4;   // en erken 4. açılış
+                if (launchCount < next) return;
+                if (document.querySelector('.ov[style*="display: flex"], #share-overlay[style*="display: flex"]')) return;   // başka pencere açıkken araya girme
             } catch (e) { return; }
-            showToast(`⭐ ${LT('Kuş Atlası işine yarıyor mu? Play\'de bir değerlendirme bize çok destek olur.', 'Enjoying Bird Atlas? A rating on Google Play helps us a lot.')}`,
-                [{ label: LT('Değerlendir', 'Rate'), fn: rateApp }, { label: LT('Sonra', 'Later'), ghost: true }], 15000);
+            openFeedbackAsk();
         }
+        window.openFeedbackAsk = function() {
+            let old = document.getElementById('fbask'); if (old) old.remove();
+            const rate = !!NativeCap && !isSample();
+            const close = later => { try { if (later) localStorage.setItem('fbask_next', launchCount + 8); else localStorage.setItem('fbask_done', '1'); } catch (e) {} let el = document.getElementById('fbask'); if (el) el.remove(); };
+            let d = document.createElement('div'); d.id = 'fbask'; d.setAttribute('data-no-i18n', '');
+            d.innerHTML = `<div class="fa-card" role="dialog" aria-modal="true">
+                <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${LT('Kuş Atlası nasıl gidiyor?', 'How is Bird Atlas going?')}</b><div class="fa-sub">${LT('Uygulamayı birlikte geliştiriyoruz. Bir dakikanı ayırırsan çok seviniriz 💙', 'We build this app together. A minute of your time means a lot 💙')}</div></div></div>
+                ${rate ? `<button class="fa-btn fa-rate" data-a="rate">⭐ ${LT("Google Play'de değerlendir", 'Rate on Google Play')}</button>` : ''}
+                <button class="fa-btn" data-a="bug">🐞 ${LT('Bir hata gördüm', 'I found a bug')}</button>
+                <button class="fa-btn" data-a="idea">💡 ${LT('Bir önerim var', 'I have an idea')}</button>
+                <div class="fa-foot"><button class="fa-link" data-a="later">${LT('Sonra', 'Later')}</button><button class="fa-link" data-a="never">${LT('Bir daha sorma', "Don't ask again")}</button></div>
+            </div>`;
+            d.addEventListener('click', e => {
+                let a = e.target.closest('[data-a]'); if (!a && e.target === d) return close(true); if (!a) return;
+                let k = a.getAttribute('data-a');
+                if (k === 'rate') { close(false); rateApp(); }
+                else if (k === 'bug' || k === 'idea') { close(false); sendFeedback(k); }
+                else close(k === 'later');
+            });
+            document.body.appendChild(d);
+        };
 
         // ----- Veri yüklendikten sonra: kertik dönüm noktası + değerlendirme zamanı -----
         const MILESTONES = [25, 50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1250, 1500, 2000];
