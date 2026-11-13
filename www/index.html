@@ -3701,7 +3701,7 @@
                 let pts = sharePoints(new Map([[l.name, l]]), false);
                 if (story) {
                     if (pts.length) await mapPanel(ctx, 40, 720, W - 80, 520, pts, C.blue, shareState.privacy === 'province' ? 7 : 13);
-                    text(ctx, LT('En sık gördüklerim', 'Most frequent here'), 80, pts.length ? 1320 : 760, { w: 600, px: 30, color: C.sky });
+                    text(ctx, (shareState.locPick && shareState.locPick.length) ? LT('Burada gördüğüm türlerden', 'Some of the species I saw here') : LT('En sık gördüklerim', 'Most frequent here'), 80, pts.length ? 1320 : 760, { w: 600, px: 30, color: C.sky });
                     await mosaic(ctx, D.top, 40, pts.length ? 1350 : 800, W - 80, 2, 3, 72);
                 } else {
                     await mosaic(ctx, D.top, 40, 530, W - 80, 2, 3, 70);
