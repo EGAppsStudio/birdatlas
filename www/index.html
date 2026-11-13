@@ -131,6 +131,8 @@
         .feedback-btn { border-color: #1662B6 !important; color: #1662B6 !important; justify-content: center !important; }
         .feedback-hint { font-size: 10.5px; color: #6b7a8c; margin-top: 6px; line-height: 1.35; }
         .ls-hide { display: none !important; }
+        .chat-share { margin-top: 6px; }
+        .chat-share button { background: #FFF6CC; color: #0A3E70; border: 1px solid #E9C440; border-radius: 14px; padding: 6px 10px; font-size: 12px; cursor: pointer; text-align: left; max-width: 100%; }
         /* v1.9: kapakta TR/EN ve ? en sağ üstte; logo yerine oturunca altına kayarlar */
         #animated-logo.on-map { position: fixed !important; top: calc(15px + env(safe-area-inset-top)) !important; right: calc(15px + env(safe-area-inset-right)) !important; left: auto !important; width: 65px !important; height: 65px !important; border: 4px solid white !important; box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important; margin: 0 !important; z-index: 999999 !important; }
         #upload-overlay { overflow-y: auto; justify-content: flex-start !important; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); box-sizing: border-box; }
@@ -1027,6 +1029,59 @@
             let list = SUGGESTIONS[LANG === 'en' ? 'en' : 'tr'].filter(x => x !== exclude);
             for (let i = list.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
             return list.slice(0, 3);
+        }
+        // ----- Maviş → paylaşım kartı: sorudaki tür / gün / yer / ay / yıla uygun kartı önerir -----
+        let shareSuggs = [];
+        window.openShareSugg = function(i) { let o = shareSuggs[i]; if (o) openShare(Object.assign({}, o)); };
+        function shareFromQuestion(question) {
+            if (!obsData.length || !question) return null;
+            const q = normTxt(question), words = q.split(/[^a-z0-9]+/).filter(Boolean), has = (...w) => w.some(x => q.includes(x));
+            const all = window.popupData.allSpecies || {};
+            let spHit = Object.entries(all).map(([sci, a]) => {
+                let names = [a.tr_name, trToEnName[a.tr_name], sci].filter(Boolean).map(normTxt).filter(n => n.length > 2 && q.includes(n));
+                return names.length ? { sci, name: a.tr_name, len: Math.max(...names.map(n => n.length)) } : null;
+            }).filter(Boolean).sort((a, b) => b.len - a.len)[0];
+            let spCand = [];
+            if (!spHit) {   // "flamingo" → "Büyük Flamingo": addaki tek bir kelime eşleşiyorsa ve tek adaysa
+                let cand = spCand = Object.entries(all).filter(([sci, a]) => [a.tr_name, trToEnName[a.tr_name]].filter(Boolean).some(n => normTxt(n).split(/[^a-z0-9]+/).some(w => w.length >= 5 && words.some(x => x === w || (x.startsWith(w) && x.length - w.length <= 4)))));
+                if (cand.length === 1) spHit = { sci: cand[0][0], name: cand[0][1].tr_name };
+            }
+            let locNames = [...new Set(obsData.map(d => d.loc))];
+            let locHit = locNames.filter(l => normTxt(l).length > 3 && q.includes(normTxt(l))).sort((a, b) => b.length - a.length)[0];
+            if (!locHit) { let cand = locNames.filter(l => { let w0 = normTxt(l).split(/[^a-z0-9]+/).filter(x => x.length >= 4)[0]; return w0 && words.includes(w0); }); if (cand.length === 1) locHit = cand[0]; }
+            const dates = [...new Set(obsData.filter(d => d.date !== 'Bilinmiyor').map(d => d.date))].sort();
+            const pad = n => String(n).padStart(2, '0');
+            let day = null, pd = parseDateQuery(q, words), rel = relativeRange(q);
+            if (pd) { let tail = `-${pad(pd.m)}-${pad(pd.d)}`; day = pd.y ? `${pd.y}${tail}` : dates.filter(d => d.endsWith(tail)).pop() || null; }
+            else if (rel && rel.day) day = rel.from;
+            if (!spHit && spCand.length > 1 && day) { let c2 = spCand.filter(([sci]) => obsData.some(d => d.sci_name === sci && d.date === day)); if (c2.length === 1) spHit = { sci: c2[0][0], name: c2[0][1].tr_name }; }
+            let yr = (q.match(/\b((?:19|20)\d{2})\b/) || [])[1] || (has('bu yil', 'this year') ? String(new Date().getFullYear()) : null);
+            let mIdx = -1;
+            words.forEach(w => { if (mIdx >= 0) return; let k = MONTHS.tr.findIndex(mn => w === mn || (w.startsWith(mn) && w.length - mn.length <= 5)); if (k < 0) k = MONTHS.en.findIndex(mn => w === mn); if (k >= 0) mIdx = k; });
+            const nm = sci => trSpecies((all[sci] || {}).tr_name || sci);
+            // 1) tür + gün → tek gözlem kartı (birey sayısıyla)
+            if (spHit && day) {
+                let rows = obsData.filter(d => d.sci_name === spHit.sci && d.date === day && (!locHit || d.loc === locHit));
+                if (rows.length) return { opts: { type: 'obs', sci: spHit.sci, loc: rows[0].loc, date: day }, label: `${LT('Tek gözlem', 'Sighting')} · ${nm(spHit.sci)} · ${formatDisplayDate(day)}` };
+            }
+            if (day && dates.includes(day) && !spHit) return { opts: { type: 'day', date: day }, label: `${LT('Gün', 'Day')} · ${formatDisplayDate(day)}` };
+            if (rel && !rel.day) { let inR = dates.filter(d => d >= rel.from && d <= rel.to); if (inR.length) return { opts: { type: 'trip', from: inR[0], to: inR[inR.length - 1] }, label: `${LT('Gezi', 'Trip')} · ${rel.label}` }; }
+            if (spHit) return { opts: { type: 'species', sci: spHit.sci }, label: `${LT('Tür', 'Species')} · ${nm(spHit.sci)}` };
+            if (locHit) return { opts: { type: 'location', loc: locHit }, label: `${LT('Konum', 'Place')} · ${locHit}` };
+            if (mIdx >= 0) {
+                let mm = pad(mIdx + 1), y = yr || (dates.filter(d => d.slice(5, 7) === mm).pop() || '').slice(0, 4);
+                if (y && dates.some(d => d.startsWith(`${y}-${mm}`))) return { opts: { type: 'month', month: `${y}-${mm}` }, label: `${LT('Ay', 'Month')} · ${monthName(mIdx + 1)} ${y}` };
+            }
+            if (has('kertik', 'lifer') && liferArray.length) return { opts: { type: 'milestone' }, label: LT('Kertik kartı', 'Lifer card') };
+            if (has('grafik', 'chart', 'aylik', 'haftalik', 'monthly', 'weekly')) return { opts: { type: 'chart' }, label: LT('Grafik', 'Chart') };
+            if (yr && dates.some(d => d.startsWith(yr))) return { opts: { type: 'year', year: yr }, label: `${LT('Yıl', 'Year')} · ${yr}` };
+            return null;
+        }
+        function shareSuggestHtml(question) {
+            let r = null; try { r = shareFromQuestion(question); } catch (e) {}
+            if (!r) return '';
+            let i = shareSuggs.push(r.opts) - 1;
+            return `<div class="chat-share" data-no-i18n><button onclick="openShareSugg(${i})">📤 ${LT('Paylaşım kartı yap', 'Make a share card')}: <b>${escHtml(r.label)}</b></button></div>`;
         }
         function suggestionButtons(list) {
             if (!list || !list.length) return '';
@@ -2909,7 +2964,7 @@
             chatBox.innerHTML += `<div class="chat-msg chat-user"><span class="msg-bubble">${escHtml(userText)}</span></div>`; inputEl.value = ''; chatBox.scrollTop = chatBox.scrollHeight;
             if (!aiKey()) {
                 let r = localAssistant(userText);
-                chatBox.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}</span>${suggestionButtons(r.suggestions)}</div>`;
+                chatBox.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}</span>${shareSuggestHtml(userText)}${suggestionButtons(r.suggestions)}</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
                 return;
             }
@@ -2926,7 +2981,7 @@
                 }
                 chatHistory.push({ role: "assistant", text: botReplyRaw });
                 document.getElementById(loadingId).remove();
-                chatBox.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${escHtml(actualReply).replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>')}</span>${suggestionsHtml}</div>`;
+                chatBox.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${escHtml(actualReply).replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>')}</span>${shareSuggestHtml(userText)}${suggestionsHtml}</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
             } catch (error) {
                 document.getElementById(loadingId).remove();
@@ -2934,7 +2989,7 @@
                 if (error && error.transient) {
                     // Google yoğun: cevabı cihazdaki Maviş versin
                     let r = localAssistant(userText);
-                    chatBox.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}<br><span style="font-size:11px; opacity:0.75;">(${LT('Gemini şu an yoğun, bu cevabı ben verdim 🐦', 'Gemini is busy right now, so I answered myself 🐦')})</span></span>${suggestionButtons(r.suggestions)}</div>`;
+                    chatBox.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}<br><span style="font-size:11px; opacity:0.75;">(${LT('Gemini şu an yoğun, bu cevabı ben verdim 🐦', 'Gemini is busy right now, so I answered myself 🐦')})</span></span>${shareSuggestHtml(userText)}${suggestionButtons(r.suggestions)}</div>`;
                 } else {
                     chatBox.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble" style="background:#fadbd8; color:#7b241c;">${LT('Hata', 'Error')} (Gemini): ${escHtml(error.message)}</span></div>`;
                 }
@@ -3808,7 +3863,7 @@
             let d0 = opts.date || lastClickedDay || days[0];
             shareState = {
                 type: opts.type || (selSci ? 'species' : selectedLocation ? 'location' : lastClickedDay ? 'day' : 'year'),
-                year: prev.year || years[0], date: d0,
+                year: opts.year || prev.year || years[0], date: d0,
                 sci: opts.sci || selSci || prev.sci || mostSci, loc: opts.loc || selectedLocation || prev.loc || mostLoc,
                 n: liferN,
                 format: prev.format || 'story', privacy: prev.privacy || 'exact', sign: prev.sign || '', locPick: null, ig: prev.ig !== false,
@@ -3845,7 +3900,7 @@
             let types = [['year', LT('📆 Yıl', '📆 Year')], ['month', LT('🗓️ Ay', '🗓️ Month')], ['day', LT('📅 Gün', '📅 Day')], ['trip', LT('🧳 Gezi', '🧳 Trip')], ['species', LT('🐦 Tür', '🐦 Species')], ['location', LT('📍 Konum', '📍 Place')]];
             if (liferArray.length) types.push(['milestone', LT('🏆 Kertik', '🏆 Lifer')]);
             types.push(['chart', LT('📊 Grafik', '📊 Chart')]);
-            types.push(['obs', LT('📸 Gözlem', '📸 Sighting')]);
+            types.push(['obs', LT('📸 Tek gözlem', '📸 One sighting')]);
             let h = `<div class="sh-row"><label>${LT('Kart', 'Card')}</label>${seg('type', types, st.type)}</div>`;
             if (st.type === 'year') h += `<div class="sh-row"><select onchange="setShare('year', this.value)">${yearsInData().map(y => `<option${y === st.year ? ' selected' : ''}>${y}</option>`).join('')}</select></div>`;
             if (st.type === 'day') h += `<div class="sh-row"><select onchange="setShare('date', this.value)">${daysInData().map(d => { let n = new Set(obsData.filter(x => x.date === d).map(x => x.sci_name)).size; return `<option value="${d}"${d === st.date ? ' selected' : ''}>${formatDisplayDate(d)} · ${n} ${LT('tür', 'sp.')}</option>`; }).join('')}</select></div>`;
@@ -3858,7 +3913,7 @@
                 h += `<div class="sh-row"><select onchange="setShare('loc', this.value)">${Object.keys(lc).sort((a, b) => a.localeCompare(b, 'tr')).map(k => `<option value="${escHtml(k)}"${k === st.loc ? ' selected' : ''}>${escHtml(k)} · ${lc[k].size}</option>`).join('')}</select></div>`;
             }
             if (st.type === 'milestone') h += liferSelectHtml();
-            if (st.type === 'obs') h += obsPickersHtml();
+            if (st.type === 'obs') h += `<div class="sh-row" style="font-size:11px; color:#5B6B7E; margin-top:-4px;">${LT('Bir türü, seçtiğin gün ve yerde, birey sayısıyla paylaş.', 'Share one species on a chosen day and place, with its count.')}</div>` + obsPickersHtml();
             if (st.type === 'location') h += locPickHtml();
             h += extraShareUI();
             if (st.type === 'obs') h += `<div class="sh-row"><button class="sh-btn primary" onclick="document.getElementById('share-photo-input').click()">🖼️ ${st.photo ? LT('Başka fotoğraf seç', 'Choose another photo') : LT('Galeriden kendi fotoğrafını seç', 'Choose your own photo')}</button>
@@ -5060,7 +5115,7 @@
             let box = $t('chat-messages');
             box.innerHTML += `<div class="chat-msg chat-user"><span class="msg-bubble">${escHtml(q)}</span></div>`;
             let r = localAssistant(q);
-            box.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}</span>${suggestionButtons(r.suggestions)}</div>`;
+            box.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}</span>${shareSuggestHtml(q)}${suggestionButtons(r.suggestions)}</div>`;
             box.scrollTop = box.scrollHeight;
         }
         function buildTourSteps(preData) {
