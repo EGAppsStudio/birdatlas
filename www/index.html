@@ -396,6 +396,7 @@
                 <button id="btn-lifer-mode" onclick="toggleLiferMode()" style="width:100%; padding:10px; background:#2ecc71; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.1); transition:0.3s;">🏆 Kertik Haritasını Aç</button>
                 <div id="lifer-calendar-container"></div>
                 <div id="lifer-day-details" style="margin-top: 10px;"></div>
+                <div id="lifer-chart-container"></div>
             </div>
         </div>
         
@@ -2156,8 +2157,9 @@
                 }
             }
             calHtml += `</div>`;
-            calHtml += chartPanelHtml('lifer');
             document.getElementById('lifer-calendar-container').innerHTML = calHtml;
+            // Seçili günün kertikleri takvimin hemen altında, yıllık grafik onların altında
+            document.getElementById('lifer-chart-container').innerHTML = chartPanelHtml('lifer');
 
             document.getElementById('prev-lifer-month').onclick = () => { currentLiferCalDate.setMonth(currentLiferCalDate.getMonth()-1); renderLiferCalendar(); document.getElementById('lifer-day-details').innerHTML=''; };
             document.getElementById('next-lifer-month').onclick = () => { currentLiferCalDate.setMonth(currentLiferCalDate.getMonth()+1); renderLiferCalendar(); document.getElementById('lifer-day-details').innerHTML=''; };
