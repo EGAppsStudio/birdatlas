@@ -321,7 +321,11 @@
         #filter-bar { top: calc(74px + env(safe-area-inset-top)) !important; }
         #explore-dock { top: calc(74px + env(safe-area-inset-top)) !important; }
         /* İlk açılış turu */
-        #tour { display: none; position: fixed; inset: 0; z-index: 1000005; }
+        #tour { display: none; position: fixed; inset: 0; z-index: 1000005; pointer-events: none; }   /* turda arka plan kaydırılabilir / sürüklenebilir; dokunmalar ayrıca süzülür */
+        #tour .tour-tip { pointer-events: auto; touch-action: none; cursor: grab; }
+        #tour .tour-tip::before { content: ''; position: absolute; top: 6px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: #cfd8e3; }
+        #tour .tour-tip.drag { cursor: grabbing; box-shadow: 0 14px 36px rgba(0,0,0,0.38); }
+        #tour .tour-tip button, #tour .tour-tip a { cursor: pointer; }
         #tour .tour-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
         #tour .tour-tip { position: absolute; background: #fff; border-radius: 16px; padding: 14px 16px 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: #0A3E70; font-size: 14px; line-height: 1.5; box-sizing: border-box; }
         #tour .tt { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 16px; margin-bottom: 4px; }
@@ -5344,6 +5348,36 @@
             r = document.createElement('div'); r.id = 'tour'; r.setAttribute('data-no-i18n', '');
             r.innerHTML = '<svg class="tour-svg" xmlns="http://www.w3.org/2000/svg"></svg><div class="tour-tip"></div>';
             document.body.appendChild(r);
+            // Açıklama kutusu parmakla kaydırılabilir (arkada kalanı görmek için); çift dokunuş yerine döndürür
+            let tip = r.querySelector('.tour-tip'), lastTap = 0;
+            tip.addEventListener('pointerdown', e => {
+                if (e.target.closest('button, a, select, input')) return;
+                if (Date.now() - lastTap < 320) { tip.style.transform = ''; tip._dx = tip._dy = 0; lastTap = 0; return; } lastTap = Date.now();
+                let sx = e.clientX - (tip._dx || 0), sy = e.clientY - (tip._dy || 0), b = tip.getBoundingClientRect(), bx = b.left - (tip._dx || 0), by = b.top - (tip._dy || 0);
+                tip.classList.add('drag'); try { tip.setPointerCapture(e.pointerId); } catch (x) {}
+                const mv = ev => {
+                    let dx = ev.clientX - sx, dy = ev.clientY - sy;
+                    dx = Math.max(8 - bx, Math.min(innerWidth - 8 - b.width - bx, dx));            // ekrandan taşmasın
+                    dy = Math.max(8 - by, Math.min(innerHeight - 70 - by, dy));                     // aşağıya çekilebilir, başlığı görünür kalır
+                    tip._dx = dx; tip._dy = dy; tip.style.transform = `translate(${dx}px, ${dy}px)`;
+                };
+                const up = () => { tip.classList.remove('drag'); tip.removeEventListener('pointermove', mv); tip.removeEventListener('pointerup', up); tip.removeEventListener('pointercancel', up); };
+                tip.addEventListener('pointermove', mv); tip.addEventListener('pointerup', up); tip.addEventListener('pointercancel', up);
+            });
+            // Tur sırasında arka planda yalnız bakmak serbest: kaydırma, harita sürükleme / yakınlaştırma.
+            // Dokunup başka ekrana geçmek, düğmeler, seçimler kapalı (turun kendi düğmeleri hariç).
+            const guard = e => {
+                if (tourIdx < 0 || !e.isTrusted) return;
+                let t = e.target;
+                if (t.closest && (t.closest('#tour .tour-tip') || t.closest('.leaflet-control-zoom'))) return;
+                e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+            };
+            ['click', 'change', 'submit', 'contextmenu'].forEach(ev => document.addEventListener(ev, guard, true));
+            document.addEventListener('pointerdown', e => {   // yazı kutusu / seçim listesi açılmasın
+                if (tourIdx < 0 || !e.isTrusted || !e.target.closest) return;
+                if (e.target.closest('#tour .tour-tip')) return;
+                if (e.target.closest('input, select, textarea, label')) { e.preventDefault(); e.stopPropagation(); }
+            }, true);
             window.addEventListener('resize', () => { if (tourIdx >= 0) placeTour(); });
             return r;
         }
@@ -5392,6 +5426,7 @@
             let back = canBack ? `<button class="tg tback" onclick="prevTour()" aria-label="${LT('Geri', 'Back')}">‹ ${LT('Geri', 'Back')}</button>` : '';
             let btns = st.buttons ? back + st.buttons.map(([t, fn, primary]) => `<button class="${primary ? 'tp' : 'tg'}" onclick="${fn}">${t}</button>`).join('')
                 : (canBack ? '' : `<button class="tg" onclick="endTour(true)">${LT('Geç', 'Skip')}</button>`) + back + `<button class="tp" onclick="nextTour()">${tourIdx === 0 ? LT('Başla', 'Start') : LT('İleri', 'Next')}</button>`;
+            tip.style.transform = ''; tip._dx = 0; tip._dy = 0;   // yeni adımda elle kaydırılan konum sıfırlanır
             tip.innerHTML = `<div class="tt"><span class="tm">${mavisSVG(34, st.id === 'done' ? 'wave' : 'idle')}</span><span>${st.title}</span></div>
                 <div class="tx">${st.text}</div>
                 <div class="tb">${k >= 0 ? `<span class="tc">${k + 1} / ${main.length}${canBack ? ` · <a href="#" onclick="endTour(true); return false;" style="color:#5B6B7E;">${LT('Geç', 'Skip')}</a>` : ''}</span>` : '<span></span>'}<span class="tbs">${btns}</span></div>`;
