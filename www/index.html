@@ -131,6 +131,15 @@
         .feedback-btn { border-color: #1662B6 !important; color: #1662B6 !important; justify-content: center !important; }
         .feedback-hint { font-size: 10.5px; color: #6b7a8c; margin-top: 6px; line-height: 1.35; }
         .ls-hide { display: none !important; }
+        /* Pencereleri tutamaçla boyutlandırma (sekme pencereleri + Maviş) */
+        .rs-grip { display: none; justify-content: center; align-items: center; height: 22px; cursor: ns-resize; touch-action: none; pointer-events: auto; user-select: none; }
+        .rs-grip span { width: 46px; height: 5px; border-radius: 3px; background: #1662B6; opacity: .55; box-shadow: 0 0 0 3px rgba(255,255,255,.85); }
+        .rs-grip:hover span, .rs-grip.on span { opacity: .9; }
+        body:has(#filter-panels[style*="display: grid"]) #sheet-grip { display: flex; margin-top: -11px; position: relative; z-index: 2; }
+        #chat-grip { display: flex; position: absolute; top: 0; left: 0; right: 0; height: 14px; z-index: 3; }
+        #chat-grip span { background: #fff; opacity: .6; box-shadow: none; height: 4px; margin-top: -2px; }
+        #chat-window { position: fixed; }
+        @media (min-width: 700px) { #sheet-grip { cursor: nwse-resize; justify-content: flex-end; padding-right: 14px; } }
         .chat-share { margin-top: 6px; }
         .chat-share button { background: #FFF6CC; color: #0A3E70; border: 1px solid #E9C440; border-radius: 14px; padding: 6px 10px; font-size: 12px; cursor: pointer; text-align: left; max-width: 100%; }
         /* v1.9: kapakta TR/EN ve ? en sağ üstte; logo yerine oturunca altına kayarlar */
@@ -481,6 +490,7 @@
         </div>
         
         </div>
+        <div id="sheet-grip" class="rs-grip" title="Sürükleyerek boyutlandır · çift dokun: eski boyut" aria-hidden="true"><span></span></div>
     </div>
 
     <div id="filter-bar" data-no-i18n></div>
@@ -492,6 +502,7 @@
 
     <button id="chat-toggle-btn" onclick="toggleChat()"><span id="chat-btn-mavis"></span> <span>Maviş'e Sor</span></button>
     <div id="chat-window">
+        <div id="chat-grip" class="rs-grip" title="Sürükleyerek boyutlandır · çift dokun: eski boyut" aria-hidden="true"><span></span></div>
         <div style="background:#0A3E70; color:white; padding:12px 15px; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
             <span style="display:flex; align-items:center; gap:8px;"><span id="chat-head-mavis" style="background:#fff; border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center;"></span><span>Maviş <span style="font-weight:normal; font-size:11px; opacity:0.85;">· kuş gözlem asistanın</span></span></span>
             <button onclick="toggleChat()" style="background:none; border:none; color:#FED008; font-size:16px; cursor:pointer; font-weight:bold;">✖</button>
@@ -1606,6 +1617,46 @@
             mapObj.on('popupclose', function(e) { if (!expandedLocation) { selectedLocation = null; renderAll(); } });
         }
         initMapBase();
+        // ----- Pencereleri tutamaçla boyutlandır -----
+        (function setupResize() {
+            const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} };
+            const fp = document.getElementById('filter-panels'), pw = document.getElementById('panels-wrapper'), cm = document.getElementById('chat-messages');
+            const applySheet = () => {
+                let h = +ls('sheet_h') || 0, w = +ls('sheet_w') || 0;
+                if (h) fp.style.setProperty('height', h + 'px'); else fp.style.removeProperty('height');
+                if (w && innerWidth >= 700) { pw.style.setProperty('width', w + 'px', 'important'); fp.style.setProperty('max-width', 'none'); }
+                else { pw.style.removeProperty('width'); fp.style.removeProperty('max-width'); }
+            };
+            const applyChat = () => { let h = +ls('chat_h') || 0; if (h) cm.style.setProperty('height', h + 'px', 'important'); else cm.style.removeProperty('height'); };
+            applySheet(); applyChat(); addEventListener('resize', applySheet);
+            function drag(grip, onMove, onReset) {
+                let sx, sy, base, last = 0;
+                grip.addEventListener('pointerdown', e => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (Date.now() - last < 320) { onReset(); last = 0; return; } last = Date.now();
+                    sx = e.clientX; sy = e.clientY; base = null; grip.classList.add('on');
+                    try { grip.setPointerCapture(e.pointerId); } catch (x) {}
+                    const mv = ev => { base = onMove(ev.clientX - sx, ev.clientY - sy, base); };
+                    const up = () => { grip.classList.remove('on'); grip.removeEventListener('pointermove', mv); grip.removeEventListener('pointerup', up); grip.removeEventListener('pointercancel', up); };
+                    grip.addEventListener('pointermove', mv); grip.addEventListener('pointerup', up); grip.addEventListener('pointercancel', up);
+                });
+            }
+            drag(document.getElementById('sheet-grip'), (dx, dy, base) => {
+                base = base || { h: fp.getBoundingClientRect().height, w: pw.getBoundingClientRect().width };
+                let maxH = innerHeight - fp.getBoundingClientRect().top - 40;
+                let h = Math.round(Math.max(140, Math.min(maxH, base.h + dy)));
+                fp.style.setProperty('height', h + 'px'); ls('sheet_h', h);
+                if (innerWidth >= 700) { let w = Math.round(Math.max(340, Math.min(innerWidth * 0.75, base.w + dx))); pw.style.setProperty('width', w + 'px', 'important'); fp.style.setProperty('max-width', 'none'); ls('sheet_w', w); }
+                return base;
+            }, () => { ls('sheet_h', null); ls('sheet_w', null); applySheet(); });
+            drag(document.getElementById('chat-grip'), (dx, dy, base) => {
+                base = base || { h: cm.getBoundingClientRect().height };
+                let cw = document.getElementById('chat-window').getBoundingClientRect(), room = cw.top - (innerWidth < 700 ? 150 : 20);   // ☰ düğmesinin altında kalsın
+                let h = Math.round(Math.max(160, Math.min(base.h + room + 0, base.h - dy)));
+                cm.style.setProperty('height', h + 'px', 'important'); ls('chat_h', h);
+                return base;
+            }, () => { ls('chat_h', null); applyChat(); });
+        })();
         // ----- Web: tam ekran -----
         const FS_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>';
         const FS_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>';
