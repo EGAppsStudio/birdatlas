@@ -1028,7 +1028,22 @@
         function pickSuggestions(exclude) {
             let list = SUGGESTIONS[LANG === 'en' ? 'en' : 'tr'].filter(x => x !== exclude);
             for (let i = list.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
-            return list.slice(0, 3);
+            let own = [];
+            try {
+                let dd = obsData.filter(d => d.date !== 'Bilinmiyor');
+                if (dd.length) {
+                    let day = dd.map(d => d.date).sort().pop();
+                    own.push(LT(`${formatDisplayDate(day)} günümü paylaşım kartı yap`, `Make a share card of ${formatDisplayDate(day)}`));
+                    let lc = {}; dd.forEach(d => { lc[d.loc] = (lc[d.loc] || 0) + 1; });
+                    let loc = Object.entries(lc).sort((a, b) => b[1] - a[1])[Math.floor(Math.random() * Math.min(3, Object.keys(lc).length))][0];
+                    own.push(LT(`${loc} özetim`, `My summary for ${loc}`));
+                    let sp = dd[Math.floor(Math.random() * dd.length)];
+                    own.push(LT(`${trSpecies(sp.tr_name)} en son ne zaman gördüm?`, `When did I last see ${trSpecies(sp.tr_name)}?`));
+                    for (let i = own.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); [own[i], own[j]] = [own[j], own[i]]; }
+                    own = own.filter(x => x !== exclude).slice(0, 2);
+                }
+            } catch (e) { own = []; }
+            return [...own, ...list.slice(0, 5 - own.length)];
         }
         // ----- Maviş → paylaşım kartı: sorudaki tür / gün / yer / ay / yıla uygun kartı önerir -----
         let shareSuggs = [];
@@ -1081,6 +1096,8 @@
             let r = null; try { r = shareFromQuestion(question); } catch (e) {}
             if (!r) return '';
             let i = shareSuggs.push(r.opts) - 1;
+            // "paylaşım kartı yap" diye açıkça istendiyse kartı kendiliğinden aç
+            if (/paylas|kart|share|card/.test(normTxt(question))) setTimeout(() => openShareSugg(i), 700);
             return `<div class="chat-share" data-no-i18n><button onclick="openShareSugg(${i})">📤 ${LT('Paylaşım kartı yap', 'Make a share card')}: <b>${escHtml(r.label)}</b></button></div>`;
         }
         function suggestionButtons(list) {
@@ -4140,6 +4157,8 @@
                 if (mIdx >= 0) return;
                 let k = MONTHS.tr.findIndex(mn => w === mn || (w.startsWith(mn) && w.length - mn.length <= 5));
                 if (k < 0) k = MONTHS.en.findIndex(mn => w === mn || (mn.length > 3 && w === mn.slice(0, 3)));
+                // "17 Haz 2024" gibi kısaltmalar (uygulamanın kendi tarih yazımı): yalnız yanında gün sayısı varsa
+                if (k < 0 && w.length === 3 && (/^\d{1,2}$/.test(words[i - 1] || '') || /^\d{1,2}$/.test(words[i + 1] || ''))) k = MONTHS.tr.findIndex(mn => mn.startsWith(w));
                 if (k >= 0) { mIdx = k; monthAt = i; }
             });
             if (mIdx < 0) return null;
