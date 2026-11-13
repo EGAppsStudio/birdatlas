@@ -1394,7 +1394,7 @@
         let mapObj = null; let markerLayerGroup = null; let obsData = []; let allRawRows = [];
         let trNameMap = {}; let enNameMap = {}; let speciesCodeMap = {}; let sciToTrMap = {}; let absMinC = 0, absMaxC = 0;
         
-        let selectedDates = new Set(); let selectedSpecies = null; let selectedLocation = null;
+        let selectedDates = new Set(); let selectedSpecies = null; let selectedLocation = null; let calDaysSplit = false;
         let selectedProvince = null; let expandedLocation = null; 
         
         let speciesSortMode = 'date'; let locationSortMode = 'species'; 
@@ -2251,20 +2251,40 @@
 
             calHtml += `<div data-no-i18n style="text-align:right; margin-top:6px;"><span class="mini-link" style="font-size:11px; color:#1662B6; font-weight:bold;" onclick="openShare({type:'month', month:'${y}-${String(m + 1).padStart(2, '0')}'})">📤 ${LT('Bu ayı paylaş', 'Share this month')}</span></div>`;
 
-            // Tıklanan günün özeti: konum → türler
-            if (lastClickedDay) {
-                let st = dateStats[lastClickedDay];
-                calHtml += `<div style="margin-top:10px; background:#f0f4f8; border:1px solid #1662B6; border-radius:6px; padding:8px; font-size:12px; color:#0A3E70;">`;
-                if (!st) calHtml += `<b>${formatDisplayDate(lastClickedDay)}</b>: <span>Bu gün kayıt yok.</span>`;
+            // Tıklanan günün özeti: konum → türler. Birden çok gün seçiliyse varsayılan: hepsinin toplamı; istenirse gün gün
+            const locListHtml = (lsMap, locs) => [...locs.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => { let sm = lsMap.get(n) || new Map(); return `<div style="padding:4px 0; border-top:1px solid #e2e8f0;"><div onclick="window.focusLocation('${escAttr(n)}')" style="cursor:pointer; display:flex; justify-content:space-between; gap:6px;"><b>📍 ${escHtml(n)}</b><span style="white-space:nowrap;">${sm.size} ${LT('tür', 'sp.')}</span></div><div style="color:#555; margin-top:2px;">${[...sm.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([t, k]) => escHtml(trSpecies(t)) + (k > 1 ? ` (${k})` : '')).join(', ')}</div></div>`; }).join('');
+            const dayBox = (day, extra) => {
+                let st = dateStats[day], h = `<div style="margin-top:10px; background:#f0f4f8; border:1px solid #1662B6; border-radius:6px; padding:8px; font-size:12px; color:#0A3E70;">${extra || ''}`;
+                if (!st) h += `<b>${formatDisplayDate(day)}</b>: <span>${LT('Bu gün kayıt yok.', 'No records on this day.')}</span>`;
                 else {
                     let totalObs = [...st.species.values()].reduce((a, b) => a + b, 0);
-                    let locNames = [...st.locs.entries()].sort((a, b) => b[1] - a[1]);
-                    calHtml += `<div style="font-weight:bold; margin-bottom:4px;">📅 ${formatDisplayDate(lastClickedDay)}</div>
+                    h += `<div style="font-weight:bold; margin-bottom:4px;">📅 ${formatDisplayDate(day)}</div>
                         <div data-no-i18n style="margin-bottom:6px;">🐦 ${st.species.size} ${LT('tür', 'species')} · 📍 ${st.locs.size} ${LT('konum', 'locations')} · ${countBadge(totalObs, st.birds)}</div>
-                        <div data-no-i18n style="font-size:11px;">${locNames.map(([n, c]) => { let sm = st.ls.get(n) || new Map(); return `<div style="padding:4px 0; border-top:1px solid #e2e8f0;"><div onclick="window.focusLocation('${escAttr(n)}')" style="cursor:pointer; display:flex; justify-content:space-between; gap:6px;"><b>📍 ${escHtml(n)}</b><span style="white-space:nowrap;">${sm.size} ${LT('tür', 'sp.')}</span></div><div style="color:#555; margin-top:2px;">${[...sm.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([t, k]) => escHtml(trSpecies(t)) + (k > 1 ? ` (${k})` : '')).join(', ')}</div></div>`; }).join('')}</div>
-                        <div data-no-i18n style="text-align:right; margin-top:6px;"><span class="mini-link" style="color:#1662B6; font-weight:bold;" onclick="openShare({type:'day', date:'${lastClickedDay}'})">📤 ${LT('Bu günü paylaş', 'Share this day')}</span></div>`;
+                        <div data-no-i18n style="font-size:11px;">${locListHtml(st.ls, st.locs)}</div>
+                        <div data-no-i18n style="text-align:right; margin-top:6px;"><span class="mini-link" style="color:#1662B6; font-weight:bold;" onclick="openShare({type:'day', date:'${day}'})">📤 ${LT('Bu günü paylaş', 'Share this day')}</span></div>`;
                 }
-                calHtml += `</div>`;
+                return h + `</div>`;
+            };
+            let multi = [...selectedDates].sort();
+            if (multi.length >= 2) {
+                let toggle = `<div data-no-i18n style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px;"><b>📅 ${multi.length} ${LT('gün seçili', 'days selected')}</b><span class="mini-link" style="font-size:11px; color:#1662B6; font-weight:bold; white-space:nowrap;" onclick="calDaysSplit=!calDaysSplit; renderCalendar();">${calDaysSplit ? LT('▤ Toplamı göster', '▤ Show total') : LT('☰ Gün gün göster', '☰ Show each day')}</span></div>`;
+                if (calDaysSplit) {
+                    calHtml += `<div style="margin-top:10px;">${toggle}</div>` + multi.map(d => dayBox(d)).join('');
+                } else {
+                    // seçili günlerin toplamı
+                    let sp = new Map(), locs = new Map(), ls = new Map(), birds = 0, days = 0;
+                    multi.forEach(d => { let st = dateStats[d]; if (!st) return; days++; birds += st.birds || 0;
+                        st.species.forEach((k, t) => sp.set(t, (sp.get(t) || 0) + k));
+                        st.locs.forEach((k, n) => locs.set(n, (locs.get(n) || 0) + k));
+                        st.ls.forEach((m, n) => { let mm = ls.get(n) || new Map(); m.forEach((k, t) => mm.set(t, (mm.get(t) || 0) + k)); ls.set(n, mm); }); });
+                    let totalObs = [...sp.values()].reduce((a, b) => a + b, 0);
+                    calHtml += `<div style="margin-top:10px; background:#f0f4f8; border:1px solid #1662B6; border-radius:6px; padding:8px; font-size:12px; color:#0A3E70;">${toggle}
+                        <div data-no-i18n style="font-size:11px; color:#5B6B7E; margin-bottom:4px;">${multi.map(d => formatDisplayDate(d)).join(' · ')}</div>
+                        ${days ? `<div data-no-i18n style="margin-bottom:6px;">🐦 ${sp.size} ${LT('tür', 'species')} · 📍 ${locs.size} ${LT('konum', 'locations')} · ${countBadge(totalObs, birds)}</div>
+                        <div data-no-i18n style="font-size:11px;">${locListHtml(ls, locs)}</div>` : `<span>${LT('Bu günlerde kayıt yok.', 'No records on these days.')}</span>`}</div>`;
+                }
+            } else if (lastClickedDay) {
+                calHtml += dayBox(lastClickedDay);
             }
 
             if(selectedDates.size > 0) {
