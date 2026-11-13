@@ -3346,32 +3346,40 @@
         // "Sonra" denirse 8 açılış sonra bir kez daha sorar; hata bildiriminin hemen ardından ya da turda asla.
         function maybeAskReview(reason) {
             try {
-                if (!obsData.length || sessionStorage.getItem('fb_sent') || (typeof tourIdx !== 'undefined' && tourIdx >= 0)) return;
+                if (!obsData.length || sessionStorage.getItem('fb_sent')) return;
+                if ((typeof tourIdx !== 'undefined' && tourIdx >= 0) || document.querySelector('#share-overlay[style*="display: flex"]')) return void setTimeout(() => maybeAskReview(reason), 60000);   // tur / paylaşım bitince
                 if (localStorage.getItem('fbask_done')) return;
+                if (document.querySelector('.ov[style*="display: flex"], #share-overlay[style*="display: flex"]')) return;   // başka pencere açıkken araya girme
+                // İlk kullanımda (birkaç dakika gezindikten sonra) yalnız "ilk izlenim": hata / öneri. Değerlendirme isteği 4. açılıştan sonra.
+                if (!localStorage.getItem('fbask_first')) { localStorage.setItem('fbask_first', '1'); return openFeedbackAsk(true); }
                 let next = parseInt(localStorage.getItem('fbask_next'), 10) || 4;   // en erken 4. açılış
                 if (launchCount < next) return;
-                if (document.querySelector('.ov[style*="display: flex"], #share-overlay[style*="display: flex"]')) return;   // başka pencere açıkken araya girme
             } catch (e) { return; }
             openFeedbackAsk();
         }
-        window.openFeedbackAsk = function() {
+        window.openFeedbackAsk = function(first) {
             let old = document.getElementById('fbask'); if (old) old.remove();
-            const rate = !!NativeCap && !isSample();
-            const close = later => { try { if (later) localStorage.setItem('fbask_next', launchCount + 8); else localStorage.setItem('fbask_done', '1'); } catch (e) {} let el = document.getElementById('fbask'); if (el) el.remove(); };
+            const rate = !first && !!NativeCap && !isSample();
+            const close = k => {   // k: 'never' | 'later' | 'rate' | 'bug' | 'idea'
+                try {
+                    if (k === 'never' || (!first && k !== 'later')) localStorage.setItem('fbask_done', '1');
+                    else if (!first && k === 'later') localStorage.setItem('fbask_next', launchCount + 8);
+                } catch (e) {}
+                let el = document.getElementById('fbask'); if (el) el.remove();
+            };
             let d = document.createElement('div'); d.id = 'fbask'; d.setAttribute('data-no-i18n', '');
             d.innerHTML = `<div class="fa-card" role="dialog" aria-modal="true">
-                <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${LT('Kuş Atlası nasıl gidiyor?', 'How is Bird Atlas going?')}</b><div class="fa-sub">${LT('Uygulamayı birlikte geliştiriyoruz. Bir dakikanı ayırırsan çok seviniriz 💙', 'We build this app together. A minute of your time means a lot 💙')}</div></div></div>
+                <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${first ? LT('İlk izlenimin nasıl?', 'First impressions?') : LT('Kuş Atlası nasıl gidiyor?', 'How is Bird Atlas going?')}</b><div class="fa-sub">${first ? LT('Bir şey takıldıysa ya da aklına bir fikir geldiyse şimdi yazman bize çok yardımcı olur 💙', 'If something got stuck or you have an idea, telling us now helps a lot 💙') : LT('Uygulamayı birlikte geliştiriyoruz. Bir dakikanı ayırırsan çok seviniriz 💙', 'We build this app together. A minute of your time means a lot 💙')}</div></div></div>
                 ${rate ? `<button class="fa-btn fa-rate" data-a="rate">⭐ ${LT("Google Play'de değerlendir", 'Rate on Google Play')}</button>` : ''}
                 <button class="fa-btn" data-a="bug">🐞 ${LT('Bir hata gördüm', 'I found a bug')}</button>
                 <button class="fa-btn" data-a="idea">💡 ${LT('Bir önerim var', 'I have an idea')}</button>
-                <div class="fa-foot"><button class="fa-link" data-a="later">${LT('Sonra', 'Later')}</button><button class="fa-link" data-a="never">${LT('Bir daha sorma', "Don't ask again")}</button></div>
+                <div class="fa-foot"><button class="fa-link" data-a="later">${first ? LT('Her şey yolunda 👍', 'All good 👍') : LT('Sonra', 'Later')}</button><button class="fa-link" data-a="never">${LT('Bir daha sorma', "Don't ask again")}</button></div>
             </div>`;
             d.addEventListener('click', e => {
-                let a = e.target.closest('[data-a]'); if (!a && e.target === d) return close(true); if (!a) return;
-                let k = a.getAttribute('data-a');
-                if (k === 'rate') { close(false); rateApp(); }
-                else if (k === 'bug' || k === 'idea') { close(false); sendFeedback(k); }
-                else close(k === 'later');
+                let a = e.target.closest('[data-a]'); if (!a && e.target === d) return close('later'); if (!a) return;
+                let k = a.getAttribute('data-a'); close(k);
+                if (k === 'rate') rateApp();
+                else if (k === 'bug' || k === 'idea') sendFeedback(k);
             });
             document.body.appendChild(d);
         };
@@ -3414,7 +3422,7 @@
             bindMiniFollow();
             maybeStartTour(true);
             setTimeout(retryMissingPhotos, 5000);
-            if (isSample()) return;
+            if (isSample()) { if (!afterDataLoaded._timer) afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 150000); return; }
             let reached = reachedMilestones(); let top = reached.length ? reached[reached.length - 1] : 0;
             let seen = NaN; try { seen = parseInt(localStorage.getItem('milestone_seen'), 10); } catch (e) {}
             try { localStorage.setItem('milestone_seen', Math.max(top, isNaN(seen) ? 0 : seen)); } catch (e) {}
