@@ -4524,8 +4524,7 @@
             let m = document.getElementById('lang-menu');
             if (m) { m.remove(); return; }
             m = document.createElement('div'); m.id = 'lang-menu'; m.setAttribute('data-no-i18n', '');
-            m.innerHTML = LANGS.map(([c, n]) => `<button class="${c === LANG ? 'on' : ''}" onclick="document.getElementById('lang-menu').remove(); setLang('${c}')">${flagSvg(c)} <b>${c.toUpperCase()}</b> <span>${n}</span></button>`).join('')
-                + `<div class="lm-soon">${flagSvg('es')} ES · ${flagSvg('ru')} RU · ${flagSvg('ar')} AR · ${LT('yakında', 'coming soon')}</div>`;
+            m.innerHTML = LANGS.map(([c, n]) => `<button class="${c === LANG ? 'on' : ''}" onclick="document.getElementById('lang-menu').remove(); setLang('${c}')">${flagSvg(c)} <b>${c.toUpperCase()}</b> <span>${n}</span></button>`).join('');
             let r = e.currentTarget.getBoundingClientRect();
             m.style.top = (r.bottom + 6) + 'px'; m.style.right = (window.innerWidth - r.right) + 'px';
             document.body.appendChild(m);
