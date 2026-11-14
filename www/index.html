@@ -3380,13 +3380,25 @@
             } catch (e) { return; }
             openFeedbackAsk();
         }
+        // Kuşçu arkadaşlarına öner: telefonun paylaş ekranı (WhatsApp vb.); birdatlas.app hem Play'e hem web/iPhone sürümüne götürür
+        window.tellFriends = async function() {
+            let url = 'https://birdatlas.app/' + (LANG === 'en' ? 'en/' : 'tr/');
+            let text = LT("Kuş Atlası'nı denedin mi? 🐦 eBird gözlemlerini kendi haritana çeviriyor: kertikler, takvim, grafikler, paylaşım kartları. Ücretsiz, hesap gerekmiyor; Android'de ve tarayıcıda çalışıyor.",
+                "Have you tried Bird Atlas? 🐦 It turns your eBird sightings into your own map: lifers, calendar, charts and share cards. Free, no account needed; works on Android and in the browser.");
+            try {
+                if (NativePlugins.Share && NativePlugins.Share.share) { await NativePlugins.Share.share({ title: LT('Kuş Atlası', 'Bird Atlas'), text, url, dialogTitle: LT('Arkadaşlarına öner', 'Recommend to friends') }); return; }
+                if (navigator.share) { await navigator.share({ title: LT('Kuş Atlası', 'Bird Atlas'), text, url }); return; }
+            } catch (e) { if (e && /cancel|abort/i.test(String(e.message || e.name))) return; }
+            window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank', 'noopener');
+        };
         window.openFeedbackAsk = function(first) {
             let old = document.getElementById('fbask'); if (old) old.remove();
             const rate = !first && !!NativeCap && !isSample();
             const close = k => {   // k: 'never' | 'later' | 'rate' | 'bug' | 'idea'
                 try {
-                    if (k === 'never' || (!first && k !== 'later')) localStorage.setItem('fbask_done', '1');
-                    else if (!first && k === 'later') localStorage.setItem('fbask_next', launchCount + 8);
+                    // öneren kullanıcıya değerlendirme 8 açılış sonra bir kez daha sorulabilir
+                    if (k === 'never' || (!first && k !== 'later' && k !== 'tell')) localStorage.setItem('fbask_done', '1');
+                    else if (!first) localStorage.setItem('fbask_next', launchCount + 8);
                 } catch (e) {}
                 let el = document.getElementById('fbask'); if (el) el.remove();
             };
@@ -3394,6 +3406,7 @@
             d.innerHTML = `<div class="fa-card" role="dialog" aria-modal="true">
                 <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${first ? LT('İlk izlenimin nasıl?', 'First impressions?') : LT('Kuş Atlası nasıl gidiyor?', 'How is Bird Atlas going?')}</b><div class="fa-sub">${first ? LT('Bir şey takıldıysa ya da aklına bir fikir geldiyse şimdi yazman bize çok yardımcı olur 💙', 'If something got stuck or you have an idea, telling us now helps a lot 💙') : LT('Uygulamayı birlikte geliştiriyoruz. Bir dakikanı ayırırsan çok seviniriz 💙', 'We build this app together. A minute of your time means a lot 💙')}</div></div></div>
                 ${rate ? `<button class="fa-btn fa-rate" data-a="rate">⭐ ${LT("Google Play'de değerlendir", 'Rate on Google Play')}</button>` : ''}
+                ${first ? '' : `<button class="fa-btn" data-a="tell">📣 ${LT('Kuşçu arkadaşlarına öner', 'Recommend to birding friends')}</button>`}
                 <button class="fa-btn" data-a="bug">🐞 ${LT('Bir hata gördüm', 'I found a bug')}</button>
                 <button class="fa-btn" data-a="idea">💡 ${LT('Bir önerim var', 'I have an idea')}</button>
                 <div class="fa-foot"><button class="fa-link" data-a="later">${first ? LT('Her şey yolunda 👍', 'All good 👍') : LT('Sonra', 'Later')}</button><button class="fa-link" data-a="never">${LT('Bir daha sorma', "Don't ask again")}</button></div>
@@ -3402,6 +3415,7 @@
                 let a = e.target.closest('[data-a]'); if (!a && e.target === d) return close('later'); if (!a) return;
                 let k = a.getAttribute('data-a'); close(k);
                 if (k === 'rate') rateApp();
+                else if (k === 'tell') tellFriends();
                 else if (k === 'bug' || k === 'idea') sendFeedback(k);
             });
             document.body.appendChild(d);
@@ -5210,6 +5224,7 @@
                 '<div class="mh"></div>' +
                 it('💬', LT('Geri bildirim', 'Feedback'), "openTab('feedback')") +
                 it('⭐', LT('Değerlendir', 'Rate the app'), 'rateApp()') +
+                it('📣', LT('Arkadaşına öner', 'Recommend to a friend'), 'tellFriends()') +
                 `<a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">📷 <span class="mt">Instagram</span><span class="mx">@birdatlas.app</span></a>` +
                 `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'en' ? 'en' : 'tr'}" target="_blank" onclick="closeMainMenu()">🔒 <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>`;
             m.style.display = 'block';
