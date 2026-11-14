@@ -269,7 +269,19 @@
         #mini-popup .mini-popup-item div { white-space: normal; }
         #photo-viewer { position: fixed; inset: 0; z-index: 1000001; background: rgba(8,22,44,0.9); display: none; align-items: center; justify-content: center; padding: calc(16px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)); box-sizing: border-box; }
         #photo-viewer .pv-card { position: relative; background: #fff; border-radius: 16px; padding: 14px; width: min(100%, 520px); max-height: 100%; overflow-y: auto; box-sizing: border-box; color: #0A3E70; text-align: center; }
-        #photo-viewer img { width: 100%; max-height: 58vh; object-fit: contain; border-radius: 10px; background: #eef2f6; display: block; }
+        #photo-viewer .pv-frame { width: min(100%, 52vh, 420px); aspect-ratio: 1; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 3px solid var(--pc); box-sizing: border-box; background: #eef2f6; }
+        #photo-viewer #pv-canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+        #photo-viewer #pv-canvas:active { cursor: grabbing; }
+        #photo-viewer .pv-hint { font-size: 11px; color: #5B6B7E; margin-top: 6px; line-height: 1.35; }
+        #photo-viewer .pv-kind { white-space: nowrap; }
+        #photo-viewer .pv-kind::before, #photo-viewer .pv-legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--pc); margin-right: 5px; vertical-align: 0; }
+        #photo-viewer .pv-opts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 12px; }
+        #photo-viewer .pv-opt { width: 52px; height: 52px; padding: 0; border-radius: 9px; border: 2px solid var(--pc); background: #eef2f6; overflow: hidden; cursor: pointer; opacity: .7; }
+        #photo-viewer .pv-opt.on { opacity: 1; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--pc); }
+        #photo-viewer .pv-opt img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        #photo-viewer .pv-legend { display: flex; gap: 14px; justify-content: center; font-size: 11px; color: #5B6B7E; margin-top: 12px; }
+        img.ph-ml, img.ph-own, img.ph-wiki { box-sizing: border-box !important; border: 2px solid !important; }
+        img.ph-ml { border-color: #F5C518 !important; } img.ph-own { border-color: #1662B6 !important; } img.ph-wiki { border-color: #0A3E70 !important; }
         #photo-viewer .pv-empty { padding: 60px 0; color: #8a97a8; background: #eef2f6; border-radius: 10px; }
         #photo-viewer .pv-x { position: absolute; top: 6px; right: 8px; background: rgba(255,255,255,0.92); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 18px; color: #0A3E70; cursor: pointer; z-index: 2; }
         #photo-viewer .pv-name { font-size: 18px; font-weight: bold; margin-top: 10px; }
@@ -850,7 +862,10 @@
                 [`📷 Kendi fotoğrafların`, [
                     `Gözlemlerim → Türler listesinde (ya da konum penceresinde) bir türün fotoğrafına dokun; fotoğraf büyür.`,
                     `<b>✏️ Kendi fotoğrafını koy</b> ile galeriden kendi çektiğin fotoğrafı seç. Artık listelerde, haritada ve paylaşım kartlarında Wikipedia fotoğrafı yerine seninki kullanılır.`,
-                    `<b>↩️ Wikipedia fotoğrafına dön</b> ile eskisine dönebilirsin. Fotoğrafın yalnızca bu telefonda saklanır; içindeki konum (GPS) bilgisi silinir.`]],
+                    `<b>↩️ Wikipedia fotoğrafına dön</b> ile eskisine dönebilirsin. Fotoğrafın yalnızca bu telefonda saklanır; içindeki konum (GPS) bilgisi silinir.`,
+                    `<b>eBird fotoğrafların:</b> eBird'e fotoğraf yüklediysen, verini yükleyince bunları kullanmayı önerir (☰ → Ayarlar'dan aç/kapa). Bir türün birden çok fotoğrafı varsa büyük görünümün altındaki küçük resimlerden birini seç.`,
+                    `<b>Çerçeve rengi</b> fotoğrafın nereden geldiğini gösterir: <span style="color:#C99A00">■ sarı</span> eBird · <span style="color:#1662B6">■ mavi</span> cihazından · <span style="color:#0A3E70">■ lacivert</span> Wikipedia.`,
+                    `<b>Kadraj:</b> büyük görünümde fotoğrafı sürükleyerek ortala, iki parmakla yakınlaştır. Kare listelerdeki, daire paylaşım kartlarındaki görünümdür.`]],
                 [`📤 Paylaşım kartları`, [
                     `Üstteki <b>📤 Paylaş</b> sekmesiyle ya da listelerdeki 📤 düğmeleriyle güzel bir görsel hazırla. <b>🔗 Bağlantı</b> ile aynı özeti, uygulaması olmayan biri de tarayıcıda açabilir (veri bağlantının içinde taşınır, sunucuda saklanmaz). Kart türleri:`,
                     `<b>📆 Yıl</b> özeti · <b>🗓️ Ay</b> takvimi · <b>📅 Gün</b> (gösterilecek türleri seçebilirsin) · <b>🧳 Gezi</b> (tarih aralığı, il ve başlık; ör. "Urfa turu") · <b>🐦 Tür</b> (harita, aylara ya da yıllara göre görünüm) · <b>📍 Konum</b> · <b>🏆 Kertik</b> (herhangi bir kertik; 50., 100. gibi dönüm noktaları ⭐) · <b>📊 Grafik</b> (istersen tek bir konum ya da tür için) · <b>📸 Gözlem</b>.`,
@@ -919,7 +934,10 @@
                 [`📷 Your own photos`, [
                     `Tap a species photo in Bird Species (or in a location popup) to enlarge it.`,
                     `<b>✏️ Use your own photo</b> lets you pick your own shot from the gallery. It then replaces the Wikipedia photo in lists, on the map and on share cards.`,
-                    `<b>↩️ Back to Wikipedia photo</b> undoes it. Your photo stays on this phone only and its GPS data is removed.`]],
+                    `<b>↩️ Back to Wikipedia photo</b> undoes it. Your photo stays on this phone only and its GPS data is removed.`,
+                    `<b>Your eBird photos:</b> if you uploaded photos to eBird, the app offers to use them when you load your data (turn on/off in ☰ → Settings). If a species has several, pick one from the small pictures under the large view.`,
+                    `<b>Frame colour</b> shows where a photo comes from: <span style="color:#C99A00">■ yellow</span> eBird · <span style="color:#1662B6">■ blue</span> your device · <span style="color:#0A3E70">■ navy</span> Wikipedia.`,
+                    `<b>Framing:</b> in the large view drag the photo to centre it and pinch to zoom. The square is how it looks in lists, the circle on share cards.`]],
                 [`📤 Share cards`, [
                     `Use the <b>📤 Share</b> tab or the 📤 buttons in the lists to make an image. <b>🔗 Link</b> lets someone without the app open the same summary in a browser (the data travels inside the link; nothing is stored on a server). Card types:`,
                     `<b>📆 Year</b> · <b>🗓️ Month</b> calendar · <b>📅 Day</b> (pick the species shown) · <b>🧳 Trip</b> (date range, province, title) · <b>🐦 Species</b> (map, by month or by year) · <b>📍 Place</b> · <b>🏆 Lifer</b> (any lifer; milestones like 50th, 100th ⭐) · <b>📊 Chart</b> (optionally for one place or species) · <b>📸 Sighting</b>.`,
@@ -3385,11 +3403,12 @@
             let url = 'https://birdatlas.app/' + (LANG === 'en' ? 'en/' : 'tr/');
             let text = LT("Kuş Atlası'nı denedin mi? 🐦 eBird gözlemlerini kendi haritana çeviriyor: kertikler, takvim, grafikler, paylaşım kartları. Ücretsiz, hesap gerekmiyor; Android'de ve tarayıcıda çalışıyor.",
                 "Have you tried Bird Atlas? 🐦 It turns your eBird sightings into your own map: lifers, calendar, charts and share cards. Free, no account needed; works on Android and in the browser.");
+            text += '\n👉 ' + url;   // link mesajın içinde: WhatsApp vb. hem yazıyı hem linki göndersin
             try {
-                if (NativePlugins.Share && NativePlugins.Share.share) { await NativePlugins.Share.share({ title: LT('Kuş Atlası', 'Bird Atlas'), text, url, dialogTitle: LT('Arkadaşlarına öner', 'Recommend to friends') }); return; }
-                if (navigator.share) { await navigator.share({ title: LT('Kuş Atlası', 'Bird Atlas'), text, url }); return; }
+                if (NativePlugins.Share && NativePlugins.Share.share) { await NativePlugins.Share.share({ title: LT('Kuş Atlası', 'Bird Atlas'), text, dialogTitle: LT('Arkadaşlarına öner', 'Recommend to friends') }); return; }
+                if (navigator.share) { await navigator.share({ title: LT('Kuş Atlası', 'Bird Atlas'), text }); return; }
             } catch (e) { if (e && /cancel|abort/i.test(String(e.message || e.name))) return; }
-            window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank', 'noopener');
+            window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
         };
         window.openFeedbackAsk = function(first) {
             let old = document.getElementById('fbask'); if (old) old.remove();
@@ -3741,11 +3760,11 @@
             ctx.drawImage(img, ox, oy, iw, ih);
         }
         async function photoCircle(ctx, src, cx, cy, r, ring) {
-            let img = await cardImg(src);
+            let img = await cardImg(src), fr = frameOf(sciOfUrl(src));
             ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.18)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 6;
             ctx.beginPath(); ctx.arc(cx, cy, r + 7, 0, Math.PI * 2); ctx.fillStyle = ring || '#fff'; ctx.fill(); ctx.restore();
             ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
-            if (img) drawCover(ctx, img, cx - r, cy - r, 2 * r, 2 * r);
+            if (img) drawCover(ctx, img, cx - r, cy - r, 2 * r, 2 * r, fr.x, fr.y, fr.z);
             else { let g = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r); g.addColorStop(0, '#cfe0f3'); g.addColorStop(1, '#9dbbe0'); ctx.fillStyle = g; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r); ctx.font = font(400, r * 0.8); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🐦', cx, cy + 4); ctx.textBaseline = 'alphabetic'; }
             ctx.restore();
         }
@@ -3996,7 +4015,7 @@
             ctx.fillStyle = '#0F1B30'; ctx.fillRect(0, 0, W, H);
             let ph = story ? H - 520 : H - 330;
             let img = st.photo || await cardImg(o.img);
-            if (img) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ph); ctx.clip(); drawCover(ctx, img, 0, 0, W, ph, st.photoX, st.photoY, st.photo ? st.photoZoom : 1); ctx.restore(); }
+            if (img) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ph); ctx.clip(); { let fr = st.photo ? null : frameOf(o.sci_name); drawCover(ctx, img, 0, 0, W, ph, st.photo ? st.photoX : fr.x, st.photo ? st.photoY : fr.y, st.photo ? st.photoZoom : fr.z); } ctx.restore(); }
             else { let g = ctx.createLinearGradient(0, 0, W, ph); g.addColorStop(0, '#5d7d94'); g.addColorStop(1, '#18283d'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, ph); }
             let g = ctx.createLinearGradient(0, ph - 360, 0, ph + 2); g.addColorStop(0, 'rgba(15,27,48,0)'); g.addColorStop(1, 'rgba(15,27,48,1)'); ctx.fillStyle = g; ctx.fillRect(0, ph - 360, W, 362);
             if (!st.photo && o.img) text(ctx, LT('Fotoğraf: Wikipedia', 'Photo: Wikipedia'), W - 30, 50, { w: 400, px: 22, color: 'rgba(255,255,255,0.7)', align: 'right' });
@@ -4985,26 +5004,77 @@
                 return c.toDataURL('image/jpeg', 0.85);
             } finally { URL.revokeObjectURL(url); }
         }
+        // ----- Fotoğraf kaynağı (renkli çerçeve) + kadraj: sürükleyerek ortala, yakınlaştır -----
+        // Renkler: eBird fotoğrafın = sarı · kendi yüklediğin = mavi · Wikipedia = lacivert
+        const PH_COLOR = { ml: '#F5C518', own: '#1662B6', wiki: '#0A3E70' };
+        let PHOTO_FRAME = {}; try { PHOTO_FRAME = JSON.parse(localStorage.getItem('photo_frame') || '{}'); } catch (e) {}
+        let ML_PICK = {}; try { ML_PICK = JSON.parse(localStorage.getItem('ml_pick') || '{}'); } catch (e) {}
+        function photoKind(sci) { if (MY_PHOTOS[sci]) return 'own'; if (mlOn() && ML_PICK[sci] !== 'wiki' && ML_PHOTOS[sci]) return 'ml'; return WIKI_IMAGES[sci] ? 'wiki' : ''; }
+        function frameKey(sci) { let k = photoKind(sci); return sci + '|' + k + (k === 'ml' ? '|' + String(ML_PHOTOS[sci]).split('/asset/')[1] : ''); }
+        function frameOf(sci) { let f = sci && PHOTO_FRAME[frameKey(sci)]; return f || { x: 0.5, y: 0.5, z: 1 }; }
+        function saveFrames() { try { localStorage.setItem('photo_frame', JSON.stringify(PHOTO_FRAME)); } catch (e) {} }
+        let _urlSci = null;
+        function sciOfUrl(u) {
+            if (!u) return null;
+            const build = () => { _urlSci = {}; obsData.forEach(d => { if (d.img) _urlSci[d.img] = d.sci_name; }); };
+            if (!_urlSci) build();
+            if (!_urlSci[u]) build();
+            return _urlSci[u] || null;
+        }
+        // Listelerdeki küçük fotoğraflar: kaynağa göre ince renkli çerçeve + kayıtlı kadraj
+        const CAN_VIEWBOX = !!(window.CSS && CSS.supports && CSS.supports('object-view-box', 'inset(10% 10% 10% 10%)'));
+        function decoratePhotos() {
+            _urlSci = null;
+            document.querySelectorAll('img').forEach(im => {
+                if (im.closest('#photo-viewer, #share-overlay, #fbask, #mlask')) return;
+                let sci = sciOfUrl(im.getAttribute('src')); if (!sci) return;
+                let k = photoKind(sci), f = frameOf(sci);
+                im.classList.remove('ph-ml', 'ph-own', 'ph-wiki'); if (k) im.classList.add('ph-' + k);
+                im.style.objectPosition = `${f.x * 100}% ${f.y * 100}%`;
+                if (CAN_VIEWBOX) {
+                    let r = 1 - 1 / (f.z || 1);
+                    im.style.objectViewBox = r > 0.001 ? `inset(${(f.y * r * 100).toFixed(1)}% ${((1 - f.x) * r * 100).toFixed(1)}% ${((1 - f.y) * r * 100).toFixed(1)}% ${(f.x * r * 100).toFixed(1)}%)` : '';
+                }
+            });
+            document.querySelectorAll('.lifer-bubble').forEach(el => {
+                let m = /url\(["']?(.*?)["']?\)/.exec(el.style.backgroundImage || ''); let sci = m && sciOfUrl(m[1].replace(/%27/g, "'")); if (!sci) return;
+                let f = frameOf(sci); el.style.backgroundPosition = `${f.x * 100}% ${f.y * 100}%`;
+            });
+        }
+        let _decoT = 0;
+        new MutationObserver(() => { if (_decoT) return; _decoT = requestAnimationFrame(() => { _decoT = 0; decoratePhotos(); }); })
+            .observe(document.body, { childList: true, subtree: true });
+
         window.openPhotoViewer = function(sci, ev) {
             if (ev) ev.stopPropagation();
             let row = obsData.find(d => d.sci_name === sci); if (!row) return;
-            let own = !!MY_PHOTOS[sci], src = photoUrl(sci), ml = !own && mlOn() && !!ML_PHOTOS[sci];
+            let kind = photoKind(sci), src = photoUrl(sci), own = kind === 'own';
             let v = document.getElementById('photo-viewer');
             if (!v) {
                 v = document.createElement('div'); v.id = 'photo-viewer'; v.setAttribute('data-no-i18n', '');
                 v.onclick = e => { if (e.target === v) closePhotoViewer(); };
                 document.body.appendChild(v);
             }
+            let kindTxt = { own: LT('Senin fotoğrafın (cihazdan)', 'Your photo (from device)'), ml: LT('eBird fotoğrafın', 'Your eBird photo'), wiki: 'Wikipedia' }[kind] || '';
+            // Bu türün seçilebilir fotoğrafları: eBird'deki tüm fotoğrafların + Wikipedia
+            let opts = [];
+            if (mlOn() && ML_CANDS[sci]) ML_CANDS[sci].slice(0, 12).forEach(n => opts.push({ k: 'ml', n, u: mlUrl(n) }));
+            if (opts.length && WIKI_IMAGES[sci]) opts.push({ k: 'wiki', n: 'wiki', u: WIKI_IMAGES[sci] });
+            let curN = kind === 'ml' ? String(ML_PHOTOS[sci]).split('/asset/')[1].split('/')[0] : kind;
             v.innerHTML = `<div class="pv-card">
                 <button class="pv-x" onclick="closePhotoViewer()" aria-label="✕">✕</button>
-                ${src ? `<img src="${src}" alt="">` : `<div class="pv-empty">${LT('Fotoğraf yok', 'No photo')}</div>`}
+                ${src ? `<div class="pv-frame" style="--pc:${PH_COLOR[kind] || '#ccc'}"><canvas id="pv-canvas" width="720" height="720"></canvas></div>
+                    <div class="pv-hint">${LT('Sürükleyerek ortala · iki parmakla ya da tekerlekle yakınlaştır · çift dokun: sıfırla', 'Drag to centre · pinch or scroll to zoom · double-tap: reset')}<br>${LT('Kare: listelerdeki görünüm · daire: paylaşım kartları', 'Square: list thumbnails · circle: share cards')}</div>`
+                    : `<div class="pv-empty">${LT('Fotoğraf yok', 'No photo')}</div>`}
                 <div class="pv-name">${escHtml(spName(row))}</div>
-                <div class="pv-sci"><i>${escHtml(sci)}</i> · ${own ? LT('📷 Senin fotoğrafın', '📷 Your photo') : ml ? LT('📷 eBird fotoğrafın', '📷 Your eBird photo') : LT('Fotoğraf: Wikipedia', 'Photo: Wikipedia')}</div>
+                <div class="pv-sci"><i>${escHtml(sci)}</i>${kindTxt ? ` · <span class="pv-kind" style="--pc:${PH_COLOR[kind]}">${kindTxt}</span>` : ''}</div>
+                ${opts.length > 1 && !own ? `<div class="pv-opts">${opts.map(o => `<button class="pv-opt ${String(o.n) === String(curN) ? 'on' : ''}" style="--pc:${PH_COLOR[o.k]}" onclick="pickSpeciesPhoto('${escAttr(sci)}','${o.n}')" title="${o.k === 'wiki' ? 'Wikipedia' : 'ML' + o.n}"><img src="${o.u}" alt="" onerror="this.parentNode.remove()"></button>`).join('')}</div>` : ''}
                 <div class="pv-btns">
                     <button class="pv-btn primary" onclick="document.getElementById('my-photo-input').click()">✏️ ${own ? LT('Fotoğrafı değiştir', 'Change photo') : LT('Kendi fotoğrafını koy', 'Use your own photo')}</button>
                     ${own ? `<button class="pv-btn" onclick="resetMyPhoto('${escAttr(sci)}')">↩️ ${mlOn() && ML_PHOTOS[sci] ? LT('eBird fotoğrafına dön', 'Back to eBird photo') : LT('Wikipedia fotoğrafına dön', 'Back to Wikipedia photo')}</button>` : ''}
                 </div>
-                <div class="pv-note">${LT('Fotoğrafın yalnızca bu telefonda saklanır; listelerde, haritada ve paylaşım kartlarında bu türün fotoğrafı olarak kullanılır. İçindeki konum (GPS) bilgisi silinir.', 'Your photo stays on this phone only and is used for this species in lists, on the map and on share cards. Its GPS data is removed.')}</div>
+                <div class="pv-legend"><span style="--pc:${PH_COLOR.ml}">eBird</span><span style="--pc:${PH_COLOR.own}">${LT('Cihazdan', 'Device')}</span><span style="--pc:${PH_COLOR.wiki}">Wikipedia</span></div>
+                <div class="pv-note">${LT('Kendi koyduğun fotoğraf yalnızca bu cihazda saklanır; içindeki konum (GPS) bilgisi silinir.', 'A photo you add stays on this device only; its GPS data is removed.')}</div>
                 <input type="file" id="my-photo-input" accept="image/*" style="display:none;">
             </div>`;
             v.querySelector('#my-photo-input').onchange = async function(e) {
@@ -5012,17 +5082,60 @@
                 try {
                     let data = await shrinkPhoto(f);
                     await photoDbSet(sci, data);
-                    MY_PHOTOS[sci] = data; applyMyPhoto(sci);
+                    MY_PHOTOS[sci] = data; delete PHOTO_FRAME[sci + '|own']; saveFrames(); applyMyPhoto(sci);
                     renderAll(); if (liferArray.length) renderLiferCalendar();
                     openPhotoViewer(sci);
                 } catch (x) { alert(LT('Fotoğraf kaydedilemedi.', 'Could not save the photo.')); }
             };
             v.style.display = 'flex';
+            if (src) initFrameEditor(sci, src);
+        };
+        async function initFrameEditor(sci, src) {
+            let cv = document.getElementById('pv-canvas'); if (!cv) return;
+            let ctx = cv.getContext('2d'), img = await loadImg(src, false); if (!img || !cv.isConnected) return;
+            let key = frameKey(sci), f = Object.assign({ x: 0.5, y: 0.5, z: 1 }, PHOTO_FRAME[key]);
+            const W = cv.width;
+            const draw = () => {
+                ctx.clearRect(0, 0, W, W); drawCover(ctx, img, 0, 0, W, W, f.x, f.y, f.z);
+                ctx.save(); ctx.fillStyle = 'rgba(255,255,255,0.38)'; ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.arc(W / 2, W / 2, W / 2 - 2, 0, Math.PI * 2, true); ctx.fill('evenodd');
+                ctx.setLineDash([14, 10]); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.beginPath(); ctx.arc(W / 2, W / 2, W / 2 - 3, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+            };
+            const save = () => { PHOTO_FRAME[key] = { x: +f.x.toFixed(3), y: +f.y.toFixed(3), z: +f.z.toFixed(2) }; if (f.x === 0.5 && f.y === 0.5 && f.z === 1) delete PHOTO_FRAME[key]; saveFrames(); decoratePhotos(); };
+            draw();
+            // Sürükleme: görüntü parmağı takip etsin (taşan kısım kadar kaydırılabilir)
+            let pts = new Map(), last = null, pinch0 = null, lastTap = 0;
+            const over = () => { let s = Math.max(W / img.width, W / img.height) * f.z; return { ox: img.width * s - W, oy: img.height * s - W }; };
+            const scale = () => W / cv.getBoundingClientRect().width;
+            cv.addEventListener('pointerdown', e => {
+                e.preventDefault(); cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                if (pts.size === 1) { last = { x: e.clientX, y: e.clientY }; let t = Date.now(); if (t - lastTap < 300) { f = { x: 0.5, y: 0.5, z: 1 }; draw(); save(); } lastTap = t; }
+                if (pts.size === 2) { let [a, b] = [...pts.values()]; pinch0 = { d: Math.hypot(a.x - b.x, a.y - b.y), z: f.z }; }
+            });
+            cv.addEventListener('pointermove', e => {
+                if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                if (pts.size >= 2 && pinch0) { let [a, b] = [...pts.values()]; f.z = Math.max(1, Math.min(4, pinch0.z * Math.hypot(a.x - b.x, a.y - b.y) / (pinch0.d || 1))); draw(); return; }
+                if (!last) return;
+                let k = scale(), o = over(), dx = (e.clientX - last.x) * k, dy = (e.clientY - last.y) * k; last = { x: e.clientX, y: e.clientY };
+                if (o.ox > 0.5) f.x = Math.max(0, Math.min(1, f.x - dx / o.ox));
+                if (o.oy > 0.5) f.y = Math.max(0, Math.min(1, f.y - dy / o.oy));
+                draw();
+            });
+            const end = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch0 = null; if (!pts.size) { last = null; save(); } else { let p = [...pts.values()][0]; last = { x: p.x, y: p.y }; } };
+            cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+            cv.addEventListener('wheel', e => { e.preventDefault(); f.z = Math.max(1, Math.min(4, f.z * (e.deltaY < 0 ? 1.1 : 1 / 1.1))); draw(); clearTimeout(cv._w); cv._w = setTimeout(save, 250); }, { passive: false });
+        }
+        // Birden çok eBird fotoğrafı varsa hangisi kullanılsın (ya da Wikipedia)
+        window.pickSpeciesPhoto = function(sci, n) {
+            if (n === 'wiki') ML_PICK[sci] = 'wiki';
+            else { ML_PICK[sci] = n; mlOk[n] = 1; ML_PHOTOS[sci] = mlUrl(n); try { localStorage.setItem('ml_ok', JSON.stringify(mlOk)); } catch (e) {} }
+            try { localStorage.setItem('ml_pick', JSON.stringify(ML_PICK)); } catch (e) {}
+            applyMyPhoto(sci); renderAll(); if (liferArray.length) renderLiferCalendar();
+            openPhotoViewer(sci);
         };
         window.closePhotoViewer = function() { let v = document.getElementById('photo-viewer'); if (v) v.style.display = 'none'; };
         window.resetMyPhoto = async function(sci) {
             try { await photoDbSet(sci, null); } catch (x) {}
-            delete MY_PHOTOS[sci]; applyMyPhoto(sci);
+            delete MY_PHOTOS[sci]; delete PHOTO_FRAME[sci + '|own']; saveFrames(); applyMyPhoto(sci);
             renderAll(); if (liferArray.length) renderLiferCalendar();
             openPhotoViewer(sci);
         };
@@ -5033,7 +5146,7 @@
         const ML_PHOTOS = {}; let ML_CANDS = {}; const ML_TRIED = {};
         const mlUrl = n => `https://cdn.download.ams.birds.cornell.edu/api/v1/asset/${n}/480`;
         const mlOn = () => { try { return localStorage.getItem('ml_photos') === '1'; } catch (e) { return false; } };
-        function photoUrl(sci) { return MY_PHOTOS[sci] || (mlOn() && ML_PHOTOS[sci]) || WIKI_IMAGES[sci] || ''; }
+        function photoUrl(sci) { return MY_PHOTOS[sci] || (mlOn() && ML_PICK[sci] !== 'wiki' && ML_PHOTOS[sci]) || WIKI_IMAGES[sci] || ''; }
         function collectMl(rows) {
             let c = {};
             (rows || []).forEach(r => {
@@ -5046,12 +5159,13 @@
         }
         let mlOk = {}; try { mlOk = JSON.parse(localStorage.getItem('ml_ok') || '{}'); } catch (e) {}
         // Daha önce açılmış fotoğraflar beklemeden yerine gelsin
-        function mlPrefill() { if (!mlOn()) return; Object.entries(ML_CANDS).forEach(([sci, ns]) => { let n = ns.find(x => mlOk[x]); if (n) ML_PHOTOS[sci] = mlUrl(n); }); }
+        const mlOrder = sci => { let ns = ML_CANDS[sci] || [], p = ML_PICK[sci]; return p && ns.includes(p) ? [p, ...ns.filter(x => x !== p)] : ns; };
+        function mlPrefill() { if (!mlOn()) return; Object.keys(ML_CANDS).forEach(sci => { let n = mlOrder(sci).find(x => mlOk[x]); if (n) ML_PHOTOS[sci] = mlUrl(n); }); }
         let mlToken = 0;
         async function resolveMlPhotos() {
             let tok = ++mlToken, list = Object.keys(ML_CANDS), i = 0, changed = 0;
             async function one(sci) {
-                for (let n of ML_CANDS[sci].slice(0, 8)) {
+                for (let n of mlOrder(sci).slice(0, 8)) {
                     if (mlOk[n]) { if (ML_PHOTOS[sci] !== mlUrl(n)) { ML_PHOTOS[sci] = mlUrl(n); applyMyPhoto(sci); changed++; } return; }
                     if (ML_TRIED[n]) continue;
                     ML_TRIED[n] = 1;
@@ -5404,7 +5518,7 @@
                 },
                 leave: () => closePhotoViewer(),
                 title: LT('Kendi fotoğrafın', 'Your own photo'),
-                text: LT('Listede bir türün fotoğrafına dokununca böyle büyür. "✏️ Kendi fotoğrafını koy" ile galeriden kendi çektiğin fotoğrafı seç: listede, haritada ve paylaşım kartlarında artık seninki görünür. Fotoğraf yalnızca bu cihazda kalır.', 'Tap a species photo in the list to enlarge it like this. "✏️ Use your own photo" lets you pick your own shot from the gallery; it then appears in lists, on the map and on share cards. The photo stays on this device.') });
+                text: LT('Listede bir türün fotoğrafına dokununca böyle büyür. Sürükleyerek ortala, iki parmakla yakınlaştır. "✏️ Kendi fotoğrafını koy" ile kendi fotoğrafını seç. Çerçeve rengi kaynağı gösterir: sarı eBird, mavi cihazın, lacivert Wikipedia.', 'Tap a species photo in the list to enlarge it like this. Drag to centre, pinch to zoom. "✏️ Use your own photo" lets you pick your own shot. The frame colour shows the source: yellow eBird, blue your device, navy Wikipedia.') });
             s.push({ id: 'chips', target: () => $t('filter-bar'), fit: true,
                 enter: () => { let first = document.querySelector('#species-list .species-item'); if (first) first.click(); closeTabs(); },
                 leave: () => { clearFilter('all'); },
