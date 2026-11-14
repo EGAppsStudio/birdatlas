@@ -131,16 +131,16 @@
         .feedback-btn { border-color: #1662B6 !important; color: #1662B6 !important; justify-content: center !important; }
         .feedback-hint { font-size: 10.5px; color: #6b7a8c; margin-top: 6px; line-height: 1.35; }
         .ls-hide { display: none !important; }
-        #fbask { position: fixed; inset: 0; z-index: 1000001; background: rgba(10,30,60,.45); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
-        #fbask .fa-card { background: #FDFDFD; border-radius: 18px; max-width: 360px; width: 100%; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.25); color: #0A3E70; }
-        #fbask .fa-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
-        #fbask .fa-top svg { flex: 0 0 auto; }
-        #fbask .fa-top b { font-size: 17px; }
-        #fbask .fa-sub { font-size: 13px; color: #4A5B70; margin-top: 4px; line-height: 1.35; }
-        #fbask .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
-        #fbask .fa-btn.fa-rate { background: #1662B6; color: #fff; }
-        #fbask .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
-        #fbask .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
+        #fbask, #mlask { position: fixed; inset: 0; z-index: 1000001; background: rgba(10,30,60,.45); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+        #fbask .fa-card, #mlask .fa-card { background: #FDFDFD; border-radius: 18px; max-width: 360px; width: 100%; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.25); color: #0A3E70; }
+        #fbask .fa-top, #mlask .fa-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+        #fbask .fa-top svg, #mlask .fa-top svg { flex: 0 0 auto; }
+        #fbask .fa-top b, #mlask .fa-top b { font-size: 17px; }
+        #fbask .fa-sub, #mlask .fa-sub { font-size: 13px; color: #4A5B70; margin-top: 4px; line-height: 1.35; }
+        #fbask .fa-btn, #mlask .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
+        #fbask .fa-btn.fa-rate, #mlask .fa-btn.fa-rate { background: #1662B6; color: #fff; }
+        #fbask .fa-foot, #mlask .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
+        #fbask .fa-link, #mlask .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
         /* Pencereleri tutamaçla boyutlandırma (sekme pencereleri + Maviş) */
         .rs-grip { display: none; justify-content: center; align-items: center; height: 22px; cursor: ns-resize; touch-action: none; pointer-events: auto; user-select: none; }
         .rs-grip span { width: 46px; height: 5px; border-radius: 3px; background: #1662B6; opacity: .55; box-shadow: 0 0 0 3px rgba(255,255,255,.85); }
@@ -586,6 +586,7 @@
             <input type="text" id="input-ebird-api" class="settings-input">
             <span class="settings-help" id="ebird-key-help" data-no-i18n></span>
             
+            <div id="ml-settings" data-no-i18n></div>
             <div id="ai-settings" data-no-i18n></div>
             
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
@@ -1407,7 +1408,14 @@
             el.innerHTML = LT(`Çevreyi Keşfet için gerekir, ücretsizdir. <b>Nasıl alınır:</b> 1) ebird.org'da hesabınla giriş yap (hesabın yoksa ücretsiz aç). 2) ${a} sayfasını aç, kullanım amacını kısaca yaz (ör. "kişisel kullanım") ve şartları onayla. 3) Çıkan kısa kodu kopyalayıp buraya yapıştır, Kaydet'e dokun.`,
                 `Needed for Explore Nearby; it's free. <b>How to get one:</b> 1) Sign in at ebird.org (create a free account if needed). 2) Open ${a}, briefly describe your use (e.g. "personal use") and accept the terms. 3) Copy the short code shown, paste it here and tap Save.`);
         }
-        function openSettings() { document.getElementById('input-ebird-api').value = EBIRD_API; renderAISettings(); renderEbirdHelp(); document.getElementById('settings-overlay').style.display = 'flex'; }
+        function renderMlSettings() {
+            let el = document.getElementById('ml-settings'), n = Object.keys(ML_CANDS).length;
+            if (!el) return; if (!n || isSample()) { el.innerHTML = ''; return; }
+            el.innerHTML = `<label style="display:flex; gap:10px; align-items:flex-start; margin:14px 0 4px; font-size:14px; color:#0A3E70; cursor:pointer;">
+                <input type="checkbox" ${mlOn() ? 'checked' : ''} onchange="setMlPhotos(this.checked)" style="margin-top:3px; width:18px; height:18px;">
+                <span><b>📷 ${LT('eBird fotoğraflarımı kullan', 'Use my eBird photos')}</b><br><span class="settings-help">${LT(`${n} türde eBird'e yüklediğin fotoğraf var; Wikipedia fotoğrafı yerine onlar gösterilir (Macaulay Library).`, `You have eBird photos of ${n} species; they're shown instead of Wikipedia photos (Macaulay Library).`)}</span></span></label>`;
+        }
+        function openSettings() { document.getElementById('input-ebird-api').value = EBIRD_API; renderAISettings(); renderEbirdHelp(); renderMlSettings(); document.getElementById('settings-overlay').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settings-overlay').style.display = 'none'; }
         function saveSettings() { EBIRD_API = document.getElementById('input-ebird-api').value.trim(); localStorage.setItem('user_ebird_api', EBIRD_API); saveAISettings(); closeSettings(); updateAIGreeting(); alert("API Şifreleri başarıyla kaydedildi!"); }
 
@@ -1858,7 +1866,8 @@
             }
             saveImgCache(imgCache);
             await myPhotosReady; WIKI_IMAGES = speciesImages;
-            obsData.forEach(d => { d.img = MY_PHOTOS[d.sci_name] || speciesImages[d.sci_name] || ""; });
+            ML_CANDS = collectMl(locGroups); Object.keys(ML_PHOTOS).forEach(k => delete ML_PHOTOS[k]); mlPrefill();
+            obsData.forEach(d => { d.img = photoUrl(d.sci_name); });
             buildGlobalStats();
 
             let lStat = {};
@@ -3409,7 +3418,7 @@
             for (let round = 0; round < 2 && todo.length; round++) {
                 for (let i = 0; i < todo.length; i += 50) {
                     let res = await fetchSpeciesImagesBatch(todo.slice(i, i + 50));
-                    Object.entries(res).forEach(([sci, url]) => { if (url) { cache[sci] = url; WIKI_IMAGES[sci] = url; obsData.forEach(d => { if (d.sci_name === sci) d.img = url; }); liferArray.forEach(l => { if (l.sci_name === sci) l.img = url; }); changed = true; } });
+                    Object.entries(res).forEach(([sci, url]) => { if (url) { cache[sci] = url; WIKI_IMAGES[sci] = url; applyMyPhoto(sci); changed = true; } });
                 }
                 todo = todo.filter(sci => !cache[sci]);
                 let left = [], fails = 0;
@@ -3421,7 +3430,7 @@
                     if (url === null) { left.push(sci); fails++; } else fails = 0;
                     if (url !== null) {
                         cache[sci] = url;
-                        if (url) { WIKI_IMAGES[sci] = url; obsData.forEach(d => { if (d.sci_name === sci) d.img = url; }); liferArray.forEach(l => { if (l.sci_name === sci) l.img = url; }); changed = true; }
+                        if (url) { WIKI_IMAGES[sci] = url; applyMyPhoto(sci); changed = true; }
                     }
                     await new Promise(r => setTimeout(r, 1200));
                 }
@@ -3436,6 +3445,7 @@
             bindMiniFollow();
             maybeStartTour(true);
             setTimeout(retryMissingPhotos, 5000);
+            setTimeout(maybeAskMl, 2500);
             if (isSample()) { if (!afterDataLoaded._timer) afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 300000); return; }
             let reached = reachedMilestones(); let top = reached.length ? reached[reached.length - 1] : 0;
             let seen = NaN; try { seen = parseInt(localStorage.getItem('milestone_seen'), 10); } catch (e) {}
@@ -3717,7 +3727,7 @@
             ctx.drawImage(img, ox, oy, iw, ih);
         }
         async function photoCircle(ctx, src, cx, cy, r, ring) {
-            let img = await loadImgMemo(src, true);
+            let img = await cardImg(src);
             ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.18)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 6;
             ctx.beginPath(); ctx.arc(cx, cy, r + 7, 0, Math.PI * 2); ctx.fillStyle = ring || '#fff'; ctx.fill(); ctx.restore();
             ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
@@ -3971,7 +3981,7 @@
             let st = shareState, o = D.o;
             ctx.fillStyle = '#0F1B30'; ctx.fillRect(0, 0, W, H);
             let ph = story ? H - 520 : H - 330;
-            let img = st.photo || await loadImgMemo(o.img, true);
+            let img = st.photo || await cardImg(o.img);
             if (img) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ph); ctx.clip(); drawCover(ctx, img, 0, 0, W, ph, st.photoX, st.photoY, st.photo ? st.photoZoom : 1); ctx.restore(); }
             else { let g = ctx.createLinearGradient(0, 0, W, ph); g.addColorStop(0, '#5d7d94'); g.addColorStop(1, '#18283d'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, ph); }
             let g = ctx.createLinearGradient(0, ph - 360, 0, ph + 2); g.addColorStop(0, 'rgba(15,27,48,0)'); g.addColorStop(1, 'rgba(15,27,48,1)'); ctx.fillStyle = g; ctx.fillRect(0, ph - 360, W, 362);
@@ -4946,7 +4956,7 @@
         }
         const myPhotosReady = (async () => { try { Object.assign(MY_PHOTOS, await photoDbAll()); } catch (e) {} })();
         function applyMyPhoto(sci) {
-            let url = MY_PHOTOS[sci] || WIKI_IMAGES[sci] || '';
+            let url = photoUrl(sci);
             obsData.forEach(d => { if (d.sci_name === sci) d.img = url; });
             liferArray.forEach(l => { if (l.sci_name === sci) l.img = url; });
         }
@@ -4964,7 +4974,7 @@
         window.openPhotoViewer = function(sci, ev) {
             if (ev) ev.stopPropagation();
             let row = obsData.find(d => d.sci_name === sci); if (!row) return;
-            let own = !!MY_PHOTOS[sci], src = MY_PHOTOS[sci] || WIKI_IMAGES[sci] || '';
+            let own = !!MY_PHOTOS[sci], src = photoUrl(sci), ml = !own && mlOn() && !!ML_PHOTOS[sci];
             let v = document.getElementById('photo-viewer');
             if (!v) {
                 v = document.createElement('div'); v.id = 'photo-viewer'; v.setAttribute('data-no-i18n', '');
@@ -4975,10 +4985,10 @@
                 <button class="pv-x" onclick="closePhotoViewer()" aria-label="✕">✕</button>
                 ${src ? `<img src="${src}" alt="">` : `<div class="pv-empty">${LT('Fotoğraf yok', 'No photo')}</div>`}
                 <div class="pv-name">${escHtml(spName(row))}</div>
-                <div class="pv-sci"><i>${escHtml(sci)}</i> · ${own ? LT('📷 Senin fotoğrafın', '📷 Your photo') : LT('Fotoğraf: Wikipedia', 'Photo: Wikipedia')}</div>
+                <div class="pv-sci"><i>${escHtml(sci)}</i> · ${own ? LT('📷 Senin fotoğrafın', '📷 Your photo') : ml ? LT('📷 eBird fotoğrafın', '📷 Your eBird photo') : LT('Fotoğraf: Wikipedia', 'Photo: Wikipedia')}</div>
                 <div class="pv-btns">
                     <button class="pv-btn primary" onclick="document.getElementById('my-photo-input').click()">✏️ ${own ? LT('Fotoğrafı değiştir', 'Change photo') : LT('Kendi fotoğrafını koy', 'Use your own photo')}</button>
-                    ${own ? `<button class="pv-btn" onclick="resetMyPhoto('${escAttr(sci)}')">↩️ ${LT('Wikipedia fotoğrafına dön', 'Back to Wikipedia photo')}</button>` : ''}
+                    ${own ? `<button class="pv-btn" onclick="resetMyPhoto('${escAttr(sci)}')">↩️ ${mlOn() && ML_PHOTOS[sci] ? LT('eBird fotoğrafına dön', 'Back to eBird photo') : LT('Wikipedia fotoğrafına dön', 'Back to Wikipedia photo')}</button>` : ''}
                 </div>
                 <div class="pv-note">${LT('Fotoğrafın yalnızca bu telefonda saklanır; listelerde, haritada ve paylaşım kartlarında bu türün fotoğrafı olarak kullanılır. İçindeki konum (GPS) bilgisi silinir.', 'Your photo stays on this phone only and is used for this species in lists, on the map and on share cards. Its GPS data is removed.')}</div>
                 <input type="file" id="my-photo-input" accept="image/*" style="display:none;">
@@ -5002,6 +5012,85 @@
             renderAll(); if (liferArray.length) renderLiferCalendar();
             openPhotoViewer(sci);
         };
+
+        // ----- eBird fotoğrafların (Macaulay Library): eBird CSV'sindeki "ML Catalog Numbers" sütunu -----
+        // Sıra: kendi yüklediğin fotoğraf > eBird fotoğrafın (en yeni gözlem) > Wikipedia. Yalnız kullanıcı "Evet" derse açılır.
+        // Cornell'e yalnız fotoğrafın numarası gider (resim adresi); başka bilgi gönderilmez.
+        const ML_PHOTOS = {}; let ML_CANDS = {}; const ML_TRIED = {};
+        const mlUrl = n => `https://cdn.download.ams.birds.cornell.edu/api/v1/asset/${n}/480`;
+        const mlOn = () => { try { return localStorage.getItem('ml_photos') === '1'; } catch (e) { return false; } };
+        function photoUrl(sci) { return MY_PHOTOS[sci] || (mlOn() && ML_PHOTOS[sci]) || WIKI_IMAGES[sci] || ''; }
+        function collectMl(rows) {
+            let c = {};
+            (rows || []).forEach(r => {
+                let v = r['ML Catalog Numbers'], sci = (r['Scientific Name'] || '').trim(); if (!v || !sci) return;
+                let d = String(r.Date || r['Observation Date'] || '') + ' ' + String(r.Time || '');
+                String(v).split(/[\s,;]+/).forEach(x => { let n = x.replace(/^ML/i, ''); if (/^\d{4,}$/.test(n)) (c[sci] = c[sci] || []).push({ n, d }); });
+            });
+            Object.keys(c).forEach(k => { c[k].sort((a, b) => b.d.localeCompare(a.d)); c[k] = [...new Set(c[k].map(x => x.n))]; });
+            return c;
+        }
+        let mlOk = {}; try { mlOk = JSON.parse(localStorage.getItem('ml_ok') || '{}'); } catch (e) {}
+        // Daha önce açılmış fotoğraflar beklemeden yerine gelsin
+        function mlPrefill() { if (!mlOn()) return; Object.entries(ML_CANDS).forEach(([sci, ns]) => { let n = ns.find(x => mlOk[x]); if (n) ML_PHOTOS[sci] = mlUrl(n); }); }
+        let mlToken = 0;
+        async function resolveMlPhotos() {
+            let tok = ++mlToken, list = Object.keys(ML_CANDS), i = 0, changed = 0;
+            async function one(sci) {
+                for (let n of ML_CANDS[sci].slice(0, 8)) {
+                    if (mlOk[n]) { if (ML_PHOTOS[sci] !== mlUrl(n)) { ML_PHOTOS[sci] = mlUrl(n); applyMyPhoto(sci); changed++; } return; }
+                    if (ML_TRIED[n]) continue;
+                    ML_TRIED[n] = 1;
+                    let im = await loadImg(mlUrl(n), false); if (tok !== mlToken) return;
+                    // ses kaydının ya da silinmiş medyanın resmi gelmez; çok yayvan görsel (spektrogram) da fotoğraf sayılmaz
+                    if (im && im.naturalWidth && im.naturalWidth / im.naturalHeight < 2.2) { mlOk[n] = 1; ML_PHOTOS[sci] = mlUrl(n); applyMyPhoto(sci); changed++; return; }
+                }
+            }
+            await Promise.all(Array.from({ length: 4 }, async () => { while (i < list.length && tok === mlToken) await one(list[i++]); }));
+            try { localStorage.setItem('ml_ok', JSON.stringify(mlOk)); } catch (e) {}
+            if (!changed || tok !== mlToken) return;
+            let apply = () => { if (tourIdx >= 0) return setTimeout(apply, 3000); renderAll(); if (liferArray.length) renderLiferCalendar(); };
+            apply();
+        }
+        window.setMlPhotos = function(on) {
+            try { localStorage.setItem('ml_photos', on ? '1' : '0'); } catch (e) {}
+            if (on) { mlPrefill(); resolveMlPhotos(); }
+            Object.keys(ML_CANDS).forEach(applyMyPhoto);
+            renderAll(); if (liferArray.length) renderLiferCalendar();
+        };
+        function maybeAskMl() {
+            if (isSample()) return;
+            let n = Object.keys(ML_CANDS).length; if (!n) return;
+            let st = null; try { st = localStorage.getItem('ml_photos'); } catch (e) {}
+            if (st === '1') return resolveMlPhotos();
+            if (st === '0' || document.getElementById('mlask')) return;
+            let busy = (typeof tourIdx !== 'undefined' && tourIdx >= 0) || document.getElementById('fbask') || (document.getElementById('share-overlay') || {}).style?.display === 'flex';
+            if (busy) return setTimeout(maybeAskMl, 4000);
+            let d = document.createElement('div'); d.id = 'mlask'; d.setAttribute('data-no-i18n', '');
+            d.innerHTML = `<div class="fa-card">
+                <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${LT('eBird fotoğrafların bulundu 📷', 'Found your eBird photos 📷')}</b>
+                <div class="fa-sub">${LT(`eBird'e ${n} türün fotoğrafını yüklemişsin. Bu türlerde Wikipedia fotoğrafı yerine kendi fotoğrafını (en yeni gözleminden) göstereyim mi?`, `You've uploaded photos of ${n} species to eBird. Shall I show your own photo (from your latest sighting) instead of the Wikipedia photo for these species?`)}</div></div></div>
+                <button class="fa-btn fa-rate" data-k="yes">${LT('Evet, fotoğraflarımı kullan', 'Yes, use my photos')}</button>
+                <button class="fa-btn" data-k="no">${LT('Hayır, Wikipedia kalsın', 'No, keep Wikipedia')}</button>
+                <div class="fa-sub" style="margin-top:8px;">${LT("Fotoğraflar eBird'ün arşivi Macaulay Library'den (Cornell) gelir; oraya yalnızca fotoğraf numarası gider. Sonra ☰ → Ayarlar'dan değiştirebilirsin.", "Photos come from eBird's archive, the Macaulay Library (Cornell); only the photo number is sent. You can change this later in ☰ → Settings.")}</div>
+            </div>`;
+            d.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { d.remove(); setMlPhotos(b.dataset.k === 'yes'); });
+            document.body.appendChild(d);
+        }
+        // Paylaşım kartı: eBird fotoğrafı tarayıcıda çizilemezse (CORS) önce telefondan indir, olmazsa Wikipedia fotoğrafı
+        async function cardImg(src) {
+            let im = await loadImgMemo(src, true);
+            if (im || !/ams\.birds\.cornell\.edu/.test(src || '')) return im;
+            try {
+                let H = NativePlugins && NativePlugins.CapacitorHttp;
+                if (H && H.request) {
+                    let r = await H.request({ url: src, method: 'GET', responseType: 'blob', connectTimeout: 15000, readTimeout: 20000 });
+                    if (r.status === 200 && typeof r.data === 'string') { im = await loadImgMemo('data:image/jpeg;base64,' + r.data, false); if (im) return im; }
+                }
+            } catch (e) {}
+            let sci = Object.keys(ML_PHOTOS).find(k => ML_PHOTOS[k] === src);
+            return sci && WIKI_IMAGES[sci] ? loadImgMemo(WIKI_IMAGES[sci], true) : null;
+        }
 
         // ----- Birey sayısı ayarı (varsayılan kapalı) + paneller açılınca harita penceresi kapansın -----
         (function initV111Ui() {
