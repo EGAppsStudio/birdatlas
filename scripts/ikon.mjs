@@ -12,7 +12,6 @@ console.log('Logo alınıyor: ' + src);
 const input = readFileSync(src);
 
 mkdirSync('assets', { recursive: true });
-mkdirSync('www/img', { recursive: true });
 
 // Kare 1024x1024 (uygulama içinde olduğu gibi ortadan kırpılmış)
 const square = await sharp(input).resize(1024, 1024, { fit: 'cover' }).flatten({ background: '#FFFFFF' }).png().toBuffer();
@@ -23,8 +22,7 @@ const round = await sharp(square).composite([{ input: circleMask, blend: 'dest-i
 const white = (w, h) => sharp({ create: { width: w, height: h, channels: 4, background: '#FFFFFF' } });
 const clear = (w, h) => sharp({ create: { width: w, height: h, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } });
 
-// Uygulama içindeki logo artık internetten değil buradan
-await sharp(square).toFile('www/img/logo.png');
+// Not: www/img/logo.png'ye DOKUNULMAZ (uygulama ve site o şeffaf logoyu kullanır; ikon üretimi onu değiştirmemeli)
 // Eski Android sürümleri için düz ikon: beyaz zemin üzerinde yuvarlak logo
 await white(1024, 1024).composite([{ input: await sharp(round).resize(900, 900).toBuffer(), gravity: 'center' }]).png().toFile('assets/icon-only.png');
 // Yeni Android "uyarlanabilir" ikon: görünen alan ortadaki ~683 px; logo 670 px → büyük görünür, dış halka kesilmez
