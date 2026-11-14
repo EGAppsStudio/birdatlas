@@ -68,6 +68,7 @@ writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
       .replace('<a class="brand" href="/">', `<a class="brand" href="/${L}/">`)
       .replace(/<img data-shot="([a-z]+)"/g, (m, k) => `<img src="/img/shots/${k}-${resim}.webp" data-shot="${k}"`)
       .replace(`data-set="${L}"`, `data-set="${L}" aria-current="true"`)
+      .replace('<span class="cur">TR</span>', `<span class="cur">${L.toUpperCase()}</span>`)
       .replace(/\/\*DIL-BASLA\*\/[\s\S]*?\/\*DIL-BITIR\*\//,
         `try { localStorage.setItem('site_lang', '${L}');${L === 'tr' || L === 'en' ? ` localStorage.setItem('app_lang', '${L}');` : ''} } catch (e) {}`);
     if (T && T._uygulama_dili) h = h.replace('<p class="note">', `<p class="note applang">${T._uygulama_dili}</p>\n        <p class="note">`);
