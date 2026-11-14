@@ -1,0 +1,49 @@
+Kuş Atlası, eBird gözlemlerini kişisel ve görsel bir haritaya dönüştürür. Hangi kuşu nerede, ne zaman gördüğünü tek bakışta keşfet; her gözlem gününü yeniden yaşa, en güzel anlarını paylaş.
+
+🗺️ GÖZLEMLERİN TEK HARİTADA
+• Her konum, gördüğün tür sayısına göre büyüyen renkli bir daire olarak görünür.
+• Uzaktan bakınca ülke ve il özeti, yakınlaşınca konum konum ayrıntı.
+• Her şey üstteki dört sekmede: Gözlemlerim, Kertikler, Keşfet, Paylaş.
+• Konumlar ve Türler listeleri: bir yerde gün gün neler gördüğünü, bir türü gördüğün bütün yerleri ve tarihleri tek dokunuşta gör.
+
+📅 TAKVİM VE YILLIK GRAFİKLER
+• Takvimden bir güne dokun; o gün hangi konumda hangi türleri gördüğün anında listelensin.
+• Aylık ya da haftalık grafiklerle kuş yılını gör; tür, gözlem, gün ya da birey sayısına göre. Yılları karşılaştır.
+• Tür, konum, il ve tarihe göre süz; Türkçe, İngilizce ya da Latince adla saniyeler içinde ara.
+
+🏆 KERTİK HARİTASI
+Her türü ilk kez gördüğün yeri fotoğraflı baloncuklarla haritada izle. Kuş gözlemciliği yolculuğunun hikâyesi tek ekranda.
+
+📤 PAYLAŞIM KARTLARI
+Instagram hikâyesi, kare gönderi ya da PDF olarak: yıl özeti, aylık takvim, gün, gezi (ör. "Urfa turu"), tür, konum, grafik ve kertik kartları. 100. tür gibi dönüm noktalarını kutla. Hassas türler için konumu il düzeyinde göster ya da tamamen gizle.
+🔗 Ya da bağlantı gönder: arkadaşın gözlemlerini uygulama kurmadan, tarayıcıda harita ve tür listesiyle görür. Veriler bağlantının içinde taşınır, sunucumuzda saklanmaz.
+
+📷 KENDİ FOTOĞRAFLARIN
+Bir türün fotoğrafına dokun, Wikipedia fotoğrafı yerine kendi çektiğin kareyi koy. Listelerde, haritada ve paylaşım kartlarında artık senin fotoğrafın görünür.
+
+🐦 MAVİŞ: DÜRBÜNLÜ ASİSTANIN
+Sevimli maskotumuz Maviş, verilerine dair sorularını cevaplar:
+"En verimli ayım hangisi?", "2025'te Mogan'da neler gördüm?", "En büyük sürüm hangisi?", "Kaç flamingo saydım?"
+Maviş cihazında çalışır; internet ya da anahtar gerektirmez.
+
+🔒 VERİLERİN SENDE KALIR
+• Hesap yok, sunucu yok, reklam yok, takip yok.
+• Gözlemlerin ve fotoğrafların yalnızca telefonunda saklanır; biz göremeyiz.
+• eBird'den indirdiğin ZIP dosyasını açmadan yüklemen yeterli.
+
+✨ VE DAHASI
+• İlk açılışta Maviş seni adım adım gezdirir; eBird hesabın yoksa örnek veriyle başlarsın.
+• Bilgisayardan ya da iPhone'dan da kullan: birdatlas.app
+• Türkçe ve İngilizce arayüz, tür adları her iki dilde
+• Elle gözlem ekleme ve düzenleme (adet bilgisiyle)
+• Çevreyi Keşfet: seçtiğin bölgedeki son 30 günün eBird kayıtları (ücretsiz eBird API anahtarınla)
+• İsteğe bağlı: ücretsiz Gemini anahtarınla Maviş'le serbest sohbet
+• Uygulama içinde adım adım kullanım kılavuzu
+
+NASIL BAŞLARIM?
+1. eBird hesabından "Verilerimi indir" talebi oluştur.
+2. E-postana gelen ZIP dosyasını indir.
+3. Kuş Atlası'nda ZIP'i seç. Hepsi bu!
+
+Kuş Atlası bağımsız bir uygulamadır; eBird veya Cornell Lab of Ornithology ile bağlantılı değildir.
+Web: birdatlas.app · Geri bildirim: egapps.support@gmail.com · Instagram: @birdatlas.app

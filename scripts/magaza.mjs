@@ -1,4 +1,5 @@
 // Play mağaza sayfası metinlerini ve görsellerini Google Play'e yükler (Google Play Developer API).
+// Diller ve iletişim bilgileri: magaza/ayarlar.json (tr-TR ve en-US dahil; görseli yazılmayan dilin görsellerine dokunulmaz)
 // Kullanım (proje klasöründe):
 //   npm run magaza -- --dene        → yalnızca kontrol eder, hiçbir şeyi değiştirmez
 //   npm run magaza                  → yükler ve kaydeder (Play incelemesine gider)
@@ -40,7 +41,7 @@ function hazirla(ayar) {
       if (telefon.length < 2 || telefon.length > 8) sorunlar.push(`${dil}: telefon ekran görüntüsü sayısı ${telefon.length} (2–8 olmalı)`);
       if (!oneCikan) sorunlar.push(`${dil}: öne çıkan görsel (one-cikan.jpg) yok`);
     }
-    isler.push({ dil, title, shortDescription, fullDescription, telefon, oneCikan });
+    isler.push({ dil, title, shortDescription, fullDescription, telefon, oneCikan, gorselli: !GORSELSIZ && !!a.gorsel });
   }
   if (TEK_DIL && !isler.length) sorunlar.push(`"${TEK_DIL}" magaza/ayarlar.json içinde yok`);
   if (sorunlar.length) hata('Yüklemeden önce düzeltilmesi gerekenler:\n   • ' + sorunlar.join('\n   • '));
@@ -72,7 +73,7 @@ try {
   for (const i of isler) {
     process.stdout.write(`• ${i.dil}: metinler`);
     await istek('PUT', `${E}/listings/${i.dil}`, { language: i.dil, title: i.title, shortDescription: i.shortDescription, fullDescription: i.fullDescription });
-    if (!GORSELSIZ) {
+    if (i.gorselli) {   // 'gorsel' yazılmayan dillerde (tr-TR, en-US) Play'deki görsellere dokunulmaz
       process.stdout.write(', ekran görüntüleri');
       await istek('DELETE', `${E}/listings/${i.dil}/phoneScreenshots`);
       for (const f of i.telefon) {
@@ -83,6 +84,15 @@ try {
       await istek('DELETE', `${E}/listings/${i.dil}/featureGraphic`);
       await istek('POST', `${EU}/listings/${i.dil}/featureGraphic?uploadType=media`, fs.readFileSync(i.oneCikan), /\.png$/i.test(i.oneCikan) ? 'image/png' : 'image/jpeg');
     }
+    console.log(' ✓');
+  }
+  // Mağaza ayarları → iletişim bilgileri (Web sitesi, e-posta)
+  if (ayar.iletisim && !TEK_DIL) {
+    process.stdout.write('• iletişim bilgileri (web sitesi, e-posta)');
+    const govde = {};
+    if (ayar.iletisim.web) govde.contactWebsite = ayar.iletisim.web;
+    if (ayar.iletisim.eposta) govde.contactEmail = ayar.iletisim.eposta;
+    await istek('PATCH', `${E}/details`, govde);
     console.log(' ✓');
   }
   if (DENE) {

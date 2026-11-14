@@ -1,0 +1,49 @@
+Bird Atlas turns your eBird sightings into a personal, visual map. See at a glance which birds you saw, where and when — relive every day in the field and share your best moments.
+
+🗺️ ALL YOUR SIGHTINGS ON ONE MAP
+• Every location is a colored circle that grows with the number of species you've seen there.
+• Zoomed out you get country and province summaries; zoom in for every single spot.
+• Everything lives in four tabs: My sightings, Lifers, Explore, Share.
+• Places and Species lists: see what you saw at a place day by day, or every place and date for a species, in one tap.
+
+📅 CALENDAR & YEAR CHARTS
+• Tap a day to instantly see which species you saw at which places.
+• See your bird year in monthly or weekly charts — by species, sightings, days or bird counts. Compare years.
+• Filter by species, place, province and date; search by common or scientific name.
+
+🏆 LIFER MAP
+Follow the places where you saw each species for the first time, shown as photo bubbles. Your birding journey, told on one screen.
+
+📤 SHARE CARDS
+As an Instagram story, square post or PDF: year summary, month calendar, day, trip, species, place, chart and lifer cards. Celebrate milestones like your 100th species. Show sensitive locations at province level only, or hide them completely.
+🔗 Or send a link: friends see your sightings on a map with the species list, right in their browser, no app needed. The data travels inside the link and is never stored on our server.
+
+📷 YOUR OWN PHOTOS
+Tap a species photo and replace the Wikipedia image with your own shot. It then appears in lists, on the map and on your share cards.
+
+🐦 MAVİŞ: YOUR BINOCULAR-TOTING ASSISTANT
+Our friendly Blue Tit mascot answers questions about your data:
+"What's my best month?", "What did I see at Lake Mogan in 2025?", "What's my largest flock?", "How many flamingos did I count?"
+Maviş runs on your device — no internet or API key needed.
+
+🔒 YOUR DATA STAYS WITH YOU
+• No account, no server, no ads, no tracking.
+• Your sightings and photos are stored only on your phone; we can't see them.
+• Just upload the ZIP you download from eBird — no need to unzip it.
+
+✨ AND MORE
+• On first launch Maviş gives you a quick guided tour; no eBird account? Start with sample data.
+• Also on your computer or iPhone: birdatlas.app
+• English and Turkish interface, species names in both languages
+• Add and edit sightings manually, with counts
+• Explore Nearby: eBird sightings from the last 30 days around any point (with your free eBird API key)
+• Optional: free-form chat with Maviş using your free Gemini key
+• Step-by-step in-app user guide
+
+HOW TO START
+1. Request "Download My Data" from your eBird account.
+2. Download the ZIP file from the email you receive.
+3. Choose that ZIP in Bird Atlas. That's it!
+
+Bird Atlas is an independent app and is not affiliated with eBird or the Cornell Lab of Ornithology.
+Web: birdatlas.app · Feedback: egapps.support@gmail.com · Instagram: @birdatlas.app

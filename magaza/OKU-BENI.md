@@ -3,7 +3,9 @@
 - `metinler/<klasör>/` → `title.txt` (≤30), `short_description.txt` (≤80), `full_description.txt` (≤4000)
 - `gorseller/en/` → `telefon-01…08.jpg` (1440×2560) + `one-cikan.jpg` (1024×500); çeviri dillerinde İngilizce görseller kullanılır
 - `ayarlar.json` → hangi Play dil kodu hangi klasörü kullanır (es-419 + es-ES → es, fr-FR + fr-CA → fr)
-- Türkçe (tr-TR) ve İngilizce (en-US) sayfalara bu komut DOKUNMAZ; onlar Play Console'dan elle.
+- Türkçe (tr-TR) ve İngilizce (en-US) metinleri de buradan gider (`metinler/tr`, `metinler/en`); bu iki dilin görsellerine dokunulmaz (Play'deki kendi TR/EN görselleri kalır).
+- `ayarlar.json` → `iletisim`: Play'deki Mağaza ayarları → İletişim bilgileri (Web sitesi + e-posta) da aynı komutla güncellenir.
+- Play Console'da metni elle değiştirirsen buradaki dosyayı da değiştir; yoksa bir sonraki `npm run magaza` buradakini yazar.
 
 Yükleme (Windows, proje klasöründe):
 1. `npm run magaza -- --dene`  → yalnız kontrol, hiçbir şey kaydedilmez
