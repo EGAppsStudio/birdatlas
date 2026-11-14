@@ -10,6 +10,13 @@
 <link rel="icon" type="image/png" href="/img/favicon-64.png">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="canonical" href="https://birdatlas.app/">
+<link rel="alternate" hreflang="x-default" href="https://birdatlas.app/">
+<link rel="alternate" hreflang="tr" href="https://birdatlas.app/tr/">
+<link rel="alternate" hreflang="en" href="https://birdatlas.app/en/">
+<link rel="alternate" hreflang="es" href="https://birdatlas.app/es/">
+<link rel="alternate" hreflang="pt" href="https://birdatlas.app/pt/">
+<link rel="alternate" hreflang="de" href="https://birdatlas.app/de/">
+<link rel="alternate" hreflang="fr" href="https://birdatlas.app/fr/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://birdatlas.app/">
 <meta property="og:title" content="Bird Atlas – your eBird sightings on your own map">
@@ -21,7 +28,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
- {"@type":"WebSite","@id":"https://birdatlas.app/#site","url":"https://birdatlas.app/","name":"Bird Atlas","alternateName":["Kuş Atlası","birdatlas.app"],"inLanguage":["en","tr"]},
+ {"@type":"WebSite","@id":"https://birdatlas.app/#site","url":"https://birdatlas.app/","name":"Bird Atlas","alternateName":["Kuş Atlası","birdatlas.app"],"inLanguage":["en","tr","es","pt","de","fr"]},
  {"@type":"MobileApplication","name":"Bird Atlas – Kuş Atlası","alternateName":"Kuş Atlası","url":"https://birdatlas.app/","operatingSystem":"Android, Web","applicationCategory":"LifestyleApplication","description":"Turns your eBird sightings into a personal map: lifers, calendars, year charts and share cards. Your data stays on your device.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"https://birdatlas.app/img/og-en.jpg","publisher":{"@type":"Organization","name":"EG Apps Studio","email":"egapps.support@gmail.com","sameAs":["https://www.instagram.com/birdatlas.app"]}}
 ]}
 </script>
@@ -60,8 +67,11 @@ html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display
 .brand { display: flex; align-items: center; gap: 10px; color: var(--navy); text-decoration: none; font-weight: 700; font-size: 18px; }
 .brand img { width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(16,50,92,.15); }
 .langs { display: flex; gap: 4px; background: rgba(255,255,255,.8); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
-.langs button { font: inherit; font-size: 14px; border: 0; background: none; color: var(--navy); padding: 4px 12px; border-radius: 999px; cursor: pointer; }
-.langs button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.langs { flex-wrap: wrap; justify-content: flex-end; }
+.langs a { font-size: 14px; color: var(--navy); text-decoration: none; padding: 4px 10px; border-radius: 999px; line-height: 1.4; }
+.langs a:hover { background: #EAF1FA; }
+.langs a[aria-current="true"] { background: var(--navy); color: #fff; }
+.applang { font-weight: 700; color: var(--navy); }
 
 /* ---------- giriş: kuş alanlarının nokta haritası ---------- */
 .hero { position: relative; overflow: hidden; padding: 120px 0 72px; background: linear-gradient(180deg, #EAF1FA 0%, var(--paper) 100%); }
@@ -141,17 +151,21 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
   .steps, .privacy .cols { grid-template-columns: 1fr; }
   .pair { padding-bottom: 40px; }
 }
-@media (max-width: 420px) { .brand span { display: none; } }
+@media (max-width: 520px) { .brand span { display: none; } .langs a { padding: 4px 7px; font-size: 13px; } }
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <a class="brand" href="/"><img src="/img/logo.svg" alt=""><span><span data-l="tr">Kuş Atlası</span><span data-l="en">Bird Atlas</span></span></a>
-    <div class="langs" role="group" aria-label="Language / Dil">
-      <button type="button" data-set="tr" aria-pressed="true">TR</button>
-      <button type="button" data-set="en" aria-pressed="false">EN</button>
-    </div>
+    <nav class="langs" aria-label="Language / Dil">
+      <a href="/tr/" hreflang="tr" lang="tr" data-set="tr" title="Türkçe">TR</a>
+      <a href="/en/" hreflang="en" lang="en" data-set="en" title="English">EN</a>
+      <a href="/es/" hreflang="es" lang="es" data-set="es" title="Español">ES</a>
+      <a href="/pt/" hreflang="pt" lang="pt" data-set="pt" title="Português">PT</a>
+      <a href="/de/" hreflang="de" lang="de" data-set="de" title="Deutsch">DE</a>
+      <a href="/fr/" hreflang="fr" lang="fr" data-set="fr" title="Français">FR</a>
+    </nav>
   </div>
 </header>
 
@@ -305,17 +319,28 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
   const PLAY_LIVE = false;
   if (PLAY_LIVE) document.querySelectorAll('.soon').forEach(e => e.remove());
 
+  /*DIL-BASLA*/
+  // Ana adres (/): TR/EN burada değişir; ES/PT/DE/FR kendi sayfasına gider (/es/ …).
+  // npm run web, /tr/ /en/ /es/ /pt/ /de/ /fr/ sayfalarında bu bloğu sabit dile çevirir.
+  const EK = ['es', 'pt', 'de', 'fr'];
+  const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
   function setLang(l) {
     document.documentElement.lang = l; document.documentElement.dataset.lang = l;
-    document.querySelectorAll('.langs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+    document.querySelectorAll('.langs a').forEach(b => b.setAttribute('aria-current', String(b.dataset.set === l)));
     document.querySelectorAll('img[data-shot]').forEach(i => { i.src = `/img/shots/${i.dataset.shot}-${l}.webp`; });
     document.title = l === 'tr' ? 'Kuş Atlası – eBird gözlemlerin, kendi haritanda' : 'Bird Atlas – your eBird sightings, on your own map';
-    try { localStorage.setItem('app_lang', l); } catch (e) {}
+    ls('app_lang', l); ls('site_lang', l);
   }
-  let saved = null; try { saved = localStorage.getItem('app_lang'); } catch (e) {}
   let q = new URLSearchParams(location.search).get('lang');
-  setLang(q === 'en' || q === 'tr' ? q : saved || ((navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en'));
-  document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
+  let site = ls('site_lang'), saved = ls('app_lang');
+  let tarayici = (navigator.language || 'en').toLowerCase().slice(0, 2);
+  let git = q ? null : EK.includes(site) ? site : (!site && !saved && EK.includes(tarayici)) ? tarayici : null;
+  if (git) location.replace('/' + git + '/');
+  else setLang(q === 'en' || q === 'tr' ? q : saved || (tarayici === 'tr' ? 'tr' : 'en'));
+  document.querySelectorAll('.langs a').forEach(b => b.addEventListener('click', e => {
+    if (b.dataset.set === 'tr' || b.dataset.set === 'en') { e.preventDefault(); setLang(b.dataset.set); }
+  }));
+  /*DIL-BITIR*/
 </script>
 </body>
 </html>

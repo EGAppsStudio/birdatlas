@@ -35,6 +35,7 @@ android/           depoda YOK (.gitignore); kullanıcının bilgisayarında duru
   - Native: CapacitorHttp, Browser (dış linkler), Share + Filesystem (paylaşım kartı), Play değerlendirme isteği.
   - Web: fetch, normal link, `navigator.share` ya da indirme; service worker yalnızca `!NativeCap && https` iken; değerlendirme isteği yok.
 - Yeni özellik eklerken ikisinde de çalıştığını düşün; yalnız birinde çalışacaksa `NativeCap` ile ayır.
+- Tanıtım sayfası 6 dilde: kaynak `site/index.html` (TR+EN) + `scripts/site-diller.json` (ES/PT/DE/FR, anahtar = İngilizce metin); `npm run web` /tr/ /en/ /es/ /pt/ /de/ /fr/ sayfalarını üretir. `/` TR/EN arasında yerinde değişir, ES/PT/DE/FR tarayıcı dilinde kendi sayfasına yönlenir (`site_lang`). İngilizce metni değiştirince site-diller.json anahtarlarını da güncelle.
 - Web derlemesi veri dosyalarına `?v=<sürüm>` ekler (`scripts/web-build.mjs`); `site/404.html` sayesinde eksik dosya yerine ana sayfa dönmez.
 - localStorage aynı alan adında ortak: tanıtım sayfası ve uygulama dil seçimi için aynı `app_lang` anahtarını kullanır.
 
