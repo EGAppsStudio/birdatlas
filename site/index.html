@@ -190,7 +190,7 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
         </p>
         <div class="ctas">
           <a class="btn primary" href="/app/"><span data-l="tr">Tarayıcıda aç</span><span data-l="en">Open in your browser</span></a>
-          <a class="btn play" href="/android" id="play-btn"><span>Google Play</span> <small data-l="tr" class="soon">yakında</small><small data-l="en" class="soon">coming soon</small></a>
+          <a class="btn play" href="/android" id="play-btn"><span>Google Play</span></a>
         </div>
         <p class="note">
           <span data-l="tr">eBird hesabın yok mu? İlk açılışta Maviş sorar; örnek veriyle hemen gezebilirsin.</span>
@@ -324,9 +324,6 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
 </footer>
 
 <script>
-  // Google Play'de herkese açık yayına çıkınca true yap: "yakında" yazısı kalkar.
-  const PLAY_LIVE = false;
-  if (PLAY_LIVE) document.querySelectorAll('.soon').forEach(e => e.remove());
 
   // Dil menüsü: dışarı dokununca ya da Esc'e basınca kapanır
   const dm = document.querySelector('.langs');
