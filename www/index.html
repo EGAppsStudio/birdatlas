@@ -861,7 +861,7 @@
                     `Kertikler sekmesindeki takvimde yeşil günler kertik günleridir; altında yıllara/aylara göre kertik grafiği vardır.`]],
                 [`📷 Kendi fotoğrafların`, [
                     `Gözlemlerim → Türler listesinde (ya da konum penceresinde) bir türün fotoğrafına dokun; fotoğraf büyür.`,
-                    `<b>✏️ Kendi fotoğrafını koy</b> ile galeriden kendi çektiğin fotoğrafı seç. Artık listelerde, haritada ve paylaşım kartlarında Wikipedia fotoğrafı yerine seninki kullanılır.`,
+                    `<b>📱 Cihazdan fotoğraf yükle</b> ile galeriden kendi çektiğin fotoğrafı seç. Artık listelerde, haritada ve paylaşım kartlarında Wikipedia fotoğrafı yerine seninki kullanılır.`,
                     `<b>↩️ Wikipedia fotoğrafına dön</b> ile eskisine dönebilirsin. Fotoğrafın yalnızca bu telefonda saklanır; içindeki konum (GPS) bilgisi silinir.`,
                     `<b>eBird fotoğrafların:</b> eBird'e fotoğraf yüklediysen, verini yükleyince bunları kullanmayı önerir (☰ → Ayarlar'dan aç/kapa). Bir türün birden çok fotoğrafı varsa büyük görünümün altındaki küçük resimlerden birini seç.`,
                     `<b>Çerçeve rengi</b> fotoğrafın nereden geldiğini gösterir: <span style="color:#C99A00">■ sarı</span> eBird · <span style="color:#1662B6">■ mavi</span> cihazından · <span style="color:#0A3E70">■ lacivert</span> Wikipedia.`,
@@ -933,7 +933,7 @@
                     `Green days in the Lifers tab calendar are lifer days; below it is a lifer chart by month or year.`]],
                 [`📷 Your own photos`, [
                     `Tap a species photo in Bird Species (or in a location popup) to enlarge it.`,
-                    `<b>✏️ Use your own photo</b> lets you pick your own shot from the gallery. It then replaces the Wikipedia photo in lists, on the map and on share cards.`,
+                    `<b>📱 Upload photo from device</b> lets you pick your own shot from the gallery. It then replaces the Wikipedia photo in lists, on the map and on share cards.`,
                     `<b>↩️ Back to Wikipedia photo</b> undoes it. Your photo stays on this phone only and its GPS data is removed.`,
                     `<b>Your eBird photos:</b> if you uploaded photos to eBird, the app offers to use them when you load your data (turn on/off in ☰ → Settings). If a species has several, pick one from the small pictures under the large view.`,
                     `<b>Frame colour</b> shows where a photo comes from: <span style="color:#C99A00">■ yellow</span> eBird · <span style="color:#1662B6">■ blue</span> your device · <span style="color:#0A3E70">■ navy</span> Wikipedia.`,
@@ -5071,7 +5071,7 @@
                 <div class="pv-sci"><i>${escHtml(sci)}</i>${kindTxt ? ` · <span class="pv-kind" style="--pc:${PH_COLOR[kind]}">${kindTxt}</span>` : ''}</div>
                 ${opts.length > 1 && !own ? `<div class="pv-opts">${opts.map(o => `<button class="pv-opt ${String(o.n) === String(curN) ? 'on' : ''}" style="--pc:${PH_COLOR[o.k]}" onclick="pickSpeciesPhoto('${escAttr(sci)}','${o.n}')" title="${o.k === 'wiki' ? 'Wikipedia' : 'ML' + o.n}"><img src="${o.u}" alt="" onerror="this.parentNode.remove()"></button>`).join('')}</div>` : ''}
                 <div class="pv-btns">
-                    <button class="pv-btn primary" onclick="document.getElementById('my-photo-input').click()">✏️ ${own ? LT('Fotoğrafı değiştir', 'Change photo') : LT('Kendi fotoğrafını koy', 'Use your own photo')}</button>
+                    <button class="pv-btn primary" onclick="document.getElementById('my-photo-input').click()">📱 ${own ? LT('Cihazdan başka fotoğraf yükle', 'Upload another photo from device') : LT('Cihazdan fotoğraf yükle', 'Upload photo from device')}</button>
                     ${own ? `<button class="pv-btn" onclick="resetMyPhoto('${escAttr(sci)}')">↩️ ${mlOn() && ML_PHOTOS[sci] ? LT('eBird fotoğrafına dön', 'Back to eBird photo') : LT('Wikipedia fotoğrafına dön', 'Back to Wikipedia photo')}</button>` : ''}
                 </div>
                 <div class="pv-legend"><span style="--pc:${PH_COLOR.ml}">eBird</span><span style="--pc:${PH_COLOR.own}">${LT('Cihazdan', 'Device')}</span><span style="--pc:${PH_COLOR.wiki}">Wikipedia</span></div>
@@ -5519,7 +5519,7 @@
                 },
                 leave: () => closePhotoViewer(),
                 title: LT('Kendi fotoğrafın', 'Your own photo'),
-                text: LT('Listede bir türün fotoğrafına dokununca böyle büyür. Sürükleyerek ortala, iki parmakla yakınlaştır. "✏️ Kendi fotoğrafını koy" ile kendi fotoğrafını seç. Çerçeve rengi kaynağı gösterir: sarı eBird, mavi cihazın, lacivert Wikipedia.', 'Tap a species photo in the list to enlarge it like this. Drag to centre, pinch to zoom. "✏️ Use your own photo" lets you pick your own shot. The frame colour shows the source: yellow eBird, blue your device, navy Wikipedia.') });
+                text: LT('Listede bir türün fotoğrafına dokununca böyle büyür. Sürükleyerek ortala, iki parmakla yakınlaştır. "📱 Cihazdan fotoğraf yükle" ile galeriden kendi fotoğrafını seç. Çerçeve rengi kaynağı gösterir: sarı eBird, mavi cihazın, lacivert Wikipedia.', 'Tap a species photo in the list to enlarge it like this. Drag to centre, pinch to zoom. "📱 Upload photo from device" lets you pick a shot from your gallery. The frame colour shows the source: yellow eBird, blue your device, navy Wikipedia.') });
             s.push({ id: 'chips', target: () => $t('filter-bar'), fit: true,
                 enter: () => { let first = document.querySelector('#species-list .species-item'); if (first) first.click(); closeTabs(); },
                 leave: () => { clearFilter('all'); },
