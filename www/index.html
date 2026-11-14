@@ -149,7 +149,10 @@
         #chat-grip { display: flex; position: absolute; top: 0; left: 0; right: 0; height: 14px; z-index: 3; }
         #chat-grip span { background: #fff; opacity: .6; box-shadow: none; height: 4px; margin-top: -2px; }
         #chat-window { position: fixed; }
-        @media (min-width: 700px) { #sheet-grip { cursor: nwse-resize; justify-content: flex-end; padding-right: 14px; } }
+        @media (min-width: 700px) {   /* bilgisayarda köşe tutamacı: hem boy hem genişlik */
+            body:has(#filter-panels[style*="display: grid"]) #sheet-grip { cursor: nwse-resize; justify-content: flex-end; padding-right: 4px; margin-top: -30px; height: 28px; pointer-events: none; }
+            #sheet-grip span { pointer-events: auto; width: 24px; height: 24px; border-radius: 0 0 14px 0; opacity: .75; box-shadow: none; background: linear-gradient(135deg, transparent 0 46%, #1662B6 46% 53%, transparent 53% 64%, #1662B6 64% 71%, transparent 71% 82%, #1662B6 82% 89%, transparent 89%); }
+        }
         .chat-share { margin-top: 6px; }
         .chat-share button { background: #FFF6CC; color: #0A3E70; border: 1px solid #E9C440; border-radius: 14px; padding: 6px 10px; font-size: 12px; cursor: pointer; text-align: left; max-width: 100%; }
         /* v1.9: kapakta TR/EN ve ? en sağ üstte; logo yerine oturunca altına kayarlar */
@@ -1648,7 +1651,14 @@
                 else { pw.style.removeProperty('width'); fp.style.removeProperty('max-width'); }
             };
             const applyChat = () => { let h = +ls('chat_h') || 0; if (h) cm.style.setProperty('height', h + 'px', 'important'); else cm.style.removeProperty('height'); };
-            applySheet(); applyChat(); addEventListener('resize', applySheet);
+            // Maviş penceresi ☰ düğmesinin altında kalsın (kayıtlı boy, pencere küçülünce de)
+            const chatTop = () => { let m = document.getElementById('menu-btn'), r = m && m.getBoundingClientRect(); return r && r.height ? Math.max(20, r.bottom + 10) : (innerWidth < 700 ? 150 : 20); };
+            window.clampChat = () => {
+                let cw = document.getElementById('chat-window'); if (!cw || cw.style.display !== 'flex') return;
+                let over = chatTop() - cw.getBoundingClientRect().top;
+                if (over > 0) { let h = Math.max(160, Math.round(parseFloat(getComputedStyle(cm).height) - over)); cm.style.setProperty('height', h + 'px', 'important'); }
+            };
+            applySheet(); applyChat(); addEventListener('resize', () => { applySheet(); applyChat(); clampChat(); });
             function drag(grip, onMove, onReset) {
                 let sx, sy, base, last = 0;
                 grip.addEventListener('pointerdown', e => {
@@ -1670,7 +1680,7 @@
                 return base;
             }, () => { ls('sheet_h', null); ls('sheet_w', null); applySheet(); });
             drag(document.getElementById('chat-grip'), (dx, dy, base) => {
-                if (!base) { let cw = document.getElementById('chat-window').getBoundingClientRect(), h0 = cm.getBoundingClientRect().height; base = { h: h0, max: h0 + cw.top - (innerWidth < 700 ? 150 : 20) }; }   // ☰ düğmesinin altında kalsın; sınır bir kez hesaplanır (titremesin)
+                if (!base) { let cw = document.getElementById('chat-window').getBoundingClientRect(), h0 = parseFloat(getComputedStyle(cm).height); base = { h: h0, max: h0 + cw.top - chatTop() }; }   // ☰ düğmesinin altında kalsın; sınır bir kez hesaplanır (titremesin)
                 let h = Math.round(Math.max(160, Math.min(base.max, base.h - dy)));
                 if (Math.abs(h - (base.last || 0)) < 2) return base; base.last = h;
                 cm.style.setProperty('height', h + 'px', 'important'); ls('chat_h', h);
@@ -3032,7 +3042,7 @@
             let cw = document.getElementById('chat-window');
             let opening = cw.style.display === 'none' || cw.style.display === '';
             cw.style.display = opening ? 'flex' : 'none';
-            if (opening) { let g = document.querySelector('#initial-greeting-msg .mavis'); if (g) g.outerHTML = mavisSVG(68, 'wave'); }
+            if (opening) { let g = document.querySelector('#initial-greeting-msg .mavis'); if (g) g.outerHTML = mavisSVG(68, 'wave'); if (window.clampChat) clampChat(); }
         }
         function handleEnter(e) { if (e.key === 'Enter') sendChatMessage(); }
         function askSuggestion(question) { document.getElementById('chat-input').value = question; sendChatMessage(); }
@@ -3426,7 +3436,7 @@
             bindMiniFollow();
             maybeStartTour(true);
             setTimeout(retryMissingPhotos, 5000);
-            if (isSample()) { if (!afterDataLoaded._timer) afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 150000); return; }
+            if (isSample()) { if (!afterDataLoaded._timer) afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 300000); return; }
             let reached = reachedMilestones(); let top = reached.length ? reached[reached.length - 1] : 0;
             let seen = NaN; try { seen = parseInt(localStorage.getItem('milestone_seen'), 10); } catch (e) {}
             try { localStorage.setItem('milestone_seen', Math.max(top, isNaN(seen) ? 0 : seen)); } catch (e) {}
@@ -3434,7 +3444,7 @@
                 setTimeout(() => showToast(`🎉 ${LT(`${top}. türün kutlu olsun!`, `Your ${top}th species, congrats!`)}`,
                     [{ label: LT('Kartı paylaş', 'Share card'), fn: () => openShare({ type: 'milestone', n: top }) }, { label: LT('Kapat', 'Close'), ghost: true }], 20000), 2200);
             } else if (!afterDataLoaded._timer) {
-                afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 150000);
+                afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 300000);
             }
         }
 
