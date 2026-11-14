@@ -5000,7 +5000,8 @@
                 let img = await new Promise((res, rej) => { let i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
                 let k = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight));
                 let c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
-                c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                let g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);   // şeffaf PNG siyah zeminli olmasın
+                g.drawImage(img, 0, 0, c.width, c.height);
                 return c.toDataURL('image/jpeg', 0.85);
             } finally { URL.revokeObjectURL(url); }
         }
