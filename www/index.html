@@ -481,12 +481,12 @@
 
         <div class="panel-container">
             <button id="toggle-explore" class="panel-btn"><span>🌍 Çevreyi Keşfet</span> <span>▼</span></button>
-            <div id="explore-panel" class="panel-content">
+            <div id="explore-panel" class="panel-content" style="overflow-x:hidden;">
                 <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
                     <label for="radius-slider" style="display:block; font-size:13px; font-weight:bold; margin-bottom:5px; color:#0A3E70;">
                         Arama Yarıçapı: <span id="radius-val" style="color:#1662B6; font-size:14px;">10 km</span>
                     </label>
-                    <input type="range" id="radius-slider" min="1" max="50" value="10" style="width:100%; cursor:pointer;">
+                    <input type="range" id="radius-slider" min="1" max="50" value="10" style="width:100%; margin:6px 0 0; box-sizing:border-box; cursor:pointer;">
                 </div>
                 <div id="explore-content" style="font-size: 13px; color: #282629;">
                     Haritada herhangi bir noktaya tıklayarak seçtiğiniz çap içerisindeki son 30 günün canlı verilerini görüntüleyin.
