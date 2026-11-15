@@ -222,7 +222,7 @@
         .sh-seg button { flex: 1; min-width: 70px; padding: 7px 6px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; color: #0A3E70; font-size: 12px; cursor: pointer; }
         .sh-seg button.on { background: #1662B6; border-color: #1662B6; color: #fff; font-weight: bold; }
         #share-preview-wrap { background: #eef3f9; border-radius: 8px; padding: 8px; text-align: center; margin: 6px 0 10px; position: relative; }
-        #share-preview { max-width: 100%; max-height: 46vh; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); touch-action: none; }
+        #share-preview { max-width: 100%; max-height: 46vh; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); touch-action: auto; }
         .sh-busy { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(238,243,249,0.8); color: #0A3E70; font-weight: bold; border-radius: 8px; }
         #toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 1000002; background: #0A3E70; color: #fff; padding: 10px 14px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.25); font-size: 13px; display: none; align-items: center; gap: 10px; max-width: calc(100vw - 40px); }
         #toast button { background: #FED008; color: #0A3E70; border: none; border-radius: 14px; padding: 6px 10px; font-weight: bold; cursor: pointer; white-space: nowrap; }
@@ -3705,8 +3705,8 @@
                 let s = summarizeRows(rows); let l = s.locs.get(st.loc);
                 let ds = [...s.days].sort();
                 let lif = liferArray.filter(x => x.loc === st.loc).length;
-                let top = [...s.sp.values()].sort((a, b) => b.days.size - a.days.size || b.count - a.count).slice(0, 6);
-                if (st.locPick && st.locPick.length) top = st.locPick.map(sci => s.sp.get(sci)).filter(Boolean).slice(0, 6);
+                let top = [...s.sp.values()].sort((a, b) => b.days.size - a.days.size || b.count - a.count).slice(0, maxPick());
+                if (st.locPick && st.locPick.length) top = st.locPick.map(sci => s.sp.get(sci)).filter(Boolean).slice(0, maxPick());
                 return { s, l, first: ds[0], last: ds[ds.length - 1], lif, top };
             }
             if (st.type === 'milestone') {
@@ -3892,6 +3892,11 @@
                 text(ctx, spName(s), cx, cy + r + 50, { w: 600, px: 28, minPx: 18, maxW: cw - 16, align: 'center' });
             }
         }
+        // 12 türe kadar: hikâyede 4 sıra × 3, karede 2 sıra × 6
+        async function manyMosaic(ctx, list, y, W, story) {
+            if (story) await mosaic(ctx, list, 40, y, W - 80, 4, 3, 72);
+            else await mosaic(ctx, list, 40, y, W - 80, 2, 6, 52);
+        }
         function statBox(ctx, x, y, w, h, label, value, sub) {
             ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.08)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 4; rr(ctx, x, y, w, h, 32); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
             text(ctx, label, x + 32, y + 56, { w: 400, px: 28, color: C.sky, maxW: w - 64 });
@@ -3933,11 +3938,12 @@
                 let cy = story ? 540 : 395;
                 chips(ctx, [`📍 ${s.locs.size} ${LT('konum', 'locations')}`, `📅 ${s.days.size} ${LT('gün', 'days')}`, `🏆 ${D.lif} ${LT('kertik', 'lifers')}`, s.birds ? `🔢 ${nf(s.birds)} ${LT('birey', 'birds')}` : null], 80, cy, { px: story ? 32 : 28, maxX: W - 60 });
                 let my = story ? 680 : 490, mh = story ? 600 : 470;
-                let pts = sharePoints(s.locs, false);
+                let pts = manySp() ? [] : sharePoints(s.locs, false);
                 let freq = [...s.sp.values()].sort((a, b) => b.days.size - a.days.size || b.count - a.count);
                 let picked = (st.pick && st.pick.length) ? pickedSpecies(s) : null;   // kullanıcı seçtiyse onlar
-                let bigSix = pts.length ? [] : (picked || freq).slice(0, 6);
+                let bigSix = pts.length ? [] : (picked || freq).slice(0, maxPick());
                 if (pts.length) await mapPanel(ctx, 40, my, W - 80, mh, pts, C.blue, 9);
+                else if (manySp()) { if (story) await mosaic(ctx, bigSix, 40, my + 10, W - 80, 3, 4, 58); else await manyMosaic(ctx, bigSix, my, W, false); }
                 else await mosaic(ctx, bigSix, 40, my + 30, W - 80, 2, 3, story ? 110 : 80);
                 if (story) {
                     let bw = (W - 160 - 26) / 2;
@@ -3948,9 +3954,11 @@
                     // alt sıra: üstte 6'lı fotoğraf varsa aynı kuşlar tekrar etmesin
                     let shown = new Set(bigSix.map(x => x.sci));
                     let top, head;
-                    if (picked && !bigSix.length) { top = picked.slice(0, 3); head = LT('Bu yıl gördüklerimden', 'Some of my birds this year'); }
+                    // harita varken seçtiğin türlerin hepsi (6'ya kadar) alt sırada tek satırda
+                    if (picked && !bigSix.length) { top = picked.slice(0, 6); head = LT('Bu yıl gördüklerimden', 'Some of my birds this year'); }
                     else { top = freq.filter(x => !shown.has(x.sci)).slice(0, 3); head = shown.size ? LT('Sık gördüklerin', 'Also frequent') : LT('En sık gördüklerin', 'Your most frequent'); }
-                    if (top.length) { text(ctx, head, 80, 1595, { w: 600, px: 30, color: C.sky }); await mosaic(ctx, top, 40, 1620, W - 80, 1, 3, 56); }
+                    if (manySp()) top = [];
+                    if (top.length) { text(ctx, head, 80, 1595, { w: 600, px: 30, color: C.sky }); await mosaic(ctx, top, 40, 1620, W - 80, 1, Math.max(3, top.length), top.length > 3 ? 46 : 56); }
                 }
             }
             else if (st.type === 'day') {
@@ -3963,10 +3971,11 @@
                 let cy = story ? 520 : 385;
                 chips(ctx, [`📍 ${s.locs.size} ${LT('konum', 'locations')}`, D.lif.length ? `🏆 ${D.lif.length} ${LT('kertik', 'lifers')}` : null, s.birds ? `🔢 ${nf(s.birds)} ${LT('birey', 'birds')}` : null], 80, cy, { px: story ? 32 : 28, maxX: W - 60 });
                 if (places.length && story) text(ctx, '📍 ' + [...new Set(places)].join(' · '), 84, 640, { w: 500, px: 30, color: C.navy, maxW: W - 160, minPx: 22 });
-                let pts = sharePoints(s.locs, true);
+                let pts = manySp() ? [] : sharePoints(s.locs, true);
                 let my = story ? 680 : 480, mh = story ? 560 : 480;
                 let topSp = pickedSpecies(s);
-                if (story) {
+                if (manySp()) await manyMosaic(ctx, topSp, story ? 700 : 470, W, story);
+                else if (story) {
                     if (pts.length) await mapPanel(ctx, 40, my, W - 80, mh, pts, C.blue, 13);
                     await mosaic(ctx, topSp.slice(0, 6), 40, pts.length ? 1290 : 760, W - 80, 2, 3, 82);
                 } else {
@@ -4005,7 +4014,11 @@
                 await drawMavis(ctx, 'wave', W - (story ? 300 : 230), story ? 290 : 50, story ? 250 : 190);
                 chips(ctx, [`📅 ${D.s.days.size} ${LT('ziyaret', 'visits')}`, D.lif ? `🏆 ${D.lif} ${LT('kertik', 'lifers')}` : null, D.s.birds ? `🔢 ${nf(D.s.birds)} ${LT('birey', 'birds')}` : null, D.first ? `🥇 ${formatDisplayDate(D.first)}` : null], 80, story ? 580 : 425, { px: story ? 32 : 28, maxX: W - 60 });
                 let pts = sharePoints(new Map([[l.name, l]]), false);
-                if (story) {
+                if (manySp()) {
+                    if (story) text(ctx, (shareState.locPick && shareState.locPick.length) ? LT('Burada gördüğüm türlerden', 'Some of the species I saw here') : LT('En sık gördüklerim', 'Most frequent here'), 80, 700, { w: 600, px: 30, color: C.sky });
+                    await manyMosaic(ctx, D.top, story ? 730 : 500, W, story);
+                }
+                else if (story) {
                     if (pts.length) await mapPanel(ctx, 40, 720, W - 80, 520, pts, C.blue, shareState.privacy === 'province' ? 7 : 13);
                     text(ctx, (shareState.locPick && shareState.locPick.length) ? LT('Burada gördüğüm türlerden', 'Some of the species I saw here') : LT('En sık gördüklerim', 'Most frequent here'), 80, pts.length ? 1320 : 760, { w: 600, px: 30, color: C.sky });
                     await mosaic(ctx, D.top, 40, pts.length ? 1350 : 800, W - 80, 2, 3, 72);
@@ -4095,6 +4108,9 @@
             $id('share-overlay').style.display = 'flex';
         };
         window.closeShare = function() { $id('share-overlay').style.display = 'none'; };
+        function layoutSeg() {
+            return `<div class="sh-row"><label>${LT('Kart düzeni', 'Card layout')}</label>${seg('layout', [['map', LT('🗺️ Harita + 6 tür', '🗺️ Map + 6 species')], ['species', LT('🐦 Yalnız türler (12)', '🐦 Species only (12)')]], shareState.layout || 'map')}</div>`;
+        }
         function seg(name, items, cur) {
             return `<div class="sh-seg">${items.map(([v, l]) => `<button class="${v === cur ? 'on' : ''}" onclick="setShare('${name}', '${escAttr(v)}')">${l}</button>`).join('')}</div>`;
         }
@@ -4169,7 +4185,7 @@
         function bindPreviewDrag() {
             let pv = $id('share-preview'); if (!pv) return;
             let active = shareState.type === 'obs' && !!shareState.photo;
-            pv.style.touchAction = active ? 'none' : '';   // tarayıcı sayfayı kaydırmasın, hareketi biz yönetelim
+            pv.style.touchAction = active ? 'none' : 'auto';   // tarayıcı sayfayı kaydırmasın, hareketi biz yönetelim
             let pts = new Map(), g = null;
             const dist = () => { let [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y) || 1; };
             const begin = () => {
@@ -4317,18 +4333,18 @@
             let st = shareState;
             let s = summarizeRows(obsData.filter(d => d.loc === st.loc));
             let list = [...s.sp.values()].sort((a, b) => b.days.size - a.days.size || b.count - a.count);
-            let picks = st.locPick && st.locPick.length ? st.locPick : list.slice(0, 6).map(x => x.sci);
-            return `<div class="sh-row"><label>${LT('Kartta görünecek türler (en fazla 6)', 'Species on the card (up to 6)')} · ${picks.length}/6</label><div class="sp-pick">${list.map(x => `<button class="${picks.includes(x.sci) ? 'on' : ''}" onclick="toggleLocPick('${escAttr(x.sci)}')">${escHtml(spName(x))}</button>`).join('')}</div></div>`;
+            let picks = (st.locPick && st.locPick.length ? st.locPick : list.map(x => x.sci)).slice(0, maxPick());
+            return layoutSeg() + `<div class="sh-row"><label>${LT(`Kartta görünecek türler (en fazla ${maxPick()})`, `Species on the card (up to ${maxPick()})`)} · ${picks.length}/${maxPick()}</label><div class="sp-pick">${list.map(x => `<button class="${picks.includes(x.sci) ? 'on' : ''}" onclick="toggleLocPick('${escAttr(x.sci)}')">${escHtml(spName(x))}</button>`).join('')}</div></div>`;
         }
         window.toggleLocPick = function(sci) {
             let st = shareState;
             if (!st.locPick || !st.locPick.length) {
                 let s = summarizeRows(obsData.filter(d => d.loc === st.loc));
-                st.locPick = [...s.sp.values()].sort((a, b) => b.days.size - a.days.size || b.count - a.count).slice(0, 6).map(x => x.sci);
+                st.locPick = [...s.sp.values()].sort((a, b) => b.days.size - a.days.size || b.count - a.count).slice(0, maxPick()).map(x => x.sci);
             }
             let i = st.locPick.indexOf(sci);
             if (i >= 0) st.locPick.splice(i, 1);
-            else { if (st.locPick.length >= 6) st.locPick.shift(); st.locPick.push(sci); }
+            else { while (st.locPick.length >= maxPick()) st.locPick.shift(); st.locPick.push(sci); }
             renderShareUI();
         };
 
@@ -4792,26 +4808,29 @@
             if (st.type === 'trip') return tripRows(st);
             return [];
         }
-        function defaultPicks(rows) { let s = summarizeRows(rows); return [...s.sp.values()].sort((a, b) => b.count - a.count || b.birds - a.birds).slice(0, 6).map(x => x.sci); }
+        // Kart düzeni: 'map' = harita + 6 tür (varsayılan) · 'species' = harita yok, 12 türe kadar
+        const manySp = () => shareState.layout === 'species';
+        const maxPick = () => manySp() ? 12 : 6;
+        function defaultPicks(rows) { let s = summarizeRows(rows); return [...s.sp.values()].sort((a, b) => b.count - a.count || b.birds - a.birds).slice(0, maxPick()).map(x => x.sci); }
         function pickHtml() {
             let rows = pickRows(); if (!rows.length) return '';
             let s = summarizeRows(rows);
             let list = [...s.sp.values()].sort((a, b) => b.count - a.count || spName(a).localeCompare(spName(b)));
             let picks = shareState.pick && shareState.pick.length ? shareState.pick : defaultPicks(rows);
-            return `<div class="sh-row"><label>${LT('Kartta görünecek türler (en fazla 6)', 'Species on the card (up to 6)')} · ${picks.length}/6</label><div class="sp-pick">${list.map(x => `<button class="${picks.includes(x.sci) ? 'on' : ''}" onclick="toggleSharePick('${escAttr(x.sci)}')">${escHtml(spName(x))}</button>`).join('')}</div></div>`;
+            return layoutSeg() + `<div class="sh-row"><label>${LT(`Kartta görünecek türler (en fazla ${maxPick()})`, `Species on the card (up to ${maxPick()})`)} · ${Math.min(picks.length, maxPick())}/${maxPick()}</label><div class="sp-pick">${list.map(x => `<button class="${picks.slice(0, maxPick()).includes(x.sci) ? 'on' : ''}" onclick="toggleSharePick('${escAttr(x.sci)}')">${escHtml(spName(x))}</button>`).join('')}</div></div>`;
         }
         window.toggleSharePick = function(sci) {
             let st = shareState;
             if (!st.pick || !st.pick.length) st.pick = defaultPicks(pickRows());
             let i = st.pick.indexOf(sci);
-            if (i >= 0) st.pick.splice(i, 1); else { if (st.pick.length >= 6) st.pick.shift(); st.pick.push(sci); }
+            if (i >= 0) st.pick.splice(i, 1); else { while (st.pick.length >= maxPick()) st.pick.shift(); st.pick.push(sci); }
             renderShareUI();
         };
         function pickedSpecies(s) {
             let st = shareState;
             let def = [...s.sp.values()].sort((a, b) => b.count - a.count || b.birds - a.birds);
-            if (st.pick && st.pick.length) return st.pick.map(sci => s.sp.get(sci)).filter(Boolean).slice(0, 6);
-            return def.slice(0, 6);
+            if (st.pick && st.pick.length) return st.pick.map(sci => s.sp.get(sci)).filter(Boolean).slice(0, maxPick());
+            return def.slice(0, maxPick());
         }
         function extraShareUI() {
             let st = shareState, h = '';
@@ -4915,7 +4934,8 @@
             text(ctx, LT('tür gördüm 🐦', 'species seen 🐦'), 84, story ? 510 : 350, { w: 500, px: story ? 48 : 36 });
             chips(ctx, [`📅 ${s.days.size} ${LT('gün', 'days')}`, `📍 ${s.locs.size} ${LT('konum', 'locations')}`, lif.length ? `🏆 ${lif.length} ${LT('kertik', 'lifers')}` : null], 80, story ? 570 : 385, { px: story ? 32 : 28, maxX: W - 60 });
             let pts = sharePoints(s.locs, true);
-            if (story) {
+            if (manySp()) await manyMosaic(ctx, pickedSpecies(s), story ? 690 : 450, W, story);
+            else if (story) {
                 if (pts.length) await mapPanel(ctx, 40, 690, W - 80, 560, pts, C.blue, 12);
                 await mosaic(ctx, pickedSpecies(s), 40, pts.length ? 1300 : 760, W - 80, 2, 3, 76);
             } else {
