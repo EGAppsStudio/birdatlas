@@ -140,6 +140,9 @@
         #fbask .fa-btn, #mlask .fa-btn, #appmsg .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
         #fbask .fa-btn.fa-rate, #mlask .fa-btn.fa-rate, #appmsg .fa-btn.fa-rate { background: #1662B6; color: #fff; }
         #fbask .fa-foot, #mlask .fa-foot, #appmsg .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
+        #appmsg .wn-lifer { background: #FFF6D6; border-radius: 12px; padding: 10px 12px; margin: 4px 0 6px; font-size: 14px; color: #0A3E70; }
+        #appmsg .wn-lifer span { display: inline-block; background: #fff; border-radius: 999px; padding: 3px 10px; margin: 6px 6px 0 0; font-size: 13px; }
+        #appmsg .wn-lifer i { color: #5B6B7E; font-style: normal; font-size: 11px; }
         #fbask .fa-link, #mlask .fa-link, #appmsg .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
         /* Pencereleri tutamaçla boyutlandırma (sekme pencereleri + Maviş) */
         .rs-grip { display: none; justify-content: center; align-items: center; height: 22px; cursor: ns-resize; touch-action: none; pointer-events: auto; user-select: none; }
@@ -1771,6 +1774,8 @@
             if (validRows.length === 0) return failUpload("Bu dosyada eBird gözlemi bulunamadı. eBird'den indirdiğiniz ZIP dosyasını ya da içindeki MyEBirdData.csv dosyasını seçin.");
             let oldManuals = _loadingSample ? [] : !isSample() ? allRawRows.filter(r => r.Source === 'Manuel')
                 : (() => { try { let b = JSON.parse(localStorage.getItem('manual_backup') || '[]'); localStorage.removeItem('manual_backup'); return b; } catch (e) { return []; } })();
+            // Aynı kişinin güncellenmiş verisi mi? Öncekini hatırla; yüklemeden sonra "neler yeni" gösterilir
+            window._prevUpload = (!_loadingSample && !isSample()) ? snapshotForUpdate(allRawRows) : null;
             try { localStorage.removeItem('is_sample'); } catch (e) {}
             allRawRows = [...validRows, ...oldManuals];
             safeSave();
@@ -3504,12 +3509,62 @@
             let reached = reachedMilestones(); let top = reached.length ? reached[reached.length - 1] : 0;
             let seen = NaN; try { seen = parseInt(localStorage.getItem('milestone_seen'), 10); } catch (e) {}
             try { localStorage.setItem('milestone_seen', Math.max(top, isNaN(seen) ? 0 : seen)); } catch (e) {}
+            let prev = window._prevUpload; window._prevUpload = null;
+            if (prev && showWhatsNew(prev, !isNaN(seen) && top > seen ? top : 0)) return;
             if (!isNaN(seen) && top > seen) {
                 setTimeout(() => showToast(`🎉 ${LT(`${top}. türün kutlu olsun!`, `Your ${top}th species, congrats!`)}`,
                     [{ label: LT('Kartı paylaş', 'Share card'), fn: () => openShare({ type: 'milestone', n: top }) }, { label: LT('Kapat', 'Close'), ghost: true }], 20000), 2200);
             } else if (!afterDataLoaded._timer) {
                 afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 300000);
             }
+        }
+
+        // ----- Veri güncellenince "neler yeni": yeni günler, türler, kertikler -----
+        const updKey = r => (r['Submission ID'] || '') + '|' + (r['Scientific Name'] || '').trim();
+        function snapshotForUpdate(rows) {
+            let eb = (rows || []).filter(r => r.Source !== 'Manuel' && r['Submission ID']);
+            if (!eb.length) return null;
+            return { keys: new Set(eb.map(updKey)), lifers: new Set(liferArray.map(l => l.sci_name)), species: new Set(eb.map(r => (r['Scientific Name'] || '').trim())) };
+        }
+        function showWhatsNew(prev, milestone) {
+            let eb = allRawRows.filter(r => r.Source !== 'Manuel' && r['Submission ID']);
+            let shared = 0, fresh = [];
+            eb.forEach(r => { if (prev.keys.has(updKey(r))) shared++; else fresh.push(r); });
+            // başka birinin verisi ya da bambaşka bir dosya: eski kayıtların çoğu yeni dosyada yoksa sessiz kal
+            if (shared < prev.keys.size * 0.7) return false;
+            if (!fresh.length) { showToast('✅ ' + LT('Verin güncel: yeni kayıt yok.', 'Your data is up to date: no new records.'), [{ label: LT('Tamam', 'OK'), ghost: true }], 6000); return true; }
+            let dates = [...new Set(fresh.map(r => r.Date || r['Observation Date']).filter(Boolean))].sort().reverse();
+            let spNew = new Set(fresh.map(r => (r['Scientific Name'] || '').trim()));
+            let newLifers = liferArray.filter(l => !prev.lifers.has(l.sci_name)).sort((a, b) => b.date.localeCompare(a.date));
+            let order = liferOrder(), nOf = l => order.findIndex(x => x.sci_name === l.sci_name) + 1;
+            let dTxt = dates.slice(0, 5).map(d => formatDisplayDate(d)).join(', ') + (dates.length > 5 ? ` +${dates.length - 5}` : '');
+            let old = document.getElementById('appmsg'); if (old) old.remove();
+            let d = document.createElement('div'); d.id = 'appmsg'; d.setAttribute('data-no-i18n', '');
+            d.innerHTML = `<div class="fa-card">
+                <div class="fa-top">${mavisSVG(60, 'wave')}<div><b>${LT('Yeni kayıtların eklendi 🎉', 'Your new records are in 🎉')}</b>
+                    <div class="fa-sub">${LT(`${fresh.length} yeni gözlem · ${dates.length} gün · ${spNew.size} tür`, `${fresh.length} new sightings · ${dates.length} days · ${spNew.size} species`)}</div></div></div>
+                <div class="fa-sub" style="margin:-4px 0 10px;">📅 ${escHtml(dTxt)}</div>
+                ${newLifers.length ? `<div class="wn-lifer"><b>🏆 ${newLifers.length === 1 ? LT('Yeni kertik! Tebrikler 🎉', 'New lifer! Congrats 🎉') : LT(`${newLifers.length} yeni kertik! Tebrikler 🎉`, `${newLifers.length} new lifers! Congrats 🎉`)}</b>
+                    <div>${newLifers.slice(0, 6).map(l => `<span>${escHtml(spName(l))} <i>#${nOf(l)}</i></span>`).join('')}${newLifers.length > 6 ? `<span>+${newLifers.length - 6}</span>` : ''}</div></div>` : ''}
+                ${milestone ? `<div class="fa-sub" style="margin:8px 0 0; font-weight:700; color:#0A3E70;">🎉 ${LT(`${milestone}. türünü geçtin!`, `You passed ${milestone} species!`)}</div>` : ''}
+                ${milestone ? `<button class="fa-btn fa-rate" data-k="ms">📤 ${LT(`${milestone}. tür kartını paylaş`, `Share your ${milestone}th species card`)}</button>` : ''}
+                ${newLifers.length ? `<button class="fa-btn ${milestone ? '' : 'fa-rate'}" data-k="lf">📤 ${LT('Yeni kertiğini paylaş', 'Share your new lifer')}</button>` : ''}
+                <button class="fa-btn" data-k="day">📅 ${LT('Yeni günleri takvimde gör', 'See the new days in the calendar')}</button>
+                <button class="fa-btn" data-k="ok">${LT('Tamam', 'OK')}</button></div>`;
+            const close = () => d.remove();
+            d.onclick = e => { if (e.target === d) close(); };
+            d.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+                close(); let k = b.dataset.k;
+                if (k === 'ms') openShare({ type: 'milestone', n: milestone });
+                if (k === 'lf') openShare({ type: 'milestone', n: nOf(newLifers[0]) });
+                if (k === 'day' && dates[0]) {
+                    selectedDates = new Set(dates); lastClickedDay = dates[0];
+                    currentCalDate = new Date(dates[0] + 'T12:00:00'); currentCalDate.setDate(1);
+                    openTab('obs'); setObsSub('calendar'); renderAll();
+                }
+            });
+            setTimeout(() => { if (tourIdx >= 0) return; document.body.appendChild(d); }, 1200);
+            return true;
         }
 
         // ----- Yapay zekâ sağlayıcıları (kullanıcının kendi anahtarıyla) -----
