@@ -131,16 +131,16 @@
         .feedback-btn { border-color: #1662B6 !important; color: #1662B6 !important; justify-content: center !important; }
         .feedback-hint { font-size: 10.5px; color: #6b7a8c; margin-top: 6px; line-height: 1.35; }
         .ls-hide { display: none !important; }
-        #fbask, #mlask { position: fixed; inset: 0; z-index: 1000001; background: rgba(10,30,60,.45); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
-        #fbask .fa-card, #mlask .fa-card { background: #FDFDFD; border-radius: 18px; max-width: 360px; width: 100%; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.25); color: #0A3E70; }
-        #fbask .fa-top, #mlask .fa-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
-        #fbask .fa-top svg, #mlask .fa-top svg { flex: 0 0 auto; }
-        #fbask .fa-top b, #mlask .fa-top b { font-size: 17px; }
-        #fbask .fa-sub, #mlask .fa-sub { font-size: 13px; color: #4A5B70; margin-top: 4px; line-height: 1.35; }
-        #fbask .fa-btn, #mlask .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
-        #fbask .fa-btn.fa-rate, #mlask .fa-btn.fa-rate { background: #1662B6; color: #fff; }
-        #fbask .fa-foot, #mlask .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
-        #fbask .fa-link, #mlask .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
+        #fbask, #mlask, #appmsg { position: fixed; inset: 0; z-index: 1000001; background: rgba(10,30,60,.45); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+        #fbask .fa-card, #mlask .fa-card, #appmsg .fa-card { background: #FDFDFD; border-radius: 18px; max-width: 360px; width: 100%; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.25); color: #0A3E70; }
+        #fbask .fa-top, #mlask .fa-top, #appmsg .fa-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+        #fbask .fa-top svg, #mlask .fa-top svg, #appmsg .fa-top svg { flex: 0 0 auto; }
+        #fbask .fa-top b, #mlask .fa-top b, #appmsg .fa-top b { font-size: 17px; }
+        #fbask .fa-sub, #mlask .fa-sub, #appmsg .fa-sub { font-size: 13px; color: #4A5B70; margin-top: 4px; line-height: 1.35; }
+        #fbask .fa-btn, #mlask .fa-btn, #appmsg .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
+        #fbask .fa-btn.fa-rate, #mlask .fa-btn.fa-rate, #appmsg .fa-btn.fa-rate { background: #1662B6; color: #fff; }
+        #fbask .fa-foot, #mlask .fa-foot, #appmsg .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
+        #fbask .fa-link, #mlask .fa-link, #appmsg .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
         /* Pencereleri tutamaçla boyutlandırma (sekme pencereleri + Maviş) */
         .rs-grip { display: none; justify-content: center; align-items: center; height: 22px; cursor: ns-resize; touch-action: none; pointer-events: auto; user-select: none; }
         .rs-grip span { width: 46px; height: 5px; border-radius: 3px; background: #1662B6; opacity: .55; box-shadow: 0 0 0 3px rgba(255,255,255,.85); }
@@ -791,7 +791,24 @@
             });
         });
         const _alert = window.alert.bind(window), _confirm = window.confirm.bind(window);
-        window.alert = m => _alert(tx(String(m)));
+        // Tarayıcının kendi uyarı penceresi yerine uygulama içi pencere ("birdatlas.app web sitesinin mesajı" görünmesin)
+        window.appAlert = function(msg, opt) {
+            opt = opt || {};
+            if (!document.body) return _alert(msg);
+            let old = document.getElementById('appmsg'); if (old) old.remove();
+            let d = document.createElement('div'); d.id = 'appmsg'; d.setAttribute('data-no-i18n', '');
+            d.innerHTML = `<div class="fa-card">
+                <div class="fa-top">${typeof mavisSVG === 'function' ? mavisSVG(56, 'wave') : ''}<div><div class="fa-sub" style="font-size:15px; color:#0A3E70;"></div></div></div>
+                ${opt.btn ? `<button class="fa-btn fa-rate" data-k="go"></button>` : ''}
+                <button class="fa-btn" data-k="ok">${opt.btn ? LT('Kapat', 'Close') : LT('Tamam', 'OK')}</button></div>`;
+            d.querySelector('.fa-sub').textContent = msg;
+            if (opt.btn) d.querySelector('[data-k=go]').textContent = opt.btn;
+            d.onclick = e => { if (e.target === d) d.remove(); };
+            d.querySelector('[data-k=ok]').onclick = () => d.remove();
+            if (opt.btn) d.querySelector('[data-k=go]').onclick = () => { d.remove(); opt.action && opt.action(); };
+            document.body.appendChild(d);
+        };
+        window.alert = m => appAlert(tx(String(m)));
         window.confirm = m => _confirm(tx(String(m)));
 
         function flagSvg(c) {
@@ -3008,7 +3025,11 @@
         };
 
         function fetchExploreData(lat, lng) {
-            if (!EBIRD_API) { alert("Lütfen önce API Ayarlarını yapın."); openSettings(); return; }
+            if (!EBIRD_API) {
+                appAlert(LT("Keşfet, çevredeki son eBird kayıtlarını getirmek için ücretsiz bir eBird API anahtarı istiyor. Ayarlar'da nasıl alınacağı adım adım yazıyor; bir kez girmen yeterli.", "Explore needs a free eBird API key to fetch recent eBird sightings nearby. Settings shows how to get one step by step; you only enter it once."),
+                    { btn: '⚙️ ' + LT("Ayarlar'a git", 'Go to Settings'), action: () => { openSettings(); setTimeout(() => { let i = document.getElementById('input-ebird-api'); if (i) { i.scrollIntoView({ block: 'center', behavior: 'smooth' }); i.focus(); } }, 150); } });
+                return;
+            }
             if (exploreCircle) mapObj.removeLayer(exploreCircle);
             exploreCircle = L.circle([lat, lng], {radius: currentRadius * 1000, color: '#FED008', fillColor: '#FED008', fillOpacity: 0.25}).addTo(mapObj);
             document.getElementById('explore-panel').style.display = 'block';
@@ -5027,7 +5048,7 @@
         function decoratePhotos() {
             _urlSci = null;
             document.querySelectorAll('img').forEach(im => {
-                if (im.closest('#photo-viewer, #share-overlay, #fbask, #mlask')) return;
+                if (im.closest('#photo-viewer, #share-overlay, #fbask, #mlask, #appmsg')) return;
                 let sci = sciOfUrl(im.getAttribute('src')); if (!sci) return;
                 let k = photoKind(sci), f = frameOf(sci);
                 im.classList.remove('ph-ml', 'ph-own', 'ph-wiki'); if (k) im.classList.add('ph-' + k);
