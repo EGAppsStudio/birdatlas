@@ -4104,7 +4104,7 @@
             ctx.fillStyle = '#0F1B30'; ctx.fillRect(0, 0, W, H);
             let ph = story ? H - 520 : H - 330;
             let img = st.photo || await cardImg(o.img);
-            if (img) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ph); ctx.clip(); { let fr = st.photo ? null : frameOf(o.sci_name); drawCover(ctx, img, 0, 0, W, ph, st.photo ? st.photoX : fr.x, st.photo ? st.photoY : fr.y, st.photo ? st.photoZoom : fr.z); } ctx.restore(); }
+            if (img) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ph); ctx.clip(); { let own = st.photo || st.framed, fr = own ? null : frameOf(o.sci_name); drawCover(ctx, img, 0, 0, W, ph, own ? st.photoX : fr.x, own ? st.photoY : fr.y, own ? st.photoZoom : fr.z); } ctx.restore(); }
             else { let g = ctx.createLinearGradient(0, 0, W, ph); g.addColorStop(0, '#5d7d94'); g.addColorStop(1, '#18283d'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, ph); }
             let g = ctx.createLinearGradient(0, ph - 360, 0, ph + 2); g.addColorStop(0, 'rgba(15,27,48,0)'); g.addColorStop(1, 'rgba(15,27,48,1)'); ctx.fillStyle = g; ctx.fillRect(0, ph - 360, W, 362);
             if (!st.photo && o.img) text(ctx, LT('Fotoğraf: Wikipedia', 'Photo: Wikipedia'), W - 30, 50, { w: 400, px: 22, color: 'rgba(255,255,255,0.7)', align: 'right' });
@@ -4191,7 +4191,7 @@
             if (st.type === 'location') h += locPickHtml();
             h += extraShareUI();
             if (st.type === 'obs') h += `<div class="sh-row"><button class="sh-btn primary" onclick="document.getElementById('share-photo-input').click()">🖼️ ${st.photo ? LT('Başka fotoğraf seç', 'Choose another photo') : LT('Galeriden kendi fotoğrafını seç', 'Choose your own photo')}</button>
-                ${st.photo ? `<div style="font-size:11px; color:#5B6B7E;">${LT('Önizlemede bir parmakla kaydır, iki parmakla yakınlaştır / uzaklaştır. Fotoğrafın hiçbir yere yüklenmez; içindeki konum (GPS) bilgisi karta geçmez.', 'On the preview, drag with one finger and pinch with two to zoom. Your photo is not uploaded anywhere, and its GPS data is not copied to the card.')}</div>` : `<div style="font-size:11px; color:#5B6B7E;">${LT('Seçmezsen türün Wikipedia fotoğrafı kullanılır.', 'Without one, the species\' Wikipedia photo is used.')}</div>`}</div>`;
+                <div style="font-size:11px; color:#5B6B7E;">${LT('Önizlemede fotoğrafı bir parmakla kaydır, iki parmakla yakınlaştır.', 'On the preview, drag the photo with one finger and pinch to zoom.')} ${st.photo ? LT('Fotoğrafın hiçbir yere yüklenmez; içindeki konum (GPS) bilgisi karta geçmez.', 'Your photo is not uploaded anywhere, and its GPS data is not copied to the card.') : LT('Seçmezsen türün listedeki fotoğrafı kullanılır.', 'Without one, the species\' photo from your lists is used.')}</div></div>`;
             h += `<div class="sh-row"><label>${LT('Biçim', 'Format')}</label>${seg('format', [['story', LT('📱 Hikâye', '📱 Story')], ['square', LT('⬛ Kare', '⬛ Square')], ['pdf', '📄 PDF']], st.format)}</div>`;
             if (!['chart', 'month'].includes(st.type) && !(st.type === 'species' && st.spView && st.spView !== 'map')) h += `<div class="sh-row"><label>${LT('Konum bilgisi', 'Location detail')}</label>${seg('privacy', [['exact', LT('Tam konum', 'Exact')], ['province', LT('Sadece il', 'Province only')], ['hidden', LT('Gizli', 'Hidden')]], st.privacy)}</div>`;
             h += `<div class="sh-row"><label>${LT('İmza (isteğe bağlı)', 'Signature (optional)')}</label><input type="text" maxlength="28" value="${escHtml(st.sign)}" placeholder="${LT('ör. adın ya da kullanıcı adın', 'e.g. your name or handle')}" oninput="setShare('sign', this.value, true)"></div>`;
@@ -4209,6 +4209,7 @@
             if (k === 'n') v = parseInt(v, 10);
             shareState[k] = v;
             if (k === 'loc') shareState.locPick = null;
+            if (['sci', 'loc', 'date', 'type'].includes(k)) shareState.framed = false;
             if (['date', 'from', 'to', 'prov', 'type', 'year'].includes(k)) shareState.pick = null;
             if (k === 'from' && shareState.to < v) shareState.to = v;
             if (k === 'fSci' && v && chartState.obs.metric === 'species') chartState.obs.metric = 'days';
@@ -4239,7 +4240,7 @@
         }
         function bindPreviewDrag() {
             let pv = $id('share-preview'); if (!pv) return;
-            let active = shareState.type === 'obs' && !!shareState.photo;
+            let active = shareState.type === 'obs';   // kendi fotoğrafın da, eBird / Wikipedia fotoğrafı da kaydırılıp yakınlaştırılabilir
             pv.style.touchAction = active ? 'none' : 'auto';   // tarayıcı sayfayı kaydırmasın, hareketi biz yönetelim
             let pts = new Map(), g = null;
             const dist = () => { let [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y) || 1; };
@@ -4249,7 +4250,9 @@
                 else if (pts.size >= 2) g = { mode: 'pinch', d: dist(), z: st.photoZoom };
             };
             pv.onpointerdown = e => {
-                if (!(shareState.type === 'obs' && shareState.photo)) return;
+                if (shareState.type !== 'obs') return;
+                let st0 = shareState;
+                if (!st0.photo && !st0.framed) { let f = frameOf(st0.sci); st0.photoX = f.x; st0.photoY = f.y; st0.photoZoom = f.z; st0.framed = true; }
                 pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
                 try { pv.setPointerCapture(e.pointerId); } catch (x) {}
                 begin(); e.preventDefault();
