@@ -3512,7 +3512,7 @@
             let prev = window._prevUpload; window._prevUpload = null;
             if (prev && showWhatsNew(prev, !isNaN(seen) && top > seen ? top : 0)) return;
             if (!isNaN(seen) && top > seen) {
-                setTimeout(() => showToast(`🎉 ${LT(`${top}. türün kutlu olsun!`, `Your ${top}th species, congrats!`)}`,
+                setTimeout(() => showToast(`🎉 ${LT(`${top}. türün kutlu olsun!`, `Your ${ordN(top)} species, congrats!`)}`,
                     [{ label: LT('Kartı paylaş', 'Share card'), fn: () => openShare({ type: 'milestone', n: top }) }, { label: LT('Kapat', 'Close'), ghost: true }], 20000), 2200);
             } else if (!afterDataLoaded._timer) {
                 afterDataLoaded._timer = setTimeout(() => maybeAskReview('time'), 300000);
@@ -3547,7 +3547,7 @@
                 ${newLifers.length ? `<div class="wn-lifer"><b>🏆 ${newLifers.length === 1 ? LT('Yeni kertik! Tebrikler 🎉', 'New lifer! Congrats 🎉') : LT(`${newLifers.length} yeni kertik! Tebrikler 🎉`, `${newLifers.length} new lifers! Congrats 🎉`)}</b>
                     <div>${newLifers.slice(0, 6).map(l => `<span>${escHtml(spName(l))} <i>#${nOf(l)}</i></span>`).join('')}${newLifers.length > 6 ? `<span>+${newLifers.length - 6}</span>` : ''}</div></div>` : ''}
                 ${milestone ? `<div class="fa-sub" style="margin:8px 0 0; font-weight:700; color:#0A3E70;">🎉 ${LT(`${milestone}. türünü geçtin!`, `You passed ${milestone} species!`)}</div>` : ''}
-                ${milestone ? `<button class="fa-btn fa-rate" data-k="ms">📤 ${LT(`${milestone}. tür kartını paylaş`, `Share your ${milestone}th species card`)}</button>` : ''}
+                ${milestone ? `<button class="fa-btn fa-rate" data-k="ms">📤 ${LT(`${milestone}. tür kartını paylaş`, `Share your ${ordN(milestone)} species card`)}</button>` : ''}
                 ${newLifers.length ? `<button class="fa-btn ${milestone ? '' : 'fa-rate'}" data-k="lf">📤 ${LT('Yeni kertiğini paylaş', 'Share your new lifer')}</button>` : ''}
                 <button class="fa-btn" data-k="day">📅 ${LT('Yeni günleri takvimde gör', 'See the new days in the calendar')}</button>
                 <button class="fa-btn" data-k="ok">${LT('Tamam', 'OK')}</button></div>`;
@@ -3698,6 +3698,12 @@
         function yearsInData() { return [...new Set(obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor').map(d => d.slice(0, 4)))].sort().reverse(); }
         function daysInData() { return [...new Set(obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor'))].sort().reverse(); }
         function liferBySci() { let m = {}; liferArray.forEach(l => { m[l.sci_name] = l; }); return m; }
+        // Sıra sayısı: Türkçe "101." · İngilizce "101st", "102nd", "103rd", "111th"
+        function ordN(n) {
+            n = +n; if (LANG !== 'en') return n + '.';
+            let t = n % 100, u = n % 10;
+            return n + ((t >= 11 && t <= 13) ? 'th' : u === 1 ? 'st' : u === 2 ? 'nd' : u === 3 ? 'rd' : 'th');
+        }
         function liferOrder() { return [...liferArray].sort((a, b) => a.date.localeCompare(b.date) || a.tr_name.localeCompare(b.tr_name)); }
         function provShort(p) { return (p && p !== 'Bilinmiyor') ? p.split(',')[0] : ''; }
         function placeText(loc, prov) {
@@ -4085,14 +4091,14 @@
                 let l = D.l; if (!l) return;
                 confetti(ctx, W, H, story ? [[40, 200], [1180, 1270], [1590, 1760]] : [[20, 90], [930, 990]]);
                 text(ctx, MILESTONES.includes(+D.n) ? LT('KERTİK DÖNÜM NOKTASI', 'LIFER MILESTONE') : LT('YENİ KERTİK', 'NEW LIFER'), W / 2, story ? 250 : 130, { w: 700, px: story ? 44 : 36, color: C.blue, align: 'center', spacing: 6 });
-                text(ctx, D.n + '.', W / 2, story ? 570 : 340, { w: 700, px: story ? 330 : 220, align: 'center' });
+                text(ctx, ordN(D.n), W / 2, story ? 570 : 340, { w: 700, px: story ? 330 : 220, align: 'center' });
                 text(ctx, LT('türün kutlu olsun! 🎉', 'species — congrats! 🎉'), W / 2, story ? 690 : 425, { w: 700, px: story ? 64 : 48, align: 'center', maxW: W - 120 });
                 await drawMavis(ctx, 'wave', W / 2 - (story ? 210 : 120), story ? 790 : 455, story ? 420 : 240);
                 let cy = story ? 1300 : 715, ch = story ? 250 : 210;
                 ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.12)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 10; rr(ctx, 110, cy, W - 220, ch, 40); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
                 await photoCircle(ctx, l.img, 110 + 40 + (story ? 75 : 62), cy + ch / 2, story ? 75 : 62);
                 let tx = 110 + 40 + (story ? 170 : 145);
-                text(ctx, `${D.n}. ${LT('tür', 'species')}`, tx, cy + (story ? 70 : 58), { w: 400, px: 28, color: C.sky });
+                text(ctx, `${ordN(D.n)} ${LT('tür', 'species')}`, tx, cy + (story ? 70 : 58), { w: 400, px: 28, color: C.sky });
                 text(ctx, spName(l), tx, cy + (story ? 132 : 112), { w: 700, px: story ? 54 : 44, maxW: W - tx - 140, minPx: 28 });
                 let pl = placeText(l.loc, l.province);
                 text(ctx, `${pl ? '📍 ' + pl + ' · ' : ''}${formatDisplayDate(l.date)}`, tx, cy + (story ? 190 : 160), { w: 400, px: 30, color: C.blue, maxW: W - tx - 140, minPx: 20 });
@@ -4975,7 +4981,7 @@
         const IG_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-3px;"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor"/></svg>';
         function liferSelectHtml() {
             let order = liferOrder();
-            return `<div class="sh-row"><select onchange="setShare('n', this.value)">${order.map((l, i) => [i + 1, l]).reverse().map(([n, l]) => `<option value="${n}"${+n === +shareState.n ? ' selected' : ''}>${MILESTONES.includes(n) ? '⭐ ' : ''}${n}. · ${escHtml(spName(l))} · ${formatDisplayDate(l.date)}</option>`).join('')}</select></div>`;
+            return `<div class="sh-row"><select onchange="setShare('n', this.value)">${order.map((l, i) => [i + 1, l]).reverse().map(([n, l]) => `<option value="${n}"${+n === +shareState.n ? ' selected' : ''}>${MILESTONES.includes(n) ? '⭐ ' : ''}${ordN(n)} · ${escHtml(spName(l))} · ${formatDisplayDate(l.date)}</option>`).join('')}</select></div>`;
         }
 
         // ---------- yeni kart çizimleri ----------
