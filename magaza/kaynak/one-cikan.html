@@ -1,0 +1,87 @@
+<html><head><style>
+        @font-face{font-family:P;src:url('file:///usr/share/fonts/truetype/google-fonts/Poppins-Bold.ttf');font-weight:700}
+        @font-face{font-family:P;src:url('file:///usr/share/fonts/truetype/google-fonts/Poppins-Regular.ttf');font-weight:400}
+        @font-face{font-family:P;src:url('file:///usr/share/fonts/truetype/google-fonts/Poppins-Medium.ttf');font-weight:500}
+        body{margin:0;width:1024px;height:500px;overflow:hidden;font-family:P;background:#EEF0EC;position:relative}
+        .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(46,98,181,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(46,98,181,.06) 1px,transparent 1px);background-size:40px 40px}
+        .c{position:absolute;border-radius:50%;border:3px solid #fff;box-shadow:0 4px 12px rgba(10,62,112,.18);opacity:.9}
+        .left::before{content:"";position:absolute;left:-64px;top:-40px;bottom:-40px;width:560px;background:linear-gradient(90deg,rgba(255,255,255,.85) 0%,rgba(255,255,255,.6) 70%,rgba(255,255,255,0) 100%);z-index:-1}.left{z-index:1;position:absolute;left:64px;top:0;bottom:0;width:470px;display:flex;flex-direction:column;justify-content:center}
+        .logo{width:118px;height:118px;border-radius:50%;border:5px solid #fff;box-shadow:0 8px 22px rgba(10,62,112,.22);margin-bottom:18px}
+        .t{font-weight:700;font-size:62px;line-height:1;letter-spacing:-1px;color:#1C3A6B} .t span{color:#2E62B5}
+        .dots{margin:16px 0 10px} .s{font-size:22px;color:#4A5B70}
+        .chips{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px;max-width:480px} .chip{background:#fff;border:1.5px solid #c8d8ee;border-radius:18px;padding:5px 12px;font-weight:500;font-size:15px;color:#1C3A6B}
+        .mv{position:absolute;right:46px;bottom:18px}
+        .bubble{position:absolute;right:250px;bottom:300px;background:#fff;border-radius:16px;padding:10px 14px;font-weight:500;font-size:16px;color:#1C3A6B;box-shadow:0 4px 14px rgba(10,62,112,.15)}
+        .bubble:after{content:'';position:absolute;right:-8px;bottom:12px;border:8px solid transparent;border-left-color:#fff}
+        </style></head><body><img src="map.png" style="position:absolute;inset:0;width:1024px;height:500px"><div class="c" style="left:560px;top:40px;width:70px;height:70px;background:#2E62B5;"></div><div class="c" style="left:650px;top:120px;width:46px;height:46px;background:#3FA34D;"></div><div class="c" style="left:610px;top:250px;width:90px;height:90px;background:#E9C440;"></div><div class="c" style="left:730px;top:60px;width:40px;height:40px;background:#2E62B5;"></div><div class="c" style="left:760px;top:330px;width:60px;height:60px;background:#E8743B;"></div><div class="c" style="left:540px;top:370px;width:38px;height:38px;background:#3FA34D;"></div><div class="c" style="left:700px;top:200px;width:30px;height:30px;background:#2E62B5;"></div><div class="c" style="left:840px;top:160px;width:54px;height:54px;background:#2E62B5;"></div>
+        <div class="left"><img class="logo" src="logo.png">
+        <div class="t">Bird <span>Atlas</span></div>
+        <div class="dots"><svg width="48" height="10"><circle cx="8" cy="5" r="4" fill="#2E62B5"/><circle cx="24" cy="5" r="4" fill="#E9C440"/><circle cx="40" cy="5" r="4" fill="#1C3A6B"/></svg></div>
+        <div class="s">Your personal birding map</div>
+        <div class="chips"><div class="chip">🗺️ Map</div><div class="chip">🏆 Lifers</div><div class="chip">📊 Charts</div><div class="chip">🐦 Maviş</div><div class="chip">📤 Share cards</div><div class="chip">📷 Your own photos</div></div></div></div></div>
+        <div class="bubble">Hi! I'm Maviş 👋</div>
+        <div class="mv" id="mv"></div>
+        <script>        // ===== Maviş: maskotumuz (dürbünlü Mavi Baştankara) =====
+        // mode: 'wave' (el sallar), 'think' (dürbünle bakar), 'idle' (göz kırpar)
+        function mavisSVG(size, mode) {
+            mode = mode || 'idle';
+            return `<svg class="mavis mavis-${mode}" width="${size}" height="${size}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <g class="mv-all">
+                <ellipse cx="100" cy="188" rx="46" ry="7" fill="#0A3E70" opacity="0.12"/>
+                <!-- kuyruk -->
+                <path d="M86,160 L80,186 L100,178 L120,186 L114,160 Z" fill="#1E5FB8"/>
+                <!-- gövde -->
+                <ellipse cx="100" cy="128" rx="56" ry="52" fill="#7FA35A"/>
+                <ellipse cx="100" cy="134" rx="46" ry="44" fill="#FED008"/>
+                <path d="M100,104 C97,120 97,140 100,166 C103,140 103,120 100,104 Z" fill="#0A3E70" opacity="0.35"/>
+                <!-- ayaklar -->
+                <g stroke="#5C6B7A" stroke-width="4" stroke-linecap="round" fill="none">
+                  <path d="M86,176 l-4,10 M86,176 l3,10 M86,176 l-9,6"/>
+                  <path d="M114,176 l4,10 M114,176 l-3,10 M114,176 l9,6"/>
+                </g>
+                <!-- sol kanat (el sallayan) -->
+                <g class="mv-wing-l">
+                  <path d="M52,112 C30,104 22,130 34,148 C44,160 60,152 62,138 Z" fill="#2F7FE0"/>
+                  <path d="M34,128 C42,130 52,132 60,128" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+                </g>
+                <!-- baş -->
+                <circle cx="100" cy="70" r="47" fill="#FFFFFF" stroke="#0A3E70" stroke-width="5"/>
+                <path d="M55,64 C57,30 80,20 100,20 C120,20 143,30 145,64 C130,48 116,44 100,44 C84,44 70,48 55,64 Z" fill="#1E6FD9"/>
+                <path d="M58,58 C70,46 84,42 100,42 C116,42 130,46 142,58" stroke="#FFFFFF" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <!-- göz bandı -->
+                <path d="M84,67 C74,65 62,68 54,76 C63,74 73,76 84,79 Z" fill="#0A3E70"/>
+                <path d="M116,67 C126,65 138,68 146,76 C137,74 127,76 116,79 Z" fill="#0A3E70"/>
+                <!-- yanaklar -->
+                <ellipse cx="70" cy="92" rx="9" ry="5" fill="#FF8FA3" opacity="0.55"/>
+                <ellipse cx="130" cy="92" rx="9" ry="5" fill="#FF8FA3" opacity="0.55"/>
+                <!-- gözler -->
+                <g class="mv-eyes">
+                  <ellipse cx="82" cy="72" rx="8" ry="9" fill="#1B1B22"/>
+                  <ellipse cx="118" cy="72" rx="8" ry="9" fill="#1B1B22"/>
+                  <circle cx="85" cy="68" r="3" fill="#FFFFFF"/>
+                  <circle cx="121" cy="68" r="3" fill="#FFFFFF"/>
+                </g>
+                <!-- gaga: kısa, yuvarlak uçlu -->
+                <path d="M95,84 Q100,81 105,84 Q103,90 100,91.5 Q97,90 95,84 Z" fill="#3A3F4A"/>
+                <path d="M97,84.2 Q100,83 102,84.2" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+                <!-- sağ kanat -->
+                <path d="M148,112 C170,104 178,130 166,148 C156,160 140,152 138,138 Z" fill="#2F7FE0"/>
+                <path d="M144,130 C152,132 160,130 166,126" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+                <!-- dürbün (öne bakan iki mercek) -->
+                <path d="M84,112 C96,124 140,124 152,112" stroke="#8B5A2B" stroke-width="3" fill="none"/>
+                <g class="mv-binoc">
+                  <rect x="114" y="132" width="16" height="10" rx="3" fill="#3C4C68"/>
+                  <circle cx="110" cy="138" r="15" fill="#24324A"/>
+                  <circle cx="134" cy="138" r="15" fill="#24324A"/>
+                  <circle cx="110" cy="138" r="9" fill="#9FD3FF"/>
+                  <circle cx="134" cy="138" r="9" fill="#9FD3FF"/>
+                  <circle cx="107" cy="135" r="3" fill="#FFFFFF" opacity="0.9"/>
+                  <circle cx="131" cy="135" r="3" fill="#FFFFFF" opacity="0.9"/>
+                  <ellipse cx="146" cy="146" rx="9" ry="7" fill="#2F7FE0"/>
+                </g>
+              </g>
+            </svg>`;
+        }
+        // ===== /Maviş =====
+; document.getElementById('mv').innerHTML=mavisSVG(250,'idle');</script>
+        <style>.mavis *{animation:none!important}</style></body></html>

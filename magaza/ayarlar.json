@@ -12,27 +12,27 @@
     },
     "es-419": {
       "metin": "es",
-      "gorsel": "en"
+      "gorsel": "es"
     },
     "es-ES": {
       "metin": "es",
-      "gorsel": "en"
+      "gorsel": "es"
     },
     "pt-BR": {
       "metin": "pt-BR",
-      "gorsel": "en"
+      "gorsel": "pt"
     },
     "de-DE": {
       "metin": "de",
-      "gorsel": "en"
+      "gorsel": "de"
     },
     "fr-FR": {
       "metin": "fr",
-      "gorsel": "en"
+      "gorsel": "fr"
     },
     "fr-CA": {
       "metin": "fr",
-      "gorsel": "en"
+      "gorsel": "fr"
     }
   },
   "iletisim": {
