@@ -21,7 +21,8 @@ try { ({ chromium } = require('playwright-core')); } catch (e) { try { ({ chromi
 if (!fs.existsSync(path.join(WWW, 'lib', 'leaflet'))) { console.log('www/lib yok: önce KOMUTLAR 6 (npm install).'); process.exit(1); }
 
 const DILLER = process.argv.slice(2).filter(a => /^[a-z]{2}$/.test(a));
-const LANGS = DILLER.length ? DILLER : ['tr', 'en', 'es', 'pt', 'de', 'fr'];
+const TUM_DILLER = ['tr', 'en', 'es', 'pt', 'de', 'fr'];
+let LANGS = DILLER.length ? DILLER : TUM_DILLER;
 const LOCALE = { tr: 'tr-TR', en: 'en-US', es: 'es-ES', pt: 'pt-BR', de: 'de-DE', fr: 'fr-FR' };
 const SORU = { tr: "2026'daki en iyi günüm hangisiydi?", en: 'What was my best day in 2026?', es: '¿Cuál fue mi mejor día en 2026?', pt: 'Qual foi meu melhor dia em 2026?', de: 'Was war mein bester Tag 2026?', fr: 'Quel a été mon meilleur jour en 2026 ?' };
 const KESFET = { lat: 44.5136, lng: 28.6356, km: 30 };        // Köstence yakınları
@@ -38,6 +39,11 @@ if (process.stdin.isTTY) {
     console.log('\nEkranlar: 1 harita · 2 takvim · 3 grafik · 4 konumlar · 5 türler · 6 kertik · 7 foto · 8 paylaş · 9 Maviş · 10 Keşfet');
     SECILI = (await rl.question('  Hangileri çekilsin? (Enter = hepsi; ör. 9 ya da 8,9): ')).split(/[\s,]+/).map(Number).filter(Boolean);
     console.log(SECILI.length ? `    ✓ yalnız: ${SECILI.join(', ')}` : '    ✓ hepsi');
+  }
+  if (!DILLER.length) {
+    let d = (await rl.question('  Hangi diller? (Enter = hepsi; ör. de ya da tr,en): ')).toLowerCase().split(/[\s,]+/).filter(x => TUM_DILLER.includes(x));
+    if (d.length) LANGS = d;
+    console.log(`    ✓ ${LANGS.join(', ')}  (aynı adlı eski görüntülerin üstüne yazılır, silmene gerek yok)`);
   }
   console.log('\nAnahtarlar yalnız bu çekim için kullanılır, hiçbir yere kaydedilmez. Boş bırakıp Enter: o ekran anahtarsız çekilir.');
   console.log('  (Yapıştırmak için pencereye farenin SAĞ tuşuyla tıkla, sonra Enter.)');
@@ -99,7 +105,17 @@ await new Promise(ok => sunucu.listen(0, '127.0.0.1', ok));
 const ADRES = `http://127.0.0.1:${sunucu.address().port}/`;
 
 const bekle = (ms) => new Promise(ok => setTimeout(ok, ms));
-async function oturt(pg, ms = 1500) { await pg.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {}); await bekle(ms); }
+async function oturt(pg, ms = 1500) {
+  await pg.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+  // sade (vektör) harita: tüm parçalar çizilene kadar bekle (en çok 20 sn)
+  await pg.evaluate(() => new Promise(ok => {
+    let gl = null; try { mapObj.eachLayer(l => { if (!gl && l.getMaplibreMap) gl = l.getMaplibreMap(); }); } catch (e) {}
+    if (!gl) return ok();
+    let bitti = () => { try { return gl.loaded() && gl.areTilesLoaded(); } catch (e) { return true; } };
+    let t0 = Date.now(), iv = setInterval(() => { if (bitti() || Date.now() - t0 > 20000) { clearInterval(iv); ok(); } }, 300);
+  })).catch(() => {});
+  await bekle(ms);
+}
 
 // Ekranlar arasında her şeyi kapat
 async function sifirla(pg) {
