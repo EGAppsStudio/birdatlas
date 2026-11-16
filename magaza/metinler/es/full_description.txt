@@ -9,7 +9,7 @@ Bird Atlas convierte tus avistamientos de eBird en un mapa personal y visual. De
 📅 CALENDARIO Y GRÁFICOS ANUALES
 • Toca un día y verás al instante qué especies viste y en qué localidades.
 • Tu año de pajareo en gráficos mensuales o semanales: por especies, avistamientos, días o número de individuos. Compara años.
-• Filtra por especie, lugar, provincia y fecha; busca por nombre en inglés o científico.
+• Filtra por especie, lugar, provincia y fecha; busca por nombre en español, inglés o científico.
 
 🏆 MAPA DE LIFERS
 Sigue en el mapa, con burbujas de fotos, el lugar donde viste cada especie por primera vez. Tu historia como observador de aves en una sola pantalla.
@@ -34,7 +34,7 @@ Maviş funciona en tu dispositivo; no necesita internet ni clave.
 ✨ Y MÁS
 • Al abrirla por primera vez, Maviş te hace un recorrido guiado; ¿sin cuenta de eBird? Empieza con datos de ejemplo.
 • También en tu ordenador o iPhone: birdatlas.app
-• La app está en inglés y turco (pronto más idiomas); nombres de especies en ambos idiomas
+• Interfaz en 6 idiomas: español, inglés, portugués, alemán, francés y turco; nombres de especies también en tu idioma
 • Añade y edita avistamientos a mano, con número de individuos
 • Explorar cerca: registros de eBird de los últimos 30 días alrededor de cualquier punto (con tu clave gratuita de la API de eBird)
 • Opcional: chatea libremente con Maviş usando tu clave gratuita de Gemini

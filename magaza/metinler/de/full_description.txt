@@ -9,7 +9,7 @@ Bird Atlas verwandelt deine eBird-Beobachtungen in eine persönliche, anschaulic
 📅 KALENDER UND JAHRESDIAGRAMME
 • Tippe auf einen Tag und sieh sofort, welche Arten du an welchen Orten beobachtet hast.
 • Dein Vogeljahr in Monats- oder Wochendiagrammen: nach Arten, Beobachtungen, Tagen oder Individuen. Vergleiche Jahre.
-• Filtere nach Art, Ort, Region und Datum; suche nach englischem oder wissenschaftlichem Namen.
+• Filtere nach Art, Ort, Region und Datum; suche nach deutschem, englischem oder wissenschaftlichem Namen.
 
 🏆 LIFER-KARTE
 Verfolge auf der Karte, wo du jede Art zum ersten Mal gesehen hast – als Fotoblasen. Deine Geschichte als Vogelbeobachter auf einem Bildschirm.
@@ -34,7 +34,7 @@ Maviş läuft auf deinem Gerät – ohne Internet oder Schlüssel.
 ✨ UND MEHR
 • Beim ersten Start führt dich Maviş durch die App; kein eBird-Konto? Starte mit Beispieldaten.
 • Auch am Computer oder iPhone: birdatlas.app
-• Die App ist auf Englisch und Türkisch (weitere Sprachen folgen); Artnamen in beiden Sprachen
+• Oberfläche in 6 Sprachen: Deutsch, Englisch, Spanisch, Portugiesisch, Französisch, Türkisch; Artnamen auch in deiner Sprache
 • Beobachtungen von Hand hinzufügen und bearbeiten, mit Anzahl
 • In der Nähe entdecken: eBird-Meldungen der letzten 30 Tage rund um jeden Punkt (mit deinem kostenlosen eBird-API-Schlüssel)
 • Optional: freier Chat mit Maviş mit deinem kostenlosen Gemini-Schlüssel

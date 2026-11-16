@@ -34,7 +34,7 @@ Maviş runs on your device — no internet or API key needed.
 ✨ AND MORE
 • On first launch Maviş gives you a quick guided tour; no eBird account? Start with sample data.
 • Also on your computer or iPhone: birdatlas.app
-• English and Turkish interface, species names in both languages
+• Interface in 6 languages: English, Turkish, Spanish, Portuguese, German, French; species names in your language too
 • Add and edit sightings manually, with counts
 • Explore Nearby: eBird sightings from the last 30 days around any point (with your free eBird API key)
 • Optional: free-form chat with Maviş using your free Gemini key

@@ -34,7 +34,7 @@ Maviş cihazında çalışır; internet ya da anahtar gerektirmez.
 ✨ VE DAHASI
 • İlk açılışta Maviş seni adım adım gezdirir; eBird hesabın yoksa örnek veriyle başlarsın.
 • Bilgisayardan ya da iPhone'dan da kullan: birdatlas.app
-• Türkçe ve İngilizce arayüz, tür adları her iki dilde
+• 6 dilde arayüz: Türkçe, İngilizce, İspanyolca, Portekizce, Almanca, Fransızca; tür adları da seçtiğin dilde
 • Elle gözlem ekleme ve düzenleme (adet bilgisiyle)
 • Çevreyi Keşfet: seçtiğin bölgedeki son 30 günün eBird kayıtları (ücretsiz eBird API anahtarınla)
 • İsteğe bağlı: ücretsiz Gemini anahtarınla Maviş'le serbest sohbet
