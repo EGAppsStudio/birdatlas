@@ -7,8 +7,10 @@
 - `ayarlar.json` → `iletisim`: Play'deki Mağaza ayarları → İletişim bilgileri (Web sitesi + e-posta) da aynı komutla güncellenir.
 - Play Console'da metni elle değiştirirsen buradaki dosyayı da değiştir; yoksa bir sonraki `npm run magaza` buradakini yazar.
 
-Yükleme (Windows, proje klasöründe):
-1. `npm run magaza -- --dene`  → yalnız kontrol, hiçbir şey kaydedilmez
-2. `npm run magaza`            → yükler; değişiklikler Play incelemesine gider
+Yükleme (Windows): kökteki `KOMUTLAR.bat`
+- **3** → METİNLER: tüm diller (TR, EN dahil) + Web sitesi/e-posta  (`npm run magaza -- --metin`)
+- **8** → GÖRSELLER: uygulama ikonu (`gorseller/ikon-512.png`, tüm dillerde) + ekran görüntüleri + öne çıkan görsel (`npm run magaza -- --gorsel`)
+- Görsel klasörü: `gorseller/<klasör>/telefon-01…08.jpg` + `one-cikan.jpg`; `ayarlar.json`'da dilin `gorsel` klasörü yoksa (ör. `gorseller/tr`) o dilin ekran görüntülerine dokunulmaz.
+- Önce yalnız kontrol istenirse komutun sonuna `--dene` eklenir.
 
 Anahtar: `Documents\kus-atlasi\` içindeki service account .json dosyası (ya da PLAY_ANAHTAR ortam değişkeni). Depoya ASLA girmez.

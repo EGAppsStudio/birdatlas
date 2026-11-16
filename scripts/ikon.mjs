@@ -30,10 +30,10 @@ await clear(1024, 1024).composite([{ input: await sharp(round).resize(670, 670).
 await white(1024, 1024).png().toFile('assets/icon-background.png');
 // Açılış ekranı
 await white(2732, 2732).composite([{ input: await sharp(round).resize(700, 700).toBuffer(), gravity: 'center' }]).png().toFile('assets/splash.png');
-// Play Console'a yükleyeceğin 512x512 ikon (Google köşeleri kendisi yuvarlar)
-await white(512, 512).composite([{ input: await sharp(round).resize(450, 450).toBuffer(), gravity: 'center' }]).png().toFile('play-store-ikon-512.png');
+// Play mağaza ikonu 512x512, tamamen beyaz zemin (şeffaf olursa Play kenarı kendi rengiyle doldurur); KOMUTLAR 8 yükler
+await white(512, 512).composite([{ input: await sharp(round).resize(450, 450).toBuffer(), gravity: 'center' }]).flatten({ background: '#FFFFFF' }).png().toFile('magaza/gorseller/ikon-512.png');
 
 console.log('✓ Kaynak resimler hazır, Android ikonları üretiliyor...');
 execSync('npx capacitor-assets generate --android', { stdio: 'inherit' });
 console.log('\n✓ Bitti. Şimdi:  npm run sync   ve Android Studio\'da ▶');
-console.log('  Play Console ikonu: play-store-ikon-512.png');
+console.log('  Play ikonu: magaza/gorseller/ikon-512.png (KOMUTLAR 8 ile yüklenir)');

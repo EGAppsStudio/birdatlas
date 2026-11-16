@@ -10,11 +10,12 @@ echo  ==============================================
 echo.
 echo   1  Android Studio yu ac        (sync + Android Studio)
 echo   2  Telefonda dene linki        (en yeni imzali AAB - Play dahili paylasim)
-echo   3  Play magaza sayfasi         (once kontrol, sonra onay ister)
+echo   3  Magaza METINLERI yukle      (6 dil + web sitesi/e-posta; Claude hazirlar)
 echo   4  Simgeler + sync             (logo degisince / yeni surumden once)
 echo   5  Sadece sync                 (dosyalari Android projesine aktar)
 echo   6  Paketleri kur / guncelle    (npm install)
 echo   7  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari ister)
+echo   8  Magaza GORSELLERI yukle     (ikon + ekran goruntuleri + one cikan gorsel)
 echo.
 echo   0  Cikis
 echo.
@@ -27,6 +28,7 @@ if "%SEC%"=="4" goto ikon
 if "%SEC%"=="5" goto sync
 if "%SEC%"=="6" goto install
 if "%SEC%"=="7" goto taksonomi
+if "%SEC%"=="8" goto gorsel
 if "%SEC%"=="0" exit /b 0
 goto menu
 
@@ -47,18 +49,14 @@ goto bitti
 
 :magaza
 echo.
-echo  1. adim: kontrol (hicbir sey kaydedilmez)
-echo.
-call npm run magaza -- --dene
+call npm run magaza -- --metin
 if errorlevel 1 goto hata
+goto bitti
+
+:gorsel
 echo.
-set "CEVAP="
-set /p CEVAP=  Kontrol basarili. Simdi gercekten Play e yukleyeyim mi? (E/H):
-if /i not "%CEVAP%"=="E" (
-  echo  Yukleme yapilmadi.
-  goto bitti
-)
-call npm run magaza
+call npm run magaza -- --gorsel
+if errorlevel 1 goto hata
 goto bitti
 
 :ikon

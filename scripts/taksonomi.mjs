@@ -36,7 +36,9 @@ const EK = { es: 'es', pt: 'pt_BR', de: 'de', fr: 'fr' };
 for (const [dil, loc] of Object.entries(EK)) {
   try {
     const liste = await get(loc), m = {};
-    for (const x of liste) { const e = enByCode.get(x.speciesCode); if (x.comName && x.comName !== e) m[x.sciName] = x.comName; }
+    // Çevirisi olmayan türlerde eBird İngilizce adı küçük harfle verebiliyor: büyük/küçük harf farkı çeviri sayılmaz.
+    // Portekizce adlar küçük harfle yazılır (gaivota-de-...); listede ilk harf büyük gösterilir.
+    for (const x of liste) { const e = enByCode.get(x.speciesCode) || ''; if (x.comName && x.comName.toLowerCase() !== e.toLowerCase()) m[x.sciName] = x.comName.charAt(0).toLocaleUpperCase(loc.replace('_', '-')) + x.comName.slice(1); }
     writeFileSync(join(outDir, `ebird-names-${dil}.json`), JSON.stringify(m));
     console.log(`✓ ${dil}: ${Object.keys(m).length} tür adı → www/data/ebird-names-${dil}.json`);
   } catch (e) { console.log(`(uyarı) ${dil} tür adları indirilemedi: ${e.message}`); }

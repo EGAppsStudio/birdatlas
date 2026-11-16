@@ -735,7 +735,9 @@
             if (!XL.includes(LANG) || !enName) return enName;
             if (!enToSciMap && typeof enNameMap !== 'undefined') { enToSciMap = {}; for (const k in enNameMap) enToSciMap[enNameMap[k]] = k; if (typeof obsData !== 'undefined') obsData.forEach(d => { if (d.en_name) enToSciMap[d.en_name] = d.sci_name; }); }
             let sci = enToSciMap && enToSciMap[enName];
-            return (sci && LOC_NAMES[sci]) || enName;
+            let l = sci && LOC_NAMES[sci];
+            if (!l || l.toLowerCase() === enName.toLowerCase()) return enName;   // eBird bazen çevrilmemiş adı küçük harfle verir
+            return l.charAt(0).toLocaleUpperCase(loc()) + l.slice(1);
         }
         async function loadLocNames() {
             if (!XL.includes(LANG) || LOC_NAMES_LANG === LANG) return false;
