@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr" data-lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/img/logo.svg">
 <link rel="icon" type="image/png" href="/img/favicon-64.png">
 <link rel="stylesheet" href="/app/lib/leaflet/leaflet.css">
+<link rel="stylesheet" href="/app/lib/maplibre/maplibre-gl.css">
 <style>
 @font-face { font-family: "Poppins"; font-weight: 400; font-display: swap; src: url("/app/lib/fonts/poppins-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-0130, U+0132-024F; }
 @font-face { font-family: "Poppins"; font-weight: 400; font-display: swap; src: url("/app/lib/fonts/poppins-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+2000-206F; }
@@ -25,8 +26,17 @@ main { width: min(760px, 100% - 32px); margin: 0 auto; padding: 20px 0 48px; }
 header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--navy); font-weight: 700; text-decoration: none; }
 .brand img { width: 38px; height: 38px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(16,50,92,.15); }
-.langs button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: #fff; color: var(--navy); padding: 3px 11px; border-radius: 999px; cursor: pointer; }
-.langs button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.langs { position: relative; }
+.langs summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--navy); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px 5px 14px; user-select: none; }
+.langs summary::-webkit-details-marker { display: none; }
+.langs summary::after { content: ""; width: 7px; height: 7px; border: solid var(--navy); border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
+.langs[open] summary::after { transform: translateY(1px) rotate(-135deg); }
+.langs nav { position: absolute; right: 0; top: calc(100% + 6px); z-index: 1000; min-width: 160px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 28px rgba(16,50,92,.18); padding: 6px; display: grid; }
+.langs nav button { font: inherit; font-size: 15px; text-align: left; border: 0; background: none; color: var(--ink); padding: 8px 12px; border-radius: 10px; cursor: pointer; display: flex; gap: 10px; }
+.langs nav button b { color: var(--navy); width: 24px; }
+.langs nav button:hover { background: #EAF1FA; }
+.langs nav button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.langs nav button[aria-pressed="true"] b { color: #fff; }
 h1 { color: var(--navy); font-size: clamp(26px, 5vw, 38px); line-height: 1.15; margin: 28px 0 4px; text-wrap: balance; }
 .by { font-size: 14px; }
 .stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
@@ -44,37 +54,83 @@ ol.sp li:first-child { border-top: 0; }
 .cta a.btn { display: inline-block; margin-top: 12px; background: var(--yellow); color: var(--navy); font-weight: 700; padding: 10px 18px; border-radius: 12px; text-decoration: none; }
 .note { font-size: 13px; color: #6A7A90; margin-top: 18px; }
 .err { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-top: 28px; }
-html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display: none; }
+
 </style>
 </head>
 <body>
 <main>
   <header>
-    <a class="brand" href="/"><img src="/img/logo.svg" alt=""><span><span data-l="tr">Kuş Atlası</span><span data-l="en">Bird Atlas</span></span></a>
-    <div class="langs"><button data-set="tr" aria-pressed="true">TR</button> <button data-set="en" aria-pressed="false">EN</button></div>
+    <a class="brand" href="/"><img src="/img/logo.svg" alt=""><span data-i="brand">Bird Atlas</span></a>
+    <details class="langs"><summary aria-label="Language"><span class="cur">EN</span></summary><nav>
+      <button data-set="tr"><b>TR</b> Türkçe</button><button data-set="en"><b>EN</b> English</button><button data-set="es"><b>ES</b> Español</button>
+      <button data-set="pt"><b>PT</b> Português</button><button data-set="de"><b>DE</b> Deutsch</button><button data-set="fr"><b>FR</b> Français</button></nav></details>
   </header>
   <div id="out"></div>
   <div class="cta">
-    <h3><span data-l="tr">Kendi kuş haritanı oluştur</span><span data-l="en">Make your own bird map</span></h3>
-    <p style="margin:0"><span data-l="tr">eBird gözlemlerini yükle; nerede, ne zaman ne gördüğün, kertiklerin ve grafiklerin tek yerde. Verilerin cihazında kalır.</span><span data-l="en">Upload your eBird sightings: where and when you saw what, your lifers and charts, all in one place. Your data stays on your device.</span></p>
-    <a class="btn" href="/app/"><span data-l="tr">Kuş Atlası'nı aç</span><span data-l="en">Open Bird Atlas</span></a>
+    <h3 data-i="ctaH">Make your own bird map</h3>
+    <p style="margin:0" data-i="ctaP">Upload your eBird sightings: where and when you saw what, your lifers and charts, all in one place. Your data stays on your device.</p>
+    <a class="btn" href="/app/" data-i="ctaB">Open Bird Atlas</a>
   </div>
-  <p class="note"><span data-l="tr">Bu sayfadaki gözlemler bağlantının içinde taşınır ve yalnızca senin tarayıcında açılır; sunucumuza gönderilmez ve saklanmaz.</span><span data-l="en">The sightings on this page travel inside the link and are opened only in your browser; they are never sent to or stored on our server.</span> · <a href="/privacy/"><span data-l="tr">Gizlilik</span><span data-l="en">Privacy</span></a></p>
+  <p class="note"><span data-i="note">The sightings on this page travel inside the link and are opened only in your browser; they are never sent to or stored on our server.</span> · <a href="/privacy/" data-i="priv">Privacy</a></p>
 </main>
 <script src="/app/lib/leaflet/leaflet.js"></script>
+<script src="/app/lib/maplibre/maplibre-gl.js"></script>
+<script src="/app/lib/maplibre/leaflet-maplibre-gl.js"></script>
 <script>
-const MON = { tr: ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'], en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] };
-let L_ = 'tr', DATA = null, map = null;
+// Paylaşılan gözlemler sayfası: 6 dil (TR, EN, ES, PT, DE, FR) ve uygulamadaki sade harita
+const LOC = { tr: 'tr-TR', en: 'en-US', es: 'es-ES', pt: 'pt-BR', de: 'de-DE', fr: 'fr-FR' };
+const TX = {
+  brand:   ['Kuş Atlası', 'Bird Atlas', 'Bird Atlas', 'Bird Atlas', 'Bird Atlas', 'Bird Atlas'],
+  ctaH:    ['Kendi kuş haritanı oluştur', 'Make your own bird map', 'Crea tu propio mapa de aves', 'Crie seu próprio mapa de aves', 'Erstelle deine eigene Vogelkarte', 'Créez votre propre carte d\'oiseaux'],
+  ctaP:    ['eBird gözlemlerini yükle; nerede, ne zaman ne gördüğün, kertiklerin ve grafiklerin tek yerde. Verilerin cihazında kalır.',
+            'Upload your eBird sightings: where and when you saw what, your lifers and charts, all in one place. Your data stays on your device.',
+            'Sube tus avistamientos de eBird: dónde y cuándo viste qué, tus lifers y gráficos, todo en un solo lugar. Tus datos se quedan en tu dispositivo.',
+            'Envie suas observações do eBird: onde e quando você viu o quê, seus lifers e gráficos, tudo em um só lugar. Seus dados ficam no seu aparelho.',
+            'Lade deine eBird-Beobachtungen hoch: wo und wann du was gesehen hast, deine Lifer und Diagramme, alles an einem Ort. Deine Daten bleiben auf deinem Gerät.',
+            'Importez vos observations eBird : où et quand vous avez vu quoi, vos lifers et graphiques, tout au même endroit. Vos données restent sur votre appareil.'],
+  ctaB:    ['Kuş Atlası\'nı aç', 'Open Bird Atlas', 'Abrir Bird Atlas', 'Abrir o Bird Atlas', 'Bird Atlas öffnen', 'Ouvrir Bird Atlas'],
+  note:    ['Bu sayfadaki gözlemler bağlantının içinde taşınır ve yalnızca senin tarayıcında açılır; sunucumuza gönderilmez ve saklanmaz.',
+            'The sightings on this page travel inside the link and are opened only in your browser; they are never sent to or stored on our server.',
+            'Los avistamientos de esta página viajan dentro del enlace y solo se abren en tu navegador; nunca se envían ni se guardan en nuestro servidor.',
+            'As observações desta página viajam dentro do link e só são abertas no seu navegador; nunca são enviadas nem guardadas no nosso servidor.',
+            'Die Beobachtungen auf dieser Seite stecken im Link und werden nur in deinem Browser geöffnet; sie werden nie an unseren Server gesendet oder dort gespeichert.',
+            'Les observations de cette page voyagent dans le lien et ne s\'ouvrent que dans votre navigateur ; elles ne sont jamais envoyées ni stockées sur notre serveur.'],
+  priv:    ['Gizlilik', 'Privacy', 'Privacidad', 'Privacidade', 'Datenschutz', 'Confidentialité'],
+  bad:     ['Bu bağlantı açılamadı.', 'This link could not be opened.', 'No se pudo abrir este enlace.', 'Não foi possível abrir este link.', 'Dieser Link konnte nicht geöffnet werden.', 'Impossible d\'ouvrir ce lien.'],
+  cut:     ['Bağlantının yalnızca bir kısmı ulaştı (%{0}). Bağlantıyı gönderdiğin ya da açtığın uygulama uzun bağlantıyı kısaltmış olabilir. Paylaşan kişi bağlantıyı "Kopyala" ile kopyalayıp başka bir uygulamadan (ör. e-posta, Telegram) göndermeyi deneyebilir.',
+            'Only part of the link arrived ({0}%). The app used to send or open it may have shortened the long link. The sender can copy it with "Copy" and try another app (e.g. email, Telegram).',
+            'Solo llegó una parte del enlace ({0} %). La app con la que se envió o abrió puede haber acortado el enlace largo. Quien lo compartió puede copiarlo con «Copiar» y probar con otra app (p. ej. correo, Telegram).',
+            'Só uma parte do link chegou ({0}%). O app usado para enviar ou abrir pode ter encurtado o link longo. Quem compartilhou pode copiá-lo com "Copiar" e tentar outro app (ex.: e-mail, Telegram).',
+            'Nur ein Teil des Links ist angekommen ({0} %). Die App zum Senden oder Öffnen hat den langen Link vielleicht gekürzt. Der Absender kann ihn mit „Kopieren“ kopieren und eine andere App (z. B. E-Mail, Telegram) probieren.',
+            'Seule une partie du lien est arrivée ({0} %). L\'appli utilisée pour l\'envoyer ou l\'ouvrir a peut-être raccourci le lien. L\'expéditeur peut le copier avec « Copier » et essayer une autre appli (p. ex. e-mail, Telegram).'],
+  partial: ['Bağlantı eksik kopyalanmış olabilir; paylaşan kişiden yeniden göndermesini iste.', 'The link may have been copied incompletely; ask the sender to share it again.', 'Puede que el enlace se haya copiado incompleto; pide a quien lo compartió que lo envíe de nuevo.', 'O link pode ter sido copiado incompleto; peça a quem compartilhou para enviar de novo.', 'Der Link wurde vielleicht unvollständig kopiert; bitte den Absender, ihn erneut zu schicken.', 'Le lien a peut-être été copié incomplètement ; demandez à l\'expéditeur de le renvoyer.'],
+  recv:    ['Ulaşan uzunluk', 'Received length', 'Longitud recibida', 'Tamanho recebido', 'Empfangene Länge', 'Longueur reçue'],
+  myObs:   ['Kuş gözlemlerim', 'My bird sightings', 'Mis avistamientos de aves', 'Minhas observações de aves', 'Meine Vogelbeobachtungen', 'Mes observations d\'oiseaux'],
+  by:      ['paylaşan', 'shared by', 'compartido por', 'compartilhado por', 'geteilt von', 'partagé par'],
+  sp:      ['tür', 'species', 'especies', 'espécies', 'Arten', 'espèces'],
+  day:     ['gün', 'day', 'día', 'dia', 'Tag', 'jour'],
+  days:    ['gün', 'days', 'días', 'dias', 'Tage', 'jours'],
+  place:   ['yer', 'place', 'lugar', 'local', 'Ort', 'site'],
+  places:  ['yer', 'places', 'lugares', 'locais', 'Orte', 'sites'],
+  obs:     ['gözlem', 'sightings', 'avistamientos', 'observações', 'Beobachtungen', 'observations'],
+  hidden:  ['Paylaşan kişi konumları gizlemiş.', 'The sender hid the locations.', 'Quien lo compartió ocultó las ubicaciones.', 'Quem compartilhou ocultou os locais.', 'Der Absender hat die Orte verborgen.', 'L\'expéditeur a masqué les lieux.'],
+  lifers:  ['Kertikler (ilk görülen türler)', 'Lifers (first sightings)', 'Lifers (primeros avistamientos)', 'Lifers (primeiras observações)', 'Lifer (Erstbeobachtungen)', 'Lifers (premières observations)'],
+  species: ['Türler', 'Species', 'Especies', 'Espécies', 'Arten', 'Espèces'],
+  birds:   ['birey', 'birds', 'ejemplares', 'indivíduos', 'Individuen', 'individus']
+};
+const LI = { tr: 0, en: 1, es: 2, pt: 3, de: 4, fr: 5 };
+let L_ = 'en', DATA = null, map = null;
+const t = (k, ...a) => String(TX[k][LI[L_]] ?? TX[k][1]).replace(/\{(\d)\}/g, (_, n) => a[n]);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const T = (tr, en) => L_ === 'en' ? en : tr;
-function dateOf(n) { let d = new Date(Date.UTC(2000, 0, 1) + n * 86400000); return `${d.getUTCDate()} ${MON[L_][d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
+function dateOf(n) { let d = new Date(Date.UTC(2000, 0, 1) + n * 86400000); return new Intl.DateTimeFormat(LOC[L_], { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(d).replace(/ de /g, ' '); }
 async function unpack(h) {
   let pre = h[0], b64 = h.slice(1).replace(/-/g, '+').replace(/_/g, '/');
   let bin = atob(b64), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
   if (pre === 'z') { let s = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(await new Response(s).text()); }
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-function spName(s) { return s.length < 3 ? (s[1] || s[0]) : ((L_ === 'en' ? s[2] : s[1]) || s[2] || s[1] || s[0]); }
+// Tür adı: bağlantıda paylaşanın dilindeki ad gelir (v2: [bilimsel, ad]); eski biçim [bilimsel, tr, en]
+function spName(s) { return s.length < 3 ? (s[1] || s[0]) : ((L_ === 'tr' ? s[1] : s[2]) || s[2] || s[1] || s[0]); }
 // v2: o = [günFarkı, [[yer, tür | [tür, birey], ...], ...], ...] → v1 biçimine aç
 function flatObs(D) {
   if (D.v !== 2) return D.o;
@@ -82,15 +138,41 @@ function flatObs(D) {
   for (let i = 0; i < D.o.length; i += 2) { dn += D.o[i]; (D.o[i + 1] || []).forEach(g => { let pi = g[0]; g.slice(1).forEach(x => out.push(Array.isArray(x) ? [x[0], pi, dn, x[1]] : [x, pi, dn, 0])); }); }
   return out;
 }
+// Harita: uygulamadaki gibi sade (OpenFreeMap Positron; il/deniz sınırları ve dükkan simgeleri yok), olmazsa OSM
+function webglOK() { try { let c = document.createElement('canvas'); return !!(c.getContext('webgl') || c.getContext('experimental-webgl')); } catch (e) { return false; } }
+function addBase(m) {
+  const raster = () => L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '© OpenStreetMap' }).addTo(m);
+  if (!(window.maplibregl && L.maplibreGL && webglOK())) return raster();
+  try {
+    let v = L.maplibreGL({ style: 'https://tiles.openfreemap.org/styles/positron', attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' }).addTo(m);
+    let g = v.getMaplibreMap(), done = false;
+    const fb = () => { if (done) return; done = true; try { m.removeLayer(v); } catch (e) {} raster(); };
+    let tm = setTimeout(() => { if (!g.isStyleLoaded()) fb(); }, 12000);
+    g.once('load', () => {
+      clearTimeout(tm);
+      g.getStyle().layers.forEach(l => {
+        let src = l['source-layer'];
+        try {
+          if (src === 'boundary') {
+            let f = JSON.stringify(l.filter || []), lv = [...f.matchAll(/admin_level"\]?,\s*(\d+)/g)].map(x => +x[1]);
+            if (lv.length && Math.min(...lv) >= 3) g.setLayoutProperty(l.id, 'visibility', 'none');
+            else { try { g.setFilter(l.id, l.filter ? ['all', l.filter, ['!=', 'maritime', 1]] : ['!=', 'maritime', 1]); } catch (e) { g.setFilter(l.id, ['all', l.filter || true, ['!=', ['get', 'maritime'], 1]]); } }
+          }
+          if (src === 'poi' || /shield/i.test(l.id)) g.setLayoutProperty(l.id, 'visibility', 'none');
+          if (l.type === 'symbol' && l.layout && l.layout['text-field'] && src !== 'transportation_name') g.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:' + L_], ['get', 'name:latin'], ['get', 'name']]);
+        } catch (e) {}
+      });
+    });
+    g.on('error', ev => { if (!g.isStyleLoaded() && ev && ev.error && /style/i.test(String(ev.error.message || ''))) { clearTimeout(tm); fb(); } });
+  } catch (e) { raster(); }
+}
 let LINK_INFO = null;
 function render() {
   let out = document.getElementById('out');
   if (!DATA) {
     let I = LINK_INFO || {}, cut = I.want && I.got < I.want;
-    out.innerHTML = `<div class="err"><b>${T('Bu bağlantı açılamadı.', 'This link could not be opened.')}</b><br>${cut
-      ? T(`Bağlantının yalnızca bir kısmı ulaştı (%${Math.round(I.got / I.want * 100)}). Bağlantıyı gönderdiğin ya da açtığın uygulama uzun bağlantıyı kısaltmış olabilir. Paylaşan kişi bağlantıyı "Kopyala" ile kopyalayıp başka bir uygulamadan (ör. e-posta, Telegram) göndermeyi deneyebilir.`, `Only part of the link arrived (${Math.round(I.got / I.want * 100)}%). The app used to send or open it may have shortened the long link. The sender can copy it with "Copy" and try another app (e.g. email, Telegram).`)
-      : T('Bağlantı eksik kopyalanmış olabilir; paylaşan kişiden yeniden göndermesini iste.', 'The link may have been copied incompletely; ask the sender to share it again.')}
-      <div style="font-size:12px; color:#8a97a8; margin-top:6px;">${T('Ulaşan uzunluk', 'Received length')}: ${I.got || 0}${I.want ? ' / ' + I.want : ''}</div></div>`;
+    out.innerHTML = `<div class="err"><b>${t('bad')}</b><br>${cut ? t('cut', Math.round(I.got / I.want * 100)) : t('partial')}
+      <div style="font-size:12px; color:#8a97a8; margin-top:6px;">${t('recv')}: ${I.got || 0}${I.want ? ' / ' + I.want : ''}</div></div>`;
     return;
   }
   let D = DATA;
@@ -99,28 +181,33 @@ function render() {
   D.o.forEach(([si, pi, dn, b]) => { days.add(dn); let a = spAgg[si]; a.n++; a.b += b || 0; a.d.add(dn); a.first = Math.min(a.first, dn); if (pi >= 0) { plAgg[pi].sp.add(si); plAgg[pi].n++; } });
   let dl = [...days].sort((a, b) => a - b), range = dl.length ? (dl.length === 1 ? dateOf(dl[0]) : `${dateOf(dl[0])} – ${dateOf(dl[dl.length - 1])}`) : '';
   let order = D.s.map((s, i) => i).sort((a, b) => D.k === 'lifer' ? spAgg[a].first - spAgg[b].first : (spAgg[b].n - spAgg[a].n || spName(D.s[a]).localeCompare(spName(D.s[b]), L_)));
-  let title = D.t || T('Kuş gözlemlerim', 'My bird sightings');
+  let title = D.t || t('myObs');
   out.innerHTML = `<h1>${esc(title)}</h1>
-    <div class="by">${esc(range)}${D.g ? ` · ${T('paylaşan', 'shared by')} ${esc(D.g)}` : ''}</div>
-    <div class="stats"><span><b>${D.s.length}</b> ${T('tür', 'species')}</span><span><b>${days.size}</b> ${T('gün', days.size === 1 ? 'day' : 'days')}</span>${D.p.length ? `<span><b>${D.p.length}</b> ${T('yer', D.p.length === 1 ? 'place' : 'places')}</span>` : ''}<span><b>${D.o.length}</b> ${T('gözlem', 'sightings')}</span></div>
-    ${D.p.some(p => p[1] != null) ? '<div id="map" role="img" aria-label="map"></div>' : `<p class="by">${T('Paylaşan kişi konumları gizlemiş.', 'The sender hid the locations.')}</p>`}
-    <h2>${D.k === 'lifer' ? T('Kertikler (ilk görülen türler)', 'Lifers (first sightings)') : T('Türler', 'Species')}</h2>
-    <ol class="sp">${order.map((i, k) => { let s = D.s[i], a = spAgg[i]; return `<li><div>${D.k === 'lifer' ? `<b>${k + 1}.</b> ` : ''}${esc(spName(s))}<div class="sci">${esc(s[0])}</div></div><div class="meta">${D.k === 'lifer' ? dateOf(a.first) : `${a.d.size} ${T('gün', a.d.size === 1 ? 'day' : 'days')}${a.b ? `<br>${a.b.toLocaleString(L_)} ${T('birey', 'birds')}` : ''}`}</div></li>`; }).join('')}</ol>`;
+    <div class="by">${esc(range)}${D.g ? ` · ${t('by')} ${esc(D.g)}` : ''}</div>
+    <div class="stats"><span><b>${D.s.length}</b> ${t('sp')}</span><span><b>${days.size}</b> ${t(days.size === 1 ? 'day' : 'days')}</span>${D.p.length ? `<span><b>${D.p.length}</b> ${t(D.p.length === 1 ? 'place' : 'places')}</span>` : ''}<span><b>${D.o.length}</b> ${t('obs')}</span></div>
+    ${D.p.some(p => p[1] != null) ? '<div id="map" role="img" aria-label="map"></div>' : `<p class="by">${t('hidden')}</p>`}
+    <h2>${D.k === 'lifer' ? t('lifers') : t('species')}</h2>
+    <ol class="sp">${order.map((i, k) => { let s = D.s[i], a = spAgg[i]; return `<li><div>${D.k === 'lifer' ? `<b>${k + 1}.</b> ` : ''}${esc(spName(s))}<div class="sci">${esc(s[0])}</div></div><div class="meta">${D.k === 'lifer' ? dateOf(a.first) : `${a.d.size} ${t(a.d.size === 1 ? 'day' : 'days')}${a.b ? `<br>${a.b.toLocaleString(LOC[L_])} ${t('birds')}` : ''}`}</div></li>`; }).join('')}</ol>`;
   if (document.getElementById('map') && window.L) {
     if (map) { map.remove(); map = null; }
     map = L.map('map', { scrollWheelZoom: false });
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '© OpenStreetMap' }).addTo(map);
+    addBase(map);
     let pts = [], max = Math.max(1, ...plAgg.map(p => p.sp.size));
-    D.p.forEach((p, i) => { if (p[1] == null) return; let n = plAgg[i].sp.size, t = n / max;
-      let col = t > .75 ? '#E74C3C' : t > .5 ? '#FED008' : t > .25 ? '#2ECC71' : '#1662B6';
-      L.circleMarker([p[1], p[2]], { radius: 7 + 14 * t, color: '#10325C', weight: 1.5, fillColor: col, fillOpacity: .75 }).addTo(map).bindPopup(`<b>${esc(p[0])}</b><br>${n} ${T('tür', 'species')}`);
+    D.p.forEach((p, i) => { if (p[1] == null) return; let n = plAgg[i].sp.size, tt = n / max;
+      let col = tt > .75 ? '#E74C3C' : tt > .5 ? '#FED008' : tt > .25 ? '#2ECC71' : '#1662B6';
+      L.circleMarker([p[1], p[2]], { radius: 7 + 14 * tt, color: '#10325C', weight: 1.5, fillColor: col, fillOpacity: .75 }).addTo(map).bindPopup(`<b>${esc(p[0])}</b><br>${n} ${t('sp')}`);
       pts.push([p[1], p[2]]); });
     if (pts.length === 1) map.setView(pts[0], 10); else map.fitBounds(pts, { padding: [30, 30], maxZoom: 11 });
   }
 }
 function setLang(l) {
-  L_ = l; document.documentElement.lang = l; document.documentElement.dataset.lang = l;
-  document.querySelectorAll('.langs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+  if (!(l in LI)) l = 'en';
+  L_ = l; document.documentElement.lang = l;
+  document.querySelectorAll('[data-i]').forEach(e => { e.textContent = t(e.dataset.i); });
+  document.querySelectorAll('.langs nav button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+  document.querySelector('.langs .cur').textContent = l.toUpperCase();
+  document.querySelector('.langs').open = false;
+  document.title = `${t('brand')} – ${t('myObs')}`;
   try { localStorage.setItem('app_lang', l); } catch (e) {}
   render();
 }
@@ -133,9 +220,11 @@ function setLang(l) {
   else LINK_INFO = { got: h.length };
   try { if (h) DATA = await unpack(h); } catch (e) { DATA = null; }
   let saved = null; try { saved = localStorage.getItem('app_lang'); } catch (e) {}
-  setLang(saved || (DATA && DATA.l) || ((navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en'));
+  let nav = (navigator.language || 'en').toLowerCase().slice(0, 2);
+  setLang(saved || (nav in LI ? nav : null) || (DATA && DATA.l) || 'en');
 })();
-document.querySelectorAll('.langs button').forEach(b => b.onclick = () => setLang(b.dataset.set));
+document.querySelectorAll('.langs nav button').forEach(b => b.onclick = () => setLang(b.dataset.set));
+document.addEventListener('click', e => { let d = document.querySelector('.langs'); if (d.open && !d.contains(e.target)) d.open = false; });
 </script>
 </body>
 </html>
