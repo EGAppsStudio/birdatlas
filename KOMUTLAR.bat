@@ -16,6 +16,7 @@ echo   5  Sadece sync                 (dosyalari Android projesine aktar)
 echo   6  Paketleri kur / guncelle    (npm install)
 echo   7  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari ister)
 echo   8  Magaza GORSELLERI yukle     (ikon + ekran goruntuleri + one cikan gorsel)
+echo   9  Magaza ekran goruntulerini cek (6 dil x 10 ekran; sonra Commit + Push)
 echo.
 echo   0  Cikis
 echo.
@@ -29,6 +30,7 @@ if "%SEC%"=="5" goto sync
 if "%SEC%"=="6" goto install
 if "%SEC%"=="7" goto taksonomi
 if "%SEC%"=="8" goto gorsel
+if "%SEC%"=="9" goto ekranlar
 if "%SEC%"=="0" exit /b 0
 goto menu
 
@@ -56,6 +58,13 @@ goto bitti
 :gorsel
 echo.
 call npm run magaza -- --gorsel
+if errorlevel 1 goto hata
+goto bitti
+
+:ekranlar
+echo.
+echo  Birkac dakika surer; bilgisayar bu sirada kullanilabilir.
+call npm run ekranlar
 if errorlevel 1 goto hata
 goto bitti
 
