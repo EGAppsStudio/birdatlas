@@ -2,6 +2,15 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <script>
+    // Ek diller (ES, PT, DE, FR): sözlük dosyası uygulamadan önce yüklenir
+    (function () {
+        var I18N_V = '', l = null, X = ['es', 'pt', 'de', 'fr']; window.I18N_V = I18N_V;
+        try { l = localStorage.getItem('app_lang'); } catch (e) {}
+        if (!l) { var n = (navigator.language || '').toLowerCase().slice(0, 2); if (X.indexOf(n) >= 0) l = n; }
+        if (X.indexOf(l) >= 0) document.write('<script src="i18n/' + l + '.js' + (I18N_V ? '?v=' + I18N_V : '') + '"><\/script>');
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0A3E70">
     <link rel="manifest" href="manifest.webmanifest">
@@ -170,9 +179,10 @@
         /* Tur açıkken dil zaten Maviş'in kartında seçiliyor: sağ üstteki dil düğmesi gizli */
         body:has(#tour[style*="display: block"]) :is(#lang-toggle, #lang-menu) { display: none !important; }
         #sa-probe { position: fixed; left: -9999px; top: 0; width: 1px; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); visibility: hidden; pointer-events: none; }
-        #tour .tl { display: flex; gap: 8px; margin-top: 10px; }
-        #tour .tl button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 10px; border: 1.5px solid #cfd8e3; background: #fff; font: inherit; font-size: 13.5px; color: #0A3E70; cursor: pointer; }
+        #tour .tl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+        #tour .tl button { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 4px; white-space: nowrap; overflow: hidden; border-radius: 10px; border: 1.5px solid #cfd8e3; background: #fff; font: inherit; font-size: 13.5px; color: #0A3E70; cursor: pointer; }
         #tour .tl button.on { border-color: #1662B6; background: #EAF2FC; font-weight: bold; }
+        #tour .tl button { font-size: 12.5px; }
         #tour .tback { padding: 7px 10px; }
         /* Tek "Son 30 gün" listesi: Keşfet sekmesinde, açılıp kapanabilir; eski harita üstü kutu kullanılmıyor */
         #explore-dock { display: none !important; }
@@ -308,6 +318,7 @@
         #tabbar .tb b { display: block; font-size: 17px; font-weight: normal; line-height: 1.25; }
         #tabbar .tb span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         #tabbar .tb.on { background: #1662B6; color: #fff; }
+        #tabbar .tb span.lg { white-space: normal; font-size: 8.6px; line-height: 1.08; text-overflow: clip; letter-spacing: -0.15px; hyphens: auto; }   /* uzun sekme adı (ör. Mis avistamientos) iki satıra iner */
         #menu-btn { position: fixed; z-index: 999998; top: calc(88px + env(safe-area-inset-top)); right: calc(25px + env(safe-area-inset-right)); width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #1662B6;
             border: 2px solid #1662B6; font-size: 22px; line-height: 1; place-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 0; }
         #menu-btn.on { background: #1662B6; color: #fff; }
@@ -668,9 +679,70 @@
 
         // ===== Dil (TR / EN) =====
         // Arayüz Türkçe yazıldı; EN seçiliyken ekrana eklenen her metin aşağıdaki sözlükle anında çevrilir.
-        var LANG = (() => { try { return localStorage.getItem('app_lang') || ((navigator.language || 'tr').toLowerCase().startsWith('tr') ? 'tr' : 'en'); } catch (e) { return 'tr'; } })();
-        function LT(tr, en) { return LANG === 'en' ? en : tr; }
-        function trSpecies(name) { return (LANG === 'en' && trToEnName && trToEnName[name]) || name; }
+        // Diller: TR (kaynak) · EN · ES · PT · DE · FR. ES/PT/DE/FR çevirileri İngilizce metni anahtar alır: www/i18n/<dil>.js
+        const XL = ['es', 'pt', 'de', 'fr'];
+        const LOCALE = { tr: 'tr-TR', en: 'en-US', es: 'es-ES', pt: 'pt-BR', de: 'de-DE', fr: 'fr-FR' };
+        const LANG_NAMES = { tr: 'Türkçe', en: 'English', es: 'Español', pt: 'Português', de: 'Deutsch', fr: 'Français' };
+        var LANG = (() => {
+            try {
+                let s = localStorage.getItem('app_lang'); if (s && LOCALE[s]) return s;
+                let n = (navigator.language || 'tr').toLowerCase().slice(0, 2);
+                return n === 'tr' ? 'tr' : XL.includes(n) ? n : 'en';
+            } catch (e) { return 'tr'; }
+        })();
+        if (XL.includes(LANG) && !window['I18N_' + LANG.toUpperCase()]) LANG = 'en';   // dil dosyası yüklenemediyse İngilizce
+        const isTR = () => LANG === 'tr';
+        const loc = () => LOCALE[LANG] || 'en-US';
+        // İngilizce metni seçili ek dile çevirir: önce birebir, sonra {0} yer tutuculu kalıplar
+        const _trCache = {};
+        let _pat = null, _patLang = null;
+        function trans(en) {
+            if (!XL.includes(LANG) || en == null) return en;
+            en = String(en);
+            const D = window['I18N_' + LANG.toUpperCase()]; if (!D) return en;
+            if (Object.prototype.hasOwnProperty.call(D, en)) return D[en];
+            const C = _trCache[LANG] || (_trCache[LANG] = new Map());
+            if (C.has(en)) return C.get(en);
+            if (_patLang !== LANG) {
+                _patLang = LANG; _pat = [];
+                for (const k in D) {
+                    if (!/\{\d+\}/.test(k)) continue;
+                    let lits = k.split(/\{\d+\}/), order = [...k.matchAll(/\{(\d+)\}/g)].map(m => +m[1]);
+                    let lit = lits.reduce((a, b) => b.length > a.length ? b : a, '');
+                    if (lit.replace(/[^A-Za-z]/g, '').length < 2) continue;
+                    let re = new RegExp('^' + lits.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('([\\s\\S]*?)') + '$');
+                    _pat.push({ re, lit, order, to: D[k] });
+                }
+                _pat.sort((a, b) => b.lit.length - a.lit.length);
+            }
+            let out = en;
+            for (const p of _pat) {
+                if (!en.includes(p.lit)) continue;
+                let m = p.re.exec(en); if (!m) continue;
+                let vals = {}; p.order.forEach((n, i) => { vals[n] = m[i + 1]; });
+                out = p.to.replace(/\{(\d+)\}/g, (_, n) => vals[n] !== undefined ? vals[n] : '');
+                break;
+            }
+            if (C.size < 5000) C.set(en, out);
+            return out;
+        }
+        function LT(tr, en) { return LANG === 'tr' ? tr : LANG === 'en' ? en : trans(en); }
+        function LTen(tr, en) { return LANG === 'tr' ? tr : en; }   // çevrilmeyecek metin (ör. yapay zekâ talimatı)
+        function trSpecies(name) { return (LANG !== 'tr' && trToEnName && trToEnName[name]) ? spLocal(trToEnName[name]) : name; }
+        // Ek dillerde tür adı (eBird taksonomisinden, data/ebird-names-<dil>.json); yoksa İngilizce ad
+        let LOC_NAMES = {}, LOC_NAMES_LANG = null, enToSciMap = null;
+        function spLocal(enName) {
+            if (!XL.includes(LANG) || !enName) return enName;
+            if (!enToSciMap && typeof enNameMap !== 'undefined') { enToSciMap = {}; for (const k in enNameMap) enToSciMap[enNameMap[k]] = k; if (typeof obsData !== 'undefined') obsData.forEach(d => { if (d.en_name) enToSciMap[d.en_name] = d.sci_name; }); }
+            let sci = enToSciMap && enToSciMap[enName];
+            return (sci && LOC_NAMES[sci]) || enName;
+        }
+        async function loadLocNames() {
+            if (!XL.includes(LANG) || LOC_NAMES_LANG === LANG) return false;
+            LOC_NAMES = {}; LOC_NAMES_LANG = LANG; enToSciMap = null;
+            try { let r = await fetch(`data/ebird-names-${LANG}.json?v=${APP_VERSION}`); if (r.ok) { LOC_NAMES = await r.json(); return true; } } catch (e) {}
+            return false;
+        }
 
         const I18N_EXACT = {
             "☰ Panelleri Göster": "☰ Show Panels", "✕ Panelleri Gizle": "✕ Hide Panels",
@@ -744,8 +816,7 @@
             [/^Son Yükleme: (.*)$/, 'Last Upload: $1'], [/^Fotoğraflar İndiriliyor \((\d+)\/(\d+)\)\.\.\.$/, 'Downloading Photos ($1/$2)...'],
             [/^Dosya okunamadı: (.*)$/, 'Could not read file: $1'], [/^Hata: (.*)$/, 'Error: $1'], [/^(.*), Türkiye$/, '$1, Turkey']
         ];
-        function tx(str) {
-            if (LANG !== 'en' || !str) return str;
+        function txEn(str) {
             if (Object.prototype.hasOwnProperty.call(I18N_EXACT, str)) return I18N_EXACT[str];
             for (const [re, rp] of I18N_RULES) if (re.test(str)) return str.replace(re, rp);
             if (trToEnName) {
@@ -753,6 +824,14 @@
                 let m = str.match(/^(.*) 🔗$/); if (m && trToEnName[m[1]]) return trToEnName[m[1]] + ' 🔗';
             }
             return str;
+        }
+        function tx(str) {
+            if (LANG === 'tr' || !str) return str;
+            let en = txEn(str);
+            if (LANG === 'en') return en;
+            if (trToEnName && trToEnName[str]) return spLocal(en);
+            let m = /^(.*) 🔗$/.exec(str); if (m && trToEnName && trToEnName[m[1]]) return spLocal(trToEnName[m[1]]) + ' 🔗';
+            return trans(en);
         }
         function i18nSkip(el) { return !el || (el.closest && el.closest('[data-no-i18n], script, style')); }
         function translateText(n) {
@@ -772,7 +851,7 @@
             });
         }
         function translateTree(root) {
-            if (LANG !== 'en' || !root) return;
+            if (LANG === 'tr' || !root) return;
             if (root.nodeType === 3) return translateText(root);
             if (root.nodeType !== 1) return;
             translateAttrs(root);
@@ -786,7 +865,7 @@
             document.querySelectorAll('[placeholder], [title]').forEach(el => { if (el.__i18nAttr) { for (let a in el.__i18nAttr) el.setAttribute(a, el.__i18nAttr[a]); el.__i18nAttr = null; } });
         }
         const i18nObserver = new MutationObserver(muts => {
-            if (LANG !== 'en') return;
+            if (LANG === 'tr') return;
             muts.forEach(m => {
                 if (m.type === 'characterData') translateText(m.target);
                 else if (m.type === 'attributes') translateAttrs(m.target);
@@ -819,16 +898,32 @@
             if (c === 'tr') return W('0 0 30 20', '<rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="16.2,10 19.9,8.8 17.6,11.9 17.6,8.1 19.9,11.2"/>');
             if (c === 'en') return W('0 0 60 30', '<rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#C8102E" stroke-width="2"/><path d="M30,0V30M0,15H60" stroke="#fff" stroke-width="10"/><path d="M30,0V30M0,15H60" stroke="#C8102E" stroke-width="6"/>');
             if (c === 'es') return W('0 0 30 20', '<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>');
+            if (c === 'pt') return W('0 0 30 20', '<rect width="30" height="20" fill="#009C3B"/><polygon points="15,2.5 27.5,10 15,17.5 2.5,10" fill="#FFDF00"/><circle cx="15" cy="10" r="4.2" fill="#002776"/>');
+            if (c === 'de') return W('0 0 30 20', '<rect width="30" height="20" fill="#FFCE00"/><rect width="30" height="13.33" fill="#DD0000"/><rect width="30" height="6.67" fill="#000"/>');
+            if (c === 'fr') return W('0 0 30 20', '<rect width="30" height="20" fill="#EF4135"/><rect width="20" height="20" fill="#fff"/><rect width="10" height="20" fill="#0055A4"/>');
             if (c === 'ru') return W('0 0 30 20', '<rect width="30" height="20" fill="#fff"/><rect y="6.67" width="30" height="6.67" fill="#0039A6"/><rect y="13.33" width="30" height="6.67" fill="#D52B1E"/>');
             if (c === 'ar') return W('0 0 30 20', '<rect width="30" height="20" fill="#006C35"/><rect x="8" y="12" width="14" height="1.4" rx=".7" fill="#fff"/><rect x="9" y="6.5" width="12" height="3" rx="1" fill="#fff" opacity=".85"/>');
             return '';
         }
-        function updateLangBtn() { let b = document.getElementById('lang-toggle'); if (b) b.innerHTML = LANG === 'en' ? flagSvg('en') + ' EN ▾' : flagSvg('tr') + ' TR ▾'; if (window.renderNav) { renderNav(); closeMainMenu(); } }
-        window.setLang = function(l) {
+        function updateLangBtn() { let b = document.getElementById('lang-toggle'); if (b) b.innerHTML = flagSvg(LANG) + ' ' + LANG.toUpperCase() + ' ▾'; if (window.renderNav) { renderNav(); closeMainMenu(); } }
+        // Ek dilin sözlük dosyasını (www/i18n/<dil>.js) gerektiğinde yükler
+        function loadLangFile(l) {
+            return new Promise(res => {
+                if (!XL.includes(l) || window['I18N_' + l.toUpperCase()]) return res(true);
+                let sc = document.createElement('script'); sc.src = `i18n/${l}.js` + (window.I18N_V ? `?v=${window.I18N_V}` : "");
+                sc.onload = () => res(!!window['I18N_' + l.toUpperCase()]); sc.onerror = () => res(false);
+                document.head.appendChild(sc);
+            });
+        }
+        window.setLang = async function(l) {
+            if (!LOCALE[l]) l = 'en';
+            if (XL.includes(l) && !(await loadLangFile(l))) { alert('Language file could not be loaded.'); return; }
             LANG = l; try { localStorage.setItem('app_lang', l); } catch (e) {}
             document.documentElement.lang = l;
+            await loadLocNames();
+            if (XL.includes(l)) obsData.forEach(d => { d.loc_name = LOC_NAMES[d.sci_name] || ''; });
             updateLangBtn();
-            if (l === 'en') translateTree(document.body); else revertTree();
+            revertTree(); if (l !== 'tr') translateTree(document.body);
             chatHistory = [];   // önceki dilde başlayan yapay zekâ sohbeti karışmasın
             obsData.forEach(d => { d.province = provinceLabel(d.prov_code || ''); });
             selectedProvince = null;
@@ -992,7 +1087,7 @@
             ]}
         };
         window.openGuide = function() {
-            let g = GUIDE[LANG === 'en' ? 'en' : 'tr'];
+            let g = guideFor();
             document.getElementById('guide-title').textContent = g.title;
             document.getElementById('guide-body').innerHTML = g.sections.map((sec, i) =>
                 `<details${i === 0 ? ' open' : ''}><summary>${sec[0]}</summary><ul>${sec[1].map(li => `<li>${li}</li>`).join('')}</ul></details>`
@@ -1086,6 +1181,9 @@
         // ===== Anahtarsız yerel asistan: soruları doğrudan verinden hesaplar =====
         function escHtml(t) { return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
         function normTxt(t) { return String(t || '').toLocaleLowerCase('tr').replace(/ı/g, 'i').normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+        // Kılavuz ek dillerde: İngilizce kılavuzun her metni sözlükten
+        function deepTrans(v) { return typeof v === 'string' ? trans(v) : Array.isArray(v) ? v.map(deepTrans) : (v && typeof v === 'object') ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, deepTrans(x)])) : v; }
+        function guideFor() { return LANG === 'tr' ? GUIDE.tr : LANG === 'en' ? GUIDE.en : deepTrans(GUIDE.en); }
         const SUGGESTIONS = {
             tr: ['En çok tür gördüğüm konum?', 'En sık gördüğüm kuşlar?', 'Son kertiklerim?', 'Bu yıl kaç tür gördüm?', 'En iyi günüm hangisi?', 'Tek seferde gördüğüm türler?', 'Genel özetim?',
                  'En verimli ayım hangisi?', 'Geçen yıl bugün ne gördüm?', 'Son gözlem günüm?', 'Hangi illerde gözlem yaptım?', 'Yıllara göre kertiklerim?', 'Bahar göçünde neler gördüm?', 'Bana bir kuş hatırlat', 'Neler sorabilirim?'],
@@ -1093,7 +1191,7 @@
                  'What is my best month?', 'What did I see on this day last year?', 'My last outing?', 'Which provinces have I birded?', 'Lifers by year?', 'What did I see in spring?', 'Remind me of a bird', 'What can I ask?']
         };
         function pickSuggestions(exclude) {
-            let list = SUGGESTIONS[LANG === 'en' ? 'en' : 'tr'].filter(x => x !== exclude);
+            let list = (LANG === 'tr' ? SUGGESTIONS.tr : SUGGESTIONS.en.map(trans)).filter(x => x !== exclude);
             for (let i = list.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
             let own = [];
             try {
@@ -1184,6 +1282,15 @@
             trNice: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
             enNice: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         };
+        // Ay adları seçili dilde (ES/PT/DE/FR için tarayıcının dil bilgisinden)
+        function mNice() {
+            if (LANG === 'tr') return MONTHS.trNice; if (LANG === 'en') return MONTHS.enNice;
+            return Array.from({ length: 12 }, (_, i) => { let t = new Intl.DateTimeFormat(loc(), { month: 'long' }).format(new Date(2020, i, 15)); return t.charAt(0).toLocaleUpperCase(loc()) + t.slice(1); });
+        }
+        function wdNames(short) {   // Pazartesi'den başlayarak
+            if (LANG === 'tr') return short ? ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'] : ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+            return Array.from({ length: 7 }, (_, i) => { let t = new Intl.DateTimeFormat(loc(), { weekday: short ? 'short' : 'long' }).format(new Date(2024, 0, 1 + i)); t = t.replace(/\.$/, ''); return t.charAt(0).toLocaleUpperCase(loc()) + t.slice(1); });
+        }
         const SEASONS = [
             { keys: ['ilkbahar', 'bahar', 'spring'], months: [3, 4, 5], tr: 'İlkbahar (Mart–Mayıs)', en: 'Spring (Mar–May)' },
             { keys: ['yaz', 'yazin', 'summer'], months: [6, 7, 8], tr: 'Yaz (Haziran–Ağustos)', en: 'Summer (Jun–Aug)' },
@@ -1191,7 +1298,29 @@
             { keys: ['kis', 'kisin', 'kislik', 'winter'], months: [12, 1, 2], tr: 'Kış (Aralık–Şubat)', en: 'Winter (Dec–Feb)' }
         ];
 
+        // ES/PT/DE/FR soruları: Maviş'in yerel çözümleyicisi TR/EN anlar; soruyu önce İngilizceye yaklaştır
+        const MAVIS_Q = {
+            es: [['mejor dia', 'best day'], ['mejor mes', 'best month'], ['mejor lugar', 'best location'], ['mejor sitio', 'best location'], ['mas especies', 'most species'], ['mas comunes', 'most common'], ['mas frecuentes', 'most frequent'], ['mas visitado', 'most visited'], ['ultimos lifers', 'latest lifers'], ['ultimo lifer', 'latest lifer'], ['primer lifer', 'first lifer'], ['primeros lifers', 'first lifer'], ['lifers por ano', 'lifers by year'], ['por ano', 'by year'], ['este ano', 'this year'], ['ano pasado', 'last year'], ['este dia', 'this day'], ['hoy', 'today'], ['ultima salida', 'last outing'], ['primera salida', 'first outing'], ['cuantas veces', 'how many times'], ['cuantos dias', 'how many days'], ['cuantas', 'how many'], ['cuantos', 'how many'], ['provincias', 'provinces'], ['regiones', 'provinces'], ['resumen', 'summary'], ['una sola vez', 'only once'], ['solo una vez', 'only once'], ['recuerdame', 'remind me'], ['que puedo preguntar', 'what can i ask'], ['hola', 'hello'], ['gracias', 'thanks'], ['quien eres', 'who are you'], ['fin de semana', 'weekend'], ['dia de la semana', 'day of the week'], ['semana pasada', 'last week'], ['esta semana', 'this week'], ['mes pasado', 'last month'], ['este mes', 'this month'], ['ayer', 'yesterday'], ['primavera', 'spring'], ['verano', 'summer'], ['otono', 'autumn'], ['invierno', 'winter'], ['donde vi', 'where did i see'], ['cuando vi por ultima vez', 'when did i last see'], ['cuando vi por primera vez', 'when did i first see'], ['he visto', 'have i seen'], ['bandada mas grande', 'largest flock'], ['conte', 'did i count'], ['raras', 'rare'], ['sorprendeme', 'surprise'], ['tarjeta', 'card'], ['compartir', 'share'], [' en ', ' in '], ['que vi', 'what did i see']],
+            pt: [['melhor dia', 'best day'], ['melhor mes', 'best month'], ['melhor local', 'best location'], ['mais especies', 'most species'], ['mais comuns', 'most common'], ['mais frequentes', 'most frequent'], ['mais visitado', 'most visited'], ['lifers mais recentes', 'latest lifers'], ['ultimos lifers', 'latest lifers'], ['primeiro lifer', 'first lifer'], ['lifers por ano', 'lifers by year'], ['por ano', 'by year'], ['neste ano', 'this year'], ['este ano', 'this year'], ['ano passado', 'last year'], ['neste dia', 'this day'], ['hoje', 'today'], ['ultima saida', 'last outing'], ['primeira saida', 'first outing'], ['quantas vezes', 'how many times'], ['quantos dias', 'how many days'], ['quantas', 'how many'], ['quantos', 'how many'], ['estados', 'provinces'], ['regioes', 'provinces'], ['resumo', 'summary'], ['so uma vez', 'only once'], ['uma unica vez', 'only once'], ['me lembre', 'remind me'], ['o que posso perguntar', 'what can i ask'], [' ola ', ' hello '], [' oi ', ' hello '], ['obrigad', 'thanks'], ['quem e voce', 'who are you'], ['fim de semana', 'weekend'], ['dia da semana', 'day of the week'], ['semana passada', 'last week'], ['esta semana', 'this week'], ['mes passado', 'last month'], ['este mes', 'this month'], ['ontem', 'yesterday'], ['primavera', 'spring'], ['verao', 'summer'], ['outono', 'autumn'], ['inverno', 'winter'], ['onde vi', 'where did i see'], ['quando vi pela ultima vez', 'when did i last see'], ['quando vi pela primeira vez', 'when did i first see'], ['ja vi', 'have i seen'], ['maior bando', 'largest flock'], ['contei', 'did i count'], ['raras', 'rare'], ['surpreenda', 'surprise'], ['cartao', 'card'], ['compartilhar', 'share'], ['o que vi', 'what did i see'], [' no ', ' in '], [' na ', ' in '], [' em ', ' in ']],
+            de: [['bester tag', 'best day'], ['besten tag', 'best day'], ['bester monat', 'best month'], ['besten monat', 'best month'], ['bester ort', 'best location'], ['meisten arten', 'most species'], ['haufigsten', 'most common'], ['meistbesucht', 'most visited'], ['neueste lifer', 'latest lifers'], ['neuesten lifer', 'latest lifers'], ['erster lifer', 'first lifer'], ['lifer nach jahr', 'lifers by year'], ['nach jahr', 'by year'], ['dieses jahr', 'this year'], ['letztes jahr', 'last year'], ['vor einem jahr', 'last year'], ['heute', 'today'], ['letzte exkursion', 'last outing'], ['erste exkursion', 'first outing'], ['wie oft', 'how many times'], ['wie viele tage', 'how many days'], ['wie viele', 'how many'], ['regionen', 'provinces'], ['bundeslander', 'provinces'], ['ubersicht', 'summary'], ['zusammenfassung', 'summary'], ['nur einmal', 'only once'], ['erinnere mich', 'remind me'], ['was kann ich fragen', 'what can i ask'], ['hallo', 'hello'], ['danke', 'thanks'], ['wer bist du', 'who are you'], ['wochenende', 'weekend'], ['wochentag', 'day of the week'], ['letzte woche', 'last week'], ['diese woche', 'this week'], ['letzten monat', 'last month'], ['diesen monat', 'this month'], ['gestern', 'yesterday'], ['fruhling', 'spring'], ['fruhjahr', 'spring'], ['sommer', 'summer'], ['herbst', 'autumn'], ['winter', 'winter'], ['was habe ich', 'what did i see'], ['wo habe ich', 'where did i see'], ['wann habe ich zuletzt', 'when did i last see'], ['wann habe ich zum ersten mal', 'when did i first see'], ['habe ich', 'have i seen'], ['grosster schwarm', 'largest flock'], ['grossten schwarm', 'largest flock'], ['gezahlt', 'did i count'], ['seltene', 'rare'], ['uberrasch', 'surprise'], ['karte', 'card'], ['teilen', 'share'], [' am ', ' at '], [' im ', ' in ']],
+            fr: [['meilleur jour', 'best day'], ['meilleur mois', 'best month'], ['meilleur site', 'best location'], ['plus d especes', 'most species'], ['plus courants', 'most common'], ['plus frequentes', 'most frequent'], ['plus visite', 'most visited'], ['derniers lifers', 'latest lifers'], ['dernier lifer', 'latest lifer'], ['premier lifer', 'first lifer'], ['lifers par annee', 'lifers by year'], ['par annee', 'by year'], ['cette annee', 'this year'], ['l an dernier', 'last year'], ['annee derniere', 'last year'], ['ce jour la', 'this day'], ['aujourd hui', 'today'], ['derniere sortie', 'last outing'], ['premiere sortie', 'first outing'], ['combien de fois', 'how many times'], ['combien de jours', 'how many days'], ['combien', 'how many'], ['regions', 'provinces'], ['departements', 'provinces'], ['resume', 'summary'], ['une seule fois', 'only once'], ['rappelle moi', 'remind me'], ['que puis je demander', 'what can i ask'], ['bonjour', 'hello'], ['salut', 'hello'], ['merci', 'thanks'], ['qui es tu', 'who are you'], ['week end', 'weekend'], ['jour de la semaine', 'day of the week'], ['semaine derniere', 'last week'], ['cette semaine', 'this week'], ['mois dernier', 'last month'], ['ce mois', 'this month'], [' hier ', ' yesterday '], ['printemps', 'spring'], [' ete ', ' summer '], ['automne', 'autumn'], ['hiver', 'winter'], ['qu ai je vu', 'what did i see'], ['ou ai je vu', 'where did i see'], ['quand ai je vu pour la derniere fois', 'when did i last see'], ['quand ai je vu pour la premiere fois', 'when did i first see'], ['ai je vu', 'have i seen'], ['plus grand groupe', 'largest flock'], ['ai je comptes', 'did i count'], ['comptes', 'did i count'], ['rares', 'rare'], ['surprends', 'surprise'], ['carte', 'card'], ['partager', 'share'], [' a ', ' at '], [' en ', ' in ']]
+        };
+        function toEnQuery(q) {
+            if (!XL.includes(LANG)) return q;
+            // Önerilen sorulardan biriyse doğrudan İngilizce aslı
+            let hit = SUGGESTIONS.en.find(e => trans(e) === q); if (hit) return hit;
+            let t = ' ' + normTxt(q).replace(/[’'´`\-]/g, ' ').replace(/[¿?¡!.,;:«»„“”"]/g, ' ').replace(/\s+/g, ' ') + ' ';
+            // Tür adları: yerel ad → İngilizce ad (uzundan kısaya)
+            let pairs = [];
+            (obsData || []).forEach(d => { let l = LOC_NAMES[d.sci_name]; if (l && d.en_name) pairs.push([normTxt(l), normTxt(d.en_name)]); });
+            [...new Map(pairs).entries()].sort((a, b) => b[0].length - a[0].length).forEach(([l, e]) => { if (t.includes(' ' + l + ' ')) t = t.split(' ' + l + ' ').join(' ' + e + ' '); });
+            // Ay adları → İngilizce
+            mNice().forEach((m, i) => { let k = normTxt(m); if (k) t = t.replace(new RegExp('\\b' + k + '\\b', 'g'), MONTHS.enNice[i].toLowerCase()); });
+            for (const [a, b] of (MAVIS_Q[LANG] || [])) t = t.split(a).join(b);
+            return t.trim();
+        }
         function localAssistant(question) {
+            question = toEnQuery(question);
             const sugg = pickSuggestions(question);
             if (!obsData.length) return { html: LT('Henüz veri yok. Önce eBird ZIP/CSV dosyanı yükle, sonra dürbünümü hazırlarım!', 'No data yet. Upload your eBird ZIP/CSV first and I\'ll get my binoculars ready!'), suggestions: [] };
             const q = normTxt(question);
@@ -1257,7 +1386,7 @@
                 let topLocs = [...s.locs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
                 let months = new Array(12).fill(0); dates.forEach(d => months[+d.slice(5, 7) - 1]++);
                 let bestM = months.indexOf(Math.max(...months));
-                let mName = (LANG === 'en' ? MONTHS.enNice : MONTHS.trNice)[bestM];
+                let mName = mNice()[bestM];
                 return out(LT(
                     `<b>${nm(s.name)}</b>: ${s.count} gözlem, ${s.locs.size} konumda, ${s.dates.size} farklı günde.` + (dates.length ? `<br>İlk: <b>${fd(dates[0])}</b> · Son: <b>${fd(dates[dates.length - 1])}</b><br>En sık gördüğün ay: <b>${mName}</b>` : '') + `<br><br>En çok görüldüğü yerler:` + li(topLocs.map(([l, c]) => `${escHtml(l)} (${c})`)),
                     `<b>${nm(s.name)}</b>: ${s.count} observations at ${s.locs.size} locations on ${s.dates.size} days.` + (dates.length ? `<br>First: <b>${fd(dates[0])}</b> · Last: <b>${fd(dates[dates.length - 1])}</b><br>Most often seen in: <b>${mName}</b>` : '') + `<br><br>Top locations:` + li(topLocs.map(([l, c]) => `${escHtml(l)} (${c})`))));
@@ -1332,7 +1461,7 @@
             if (mIdx >= 0) {
                 let mm = String(mIdx + 1).padStart(2, '0');
                 let rows = dated.filter(d => d.date.slice(5, 7) === mm), sm = summarize(rows);
-                let mName = (LANG === 'en' ? MONTHS.enNice : MONTHS.trNice)[mIdx];
+                let mName = mNice()[mIdx];
                 if (!rows.length) return out(LT(`${mName} aylarında hiç kaydın yok.`, `You have no records in ${mName}.`));
                 return out(LT(`Tüm yıllardaki <b>${mName}</b> ayları: <b>${sm.species.size}</b> tür, ${sm.days.size} gün, ${sm.locs.size} konum.<br><br>En sık görülenler:`, `<b>${mName}</b> across all years: <b>${sm.species.size}</b> species, ${sm.days.size} days, ${sm.locs.size} locations.<br><br>Most frequent:`) + li(topSpecies(rows).map(([n, c]) => `${nm(n)} (${c})`)));
             }
@@ -1352,7 +1481,7 @@
                 let byM = Array.from({ length: 12 }, () => new Set());
                 dated.forEach(d => byM[+d.date.slice(5, 7) - 1].add(d.sci_name));
                 let order = byM.map((s, i) => [i, s.size]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]);
-                let names = LANG === 'en' ? MONTHS.enNice : MONTHS.trNice;
+                let names = mNice();
                 return out(LT('Tüm yıllar birlikte, aylara göre tür sayın:', 'Species per month, all years combined:') + li(order.slice(0, 6).map(([i, n]) => `${names[i]} – <b>${sp(n)}</b>`)));
             }
             if (has('hangi il', 'kac il', 'iller', 'il bazinda', 'province', 'region', 'bolge')) {
@@ -1571,7 +1700,7 @@
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(mapObj);
         }
         function labelExpr() {
-            let lang = (typeof LANG !== 'undefined' && LANG === 'en') ? 'en' : 'tr';
+            let lang = (typeof LANG !== 'undefined' && LANG !== 'tr') ? LANG : 'tr';
             return ['coalesce', ['get', 'name:' + lang], ['get', 'name:latin'], ['get', 'name']];
         }
         function applyMapLanguage() {
@@ -1906,7 +2035,7 @@
             }
             saveImgCache(imgCache);
             await myPhotosReady; WIKI_IMAGES = speciesImages;
-            ML_CANDS = collectMl(locGroups); Object.keys(ML_PHOTOS).forEach(k => delete ML_PHOTOS[k]); mlPrefill();
+            enToSciMap = null; ML_CANDS = collectMl(locGroups); Object.keys(ML_PHOTOS).forEach(k => delete ML_PHOTOS[k]); mlPrefill();
             obsData.forEach(d => { d.img = photoUrl(d.sci_name); });
             buildGlobalStats();
 
@@ -2027,6 +2156,7 @@
 
         function formatDisplayDate(ymd) {
             if (!ymd || ymd === 'Bilinmiyor' || ymd === '9999-12-31') return ymd;
+            if (XL.includes(LANG)) { let d = new Date(ymd + 'T12:00:00'); if (!isNaN(d)) return new Intl.DateTimeFormat(loc(), { day: 'numeric', month: 'short', year: 'numeric' }).format(d).replace(/ de /g, ' '); }
             const months = LANG === 'en' ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
             let parts = ymd.split('-'); return parts.length === 3 ? `${parseInt(parts[2], 10)} ${months[parseInt(parts[1], 10)-1]} ${parts[0]}` : ymd;
         }
@@ -2313,7 +2443,7 @@
                 <div style="font-size:13px; font-weight:bold; color:#27ae60; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:6px;">🏆 Kertik (İlk Gözlem)</div>
                 ${img}
                 <div style="font-weight:bold; font-size:15px; color:#1662B6;">${l.tr_name}</div>
-                <div style="font-size:11px; color:#777; margin-bottom:6px;">${LANG === 'en' ? `<i>${l.sci_name}</i>` : `${l.en_name || ''} (<i>${l.sci_name}</i>)`}</div>
+                <div style="font-size:11px; color:#777; margin-bottom:6px;">${LANG !== 'tr' ? `<i>${l.sci_name}</i>` : `${l.en_name || ''} (<i>${l.sci_name}</i>)`}</div>
                 <div style="font-size:12px; color:#282629; margin-bottom:3px;">📍 ${l.loc}</div>
                 <div style="font-size:12px; font-weight:bold; color:#0A3E70; margin-bottom:8px;">📅 ${formatDisplayDate(l.date)}</div>
                 <div style="font-size:11px; background:#f4fcf7; border:1px solid #a3e4d7; border-radius:6px; padding:6px; color:#0A3E70; margin-bottom:8px;">
@@ -2329,7 +2459,7 @@
             let y = currentLiferCalDate.getFullYear(); let m = currentLiferCalDate.getMonth();
             let calHtml = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:14px; color:#27ae60; gap:5px;">
                 <button id="prev-lifer-month" class="cal-arrow" aria-label="‹" style="border:1px solid #2ecc71; color:#27ae60;">‹</button>
-                <strong style="text-transform: capitalize; font-size:13px; flex:1; text-align:center;">${new Intl.DateTimeFormat(LANG === 'en' ? 'en-US' : 'tr-TR', { month: 'long'}).format(currentLiferCalDate)} ${y}</strong>
+                <strong style="text-transform: capitalize; font-size:13px; flex:1; text-align:center;">${new Intl.DateTimeFormat(loc(), { month: 'long'}).format(currentLiferCalDate)} ${y}</strong>
                 <button id="next-lifer-month" class="cal-arrow" aria-label="›" style="border:1px solid #2ecc71; color:#27ae60;">›</button>
             </div>
             <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:2px; text-align:center; font-weight:bold; font-size:12px; margin-bottom:5px; color:#282629;">
@@ -2406,7 +2536,7 @@
             
             calHtml += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:14px; color:#0A3E70; gap:5px;">
                 <button id="prev-month" class="cal-arrow" aria-label="‹" style="border:1px solid #1662B6; color:#1662B6;">‹</button>
-                <strong style="text-transform: capitalize; white-space:nowrap; font-size:13px; text-align:center; flex:1;">${new Intl.DateTimeFormat(LANG === 'en' ? 'en-US' : 'tr-TR', { month: 'long'}).format(currentCalDate)} ${y}</strong>
+                <strong style="text-transform: capitalize; white-space:nowrap; font-size:13px; text-align:center; flex:1;">${new Intl.DateTimeFormat(loc(), { month: 'long'}).format(currentCalDate)} ${y}</strong>
                 <button id="next-month" class="cal-arrow" aria-label="›" style="border:1px solid #1662B6; color:#1662B6;">›</button>
             </div>
             <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:2px; text-align:center; font-weight:bold; font-size:12px; margin-bottom:5px; color:#282629;">
@@ -3040,7 +3170,7 @@
             document.getElementById('explore-panel').style.display = 'block';
             document.getElementById('explore-content').innerHTML = `<div style="text-align:center; padding:20px; color:#0A3E70;"><strong>eBird'e bağlanılıyor... ⏳</strong></div>`;
 
-            fetch(`https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&dist=${currentRadius}&back=30&sppLocale=${LANG === 'en' ? 'en' : 'tr'}&key=${EBIRD_API}`)
+            fetch(`https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&dist=${currentRadius}&back=30&sppLocale=${({ tr: 'tr', en: 'en', es: 'es', pt: 'pt_BR', de: 'de', fr: 'fr' })[LANG] || 'en'}&key=${EBIRD_API}`)
             .then(r => r.json()).then(data => {
                 let counts = {}; data.forEach(o => { let n = o.comName || o.sciName; if(!counts[n]) counts[n] = { count:0, code:o.speciesCode, sciName:o.sciName }; counts[n].count += o.howMany || 1; });
                 exploreData = Object.keys(counts).map(k => ({name:k, count:counts[k].count, code:counts[k].code, sciName:counts[k].sciName}));
@@ -3103,7 +3233,7 @@
         function getBirdingContext() {
             if (!obsData || obsData.length === 0) return LT("Henüz veri yok.", "No data yet.");
             let records = new Set();
-            obsData.forEach(d => records.add(LANG === 'en'
+            obsData.forEach(d => records.add(LANG !== 'tr'
                 ? `${d.en_name || d.tr_name} [Location: ${d.loc}, Date: ${d.date !== 'Bilinmiyor' ? d.date : 'undated'}]`
                 : `${d.tr_name} [Konum: ${d.loc}, Tarih: ${d.date !== 'Bilinmiyor' ? d.date : 'Tarihsiz'}]`));
             return LT('KULLANICININ GÖZLEM GEÇMİŞİ: ', "USER'S SIGHTING HISTORY: ") + Array.from(records).join(' | ');
@@ -3226,7 +3356,7 @@
         const REGION_CACHE_KEY = 'region_names_v1';
         let regionCache = (() => { try { return JSON.parse(localStorage.getItem(REGION_CACHE_KEY)) || {}; } catch (e) { return {}; } })();
         function countryName(cc) {
-            try { return new Intl.DisplayNames([LANG === 'en' ? 'en' : 'tr'], { type: 'region' }).of(cc) || cc; } catch (e) { return cc; }
+            try { return new Intl.DisplayNames([LANG], { type: 'region' }).of(cc) || cc; } catch (e) { return cc; }
         }
         function provinceLabel(code) {
             code = (code || '').trim();
@@ -3236,7 +3366,7 @@
             let cc = m[1], sub = m[2];
             if (cc === 'TR' && sub && trProvinces[sub]) return trProvinces[sub] + ', ' + LT('Türkiye', 'Turkey');
             if (!sub) return countryName(cc);
-            let nm = REGION_NAMES[code] ? REGION_NAMES[code][LANG === 'en' ? 1 : 0] : (regionCache[code] || sub);
+            let nm = REGION_NAMES[code] ? REGION_NAMES[code][LANG === 'tr' ? 0 : 1] : (regionCache[code] || sub);
             return nm + ', ' + countryName(cc);
         }
         // Tabloda olmayan bölgelerin adı: eBird anahtarı varsa bir kez sorulur ve saklanır
@@ -3426,7 +3556,7 @@
         }
         // Kuşçu arkadaşlarına öner: telefonun paylaş ekranı (WhatsApp vb.); birdatlas.app hem Play'e hem web/iPhone sürümüne götürür
         window.tellFriends = async function() {
-            let url = 'https://birdatlas.app/' + (LANG === 'en' ? 'en/' : 'tr/');
+            let url = 'https://birdatlas.app/' + LANG + '/';
             let text = LT("Kuş Atlası'nı denedin mi? 🐦 eBird gözlemlerini kendi haritana çeviriyor: kertikler, takvim, grafikler, paylaşım kartları. Ücretsiz, hesap gerekmiyor; Android'de ve tarayıcıda çalışıyor.",
                 "Have you tried Bird Atlas? 🐦 It turns your eBird sightings into your own map: lifers, calendar, charts and share cards. Free, no account needed; works on Android and in the browser.");
             text += '\n👉 ' + url;   // link mesajın içinde: WhatsApp vb. hem yazıyı hem linki göndersin
@@ -3615,14 +3745,16 @@
         }
         function todayStr(l) {
             let d = new Date(), iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            return `${d.getDate()} ${(l === 'en' ? MONTHS.enNice : MONTHS.trNice)[d.getMonth()]} ${d.getFullYear()} (${iso})`;
+            return `${d.getDate()} ${(l === 'tr' ? MONTHS.trNice : MONTHS.enNice)[d.getMonth()]} ${d.getFullYear()} (${iso})`;
         }
         function aiSystemPrompt() {
             let ctx = getBirdingContext();
             if (ctx.length > 120000) ctx = ctx.slice(0, 120000) + ' …';
-            return LT(
+            let out = LTen(
                 `Sen Maviş'sin: dürbünlü, neşeli ve meraklı bir Mavi Baştankara olan kuş gözlem asistanısın. Kullanıcının aşağıdaki kendi gözlem verisine dayanarak samimi, kısa ve doğru cevap ver; veride olmayan şeyi uydurma.\nŞAKA: Şaka zorunlu değil. Yapacaksan kısa, anlamı açık ve konuyla ilgili olsun (ör. tatlı bir kuş benzetmesi ya da veriden hafif bir gözlem). Kelime oyunu, çeviriden gelen espri ve "… bilir misin? Çünkü …" tarzı bilmece şakaları YAPMA.\nBugünün tarihi: ${todayStr('tr')}. "Bugün", "geçen yıl bugün", "dün", "bu ay" gibi ifadeleri bu tarihe göre hesapla.\nKESİN KURAL: Yalnızca Türkçe yaz; tür adlarını Türkçe adlarıyla ver. İngilizce cümle kurma.\nCevabın sonuna '|||' ekle, ardından kullanıcının sorabileceği 3 kısa TÜRKÇE soruyu '|' ile ayırarak yaz. Bu sorular kullanıcının ağzından, birinci tekil şahısla olsun (ör. "En çok hangi türü gördüm?", "Mogan'da neler kaydettim?"); "gördün", "yaptın" gibi ikinci şahıs kullanma.\n\n${ctx}`,
                 `You are Maviş, a cheerful, curious Blue Tit with binoculars and a birding assistant. Answer warmly, briefly and accurately based on the user's own sighting data below; never invent anything that is not in the data.\nHUMOR: Jokes are optional. If you add one, keep it short, clear and relevant (e.g. a gentle bird comparison or a light observation about the data). No puns, no riddle jokes like "Why do …? Because …".\nToday's date is ${todayStr('en')}. Work out "today", "this day last year", "yesterday", "this month" from this date.\nSTRICT RULE: Write only in English and use English species names. Do not write any Turkish.\nEnd your answer with '|||' followed by 3 short questions IN ENGLISH the user could ask next, separated by '|'. Write them in the user's own voice, first person (e.g. "Which species did I see most?", "What did I record at Mogan?"), never "you".\n\n${ctx}`);
+            if (XL.includes(LANG)) out = out.replace(/Write only in English and use English species names\./, `Write only in ${LANG_NAMES[LANG]} (${LANG}) and use ${LANG_NAMES[LANG]} species names where you know them (otherwise English).`) + `\nLANGUAGE: Always reply in ${LANG_NAMES[LANG]}, including suggested follow-up questions.`;
+            return out;
         }
         async function postJSON(url, headers, body) {
             let H = NativePlugins.CapacitorHttp;
@@ -3694,13 +3826,13 @@
         const C = { navy: '#1C3A6B', blue: '#2E62B5', sky: '#6B7FA3', yellow: '#F5C518', pink: '#E26D84', green: '#2ecc71', bg1: '#F4F8FD', bg2: '#E3EDF9', panel: '#E7EDF5' };
         let shareState = null, shareRenderToken = 0, shareSnapCache = {};
 
-        function spName(o) { return LANG === 'en' ? (o.en_name || o.tr_name) : o.tr_name; }
+        function spName(o) { return LANG === 'tr' ? o.tr_name : LANG === 'en' ? (o.en_name || o.tr_name) : (LOC_NAMES[o.sci_name] || o.en_name || o.tr_name); }
         function yearsInData() { return [...new Set(obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor').map(d => d.slice(0, 4)))].sort().reverse(); }
         function daysInData() { return [...new Set(obsData.map(d => d.date).filter(d => d && d !== 'Bilinmiyor'))].sort().reverse(); }
         function liferBySci() { let m = {}; liferArray.forEach(l => { m[l.sci_name] = l; }); return m; }
         // Sıra sayısı: Türkçe "101." · İngilizce "101st", "102nd", "103rd", "111th"
         function ordN(n) {
-            n = +n; if (LANG !== 'en') return n + '.';
+            n = +n; if (LANG === 'fr') return n + (n === 1 ? 'er' : 'e'); if (LANG === 'es') return n + '.ª'; if (LANG === 'pt') return n + 'ª'; if (LANG !== 'en') return n + '.';
             let t = n % 100, u = n % 10;
             return n + ((t >= 11 && t <= 13) ? 'th' : u === 1 ? 'st' : u === 2 ? 'nd' : u === 3 ? 'rd' : 'th');
         }
@@ -3973,8 +4105,8 @@
                 rr(ctx, -9, -16, 18 + (i % 3) * 6, 30, 4); ctx.fill(); ctx.restore();
             }
         }
-        const monthName = m => (LANG === 'en' ? MONTHS.enNice : MONTHS.trNice)[m - 1];
-        const nf = n => Number(n).toLocaleString(LANG === 'en' ? 'en-US' : 'tr-TR');
+        const monthName = m => mNice()[m - 1];
+        const nf = n => Number(n).toLocaleString(loc());
 
         // ---------- kartlar ----------
         async function drawCard(ctx, W, H) {
@@ -4024,7 +4156,7 @@
             }
             else if (st.type === 'day') {
                 let s = D.s;
-                text(ctx, formatDisplayDate(st.date).toLocaleUpperCase(LANG === 'en' ? 'en' : 'tr'), 80, story ? 150 : 110, { w: 700, px: 40, color: C.blue, spacing: 5 });
+                text(ctx, formatDisplayDate(st.date).toLocaleUpperCase(loc()), 80, story ? 150 : 110, { w: 700, px: 40, color: C.blue, spacing: 5 });
                 text(ctx, nf(s.sp.size), 74, story ? 370 : 270, { w: 700, px: story ? 210 : 160 });
                 text(ctx, LT('tür, tek bir günde 🐦', 'species in a single day 🐦'), 84, story ? 455 : 340, { w: 500, px: story ? 52 : 40, maxW: story ? 640 : 620 });
                 await drawMavis(ctx, 'think', W - (story ? 300 : 240), story ? 200 : 60, story ? 250 : 200);
@@ -4452,7 +4584,7 @@
             const { out, li, sp, nm, fd, summarize, topSpecies, spArr, dated, lifers, locs } = c;
             const has = (...ws) => ws.some(w => q.includes(w));
             const hasWord = (...ws) => ws.some(w => words.includes(w));
-            const mNames = LANG === 'en' ? MONTHS.enNice : MONTHS.trNice;
+            const mNames = mNice();
             // eşleşmeler
             let spHit = spArr.map(s => {
                 let names = [s.name, trToEnName[s.name], s.sci].filter(Boolean).map(normTxt).filter(n => n.length > 2 && q.includes(n));
@@ -4563,7 +4695,7 @@
             }
             // g) haftanın günleri
             if (has('haftanin hangi', 'hangi gunler', 'hafta sonu', 'hafta ici', 'day of the week', 'weekday', 'weekend')) {
-                let names = LANG === 'en' ? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] : ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+                let names = wdNames(false);
                 let cnt = new Array(7).fill(0); [...new Set(dated.map(d => d.date))].forEach(ds => { cnt[(new Date(ds + 'T12:00:00').getDay() + 6) % 7]++; });
                 let we = cnt[5] + cnt[6], tot = cnt.reduce((a, b) => a + b, 0) || 1;
                 return out(LT('Gözlem günlerinin haftaya dağılımı:', 'Your outings by day of the week:') + li(cnt.map((n, i) => [names[i], n]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).map(([n, k]) => `${n} – ${k}`))
@@ -4577,7 +4709,7 @@
         // =====================================================================
         const INSTAGRAM_URL = 'https://www.instagram.com/birdatlas.app';
         const isSample = () => { try { return localStorage.getItem('is_sample') === '1'; } catch (e) { return false; } };
-        const nf2 = n => Number(n).toLocaleString(LANG === 'en' ? 'en-US' : 'tr-TR');
+        const nf2 = n => Number(n).toLocaleString(loc());
 
         // ----- Gözlem / birey rozeti -----
         function showBirds() { try { return localStorage.getItem('show_birds') === '1'; } catch (e) { return false; } }
@@ -4672,7 +4804,7 @@
         };
 
         // ----- Dil menüsü: düğme ŞU ANKİ dili gösterir -----
-        const LANGS = [['tr', 'Türkçe'], ['en', 'English']];
+        const LANGS = Object.entries(LANG_NAMES);
         window.toggleLangMenu = function(e) {
             e.stopPropagation();
             let m = document.getElementById('lang-menu');
@@ -4757,7 +4889,7 @@
         function weekRange(year, w) {
             let j4 = new Date(+year, 0, 4), mon = new Date(j4); mon.setDate(j4.getDate() - ((j4.getDay() + 6) % 7) + (w - 1) * 7);
             let sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-            let mn = LANG === 'en' ? MONTHS.enNice : MONTHS.trNice, ab = d => mn[d.getMonth()].slice(0, 3);
+            let mn = mNice(), ab = d => mn[d.getMonth()].slice(0, 3);
             if (mon.getMonth() === sun.getMonth()) return `${mon.getDate()} – ${sun.getDate()} ${ab(sun)} ${sun.getFullYear()}`;
             return `${mon.getDate()} ${ab(mon)}${mon.getFullYear() !== sun.getFullYear() ? ' ' + mon.getFullYear() : ''} – ${sun.getDate()} ${ab(sun)} ${sun.getFullYear()}`;
         }
@@ -4780,7 +4912,7 @@
                 rows.filter(d => d.date.startsWith(year)).forEach(d => { let w = isoWeek(d.date); if (d.date.slice(5, 7) === '01' && w > 50) w = 1; if (d.date.slice(5, 7) === '12' && w === 1) w = 53; buckets[w - 1].rows.push(d); });
                 while (buckets.length > 52 && !buckets[buckets.length - 1].rows.length) buckets.pop();
             } else {
-                let mn = LANG === 'en' ? MONTHS.enNice : MONTHS.trNice;
+                let mn = mNice();
                 for (let m = 1; m <= 12; m++) buckets.push({ key: m, label: mn[m - 1].slice(0, 3), rows: rows.filter(d => d.date.startsWith(`${year}-${String(m).padStart(2, '0')}`)), title: `${mn[m - 1]} ${year}` });
             }
             buckets.forEach(b => { b.value = metricValue(b.rows, kind === 'lifer' ? 'lifers' : st.metric); });
@@ -4959,7 +5091,7 @@
                 let ys = [...new Set(rows.map(d => d.date.slice(0, 4)))].sort();
                 return ys.map(y => ({ label: y, title: y, value: new Set(rows.filter(d => d.date.startsWith(y)).map(d => d.date)).size }));
             }
-            let mn = LANG === 'en' ? MONTHS.enNice : MONTHS.trNice;
+            let mn = mNice();
             return mn.map((n, i) => ({ label: n.slice(0, 3), title: n, value: new Set(rows.filter(d => +d.date.slice(5, 7) === i + 1).map(d => d.date)).size }));
         }
         async function drawSpeciesBars(ctx, x, y, w, h, sci, mode) {
@@ -4990,7 +5122,7 @@
             let lif = liferArray.filter(l => l.date >= st.from && l.date <= st.to && (!st.prov || l.province === st.prov));
             let range = st.from === st.to ? formatDisplayDate(st.from) : `${formatDisplayDate(st.from)} – ${formatDisplayDate(st.to)}`;
             let title = (st.title || '').trim() || (st.prov ? provShort(st.prov) + LT(' gezisi', ' trip') : LT('Kuş gezim', 'My birding trip'));
-            text(ctx, range.toLocaleUpperCase(LANG === 'en' ? 'en' : 'tr'), 80, story ? 150 : 100, { w: 700, px: 34, color: C.blue, spacing: 4, maxW: W - 160 });
+            text(ctx, range.toLocaleUpperCase(loc()), 80, story ? 150 : 100, { w: 700, px: 34, color: C.blue, spacing: 4, maxW: W - 160 });
             text(ctx, title, 80, story ? 245 : 170, { w: 700, px: story ? 76 : 58, maxW: W - (story ? 380 : 320), minPx: 34 });
             await drawMavis(ctx, 'wave', W - (story ? 300 : 230), story ? 180 : 40, story ? 250 : 190);
             if (!rows.length) { text(ctx, LT('Bu aralıkta kayıt yok.', 'No records in this range.'), 80, story ? 420 : 320, { w: 500, px: 40, color: C.sky }); return; }
@@ -5019,7 +5151,7 @@
             await drawMavis(ctx, 'think', W - (story ? 290 : 220), story ? 120 : 30, story ? 230 : 180);
             chips(ctx, [filterLabel() || null, ex.sci ? null : `🐦 ${s.sp.size} ${LT('tür', 'species')}`, `📅 ${s.days.size} ${LT('gün', 'days')}`, ex.loc ? null : `📍 ${s.locs.size} ${LT('konum', 'locations')}`], 80, story ? 290 : 195, { px: story ? 30 : 26, maxX: W - 60 });
             let cell = story ? 128 : 104, gap = story ? 8 : 6, gw = cell * 7 + gap * 6, gx = (W - gw) / 2, gy = story ? 430 : 290;
-            let wd = LANG === 'en' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+            let wd = wdNames(true);
             wd.forEach((n, i) => text(ctx, n, gx + i * (cell + gap) + cell / 2, gy - 14, { w: 600, px: story ? 26 : 22, color: C.sky, align: 'center' }));
             let first = (new Date(y, m - 1, 1).getDay() + 6) % 7, nDays = new Date(y, m, 0).getDate();
             for (let d = 1; d <= nDays; d++) {
@@ -5370,7 +5502,7 @@
         window.renderNav = function() {
             renderDataUploadCard();
             let bar = document.getElementById('tabbar'); if (!bar) return;
-            bar.innerHTML = NAV_TABS().map(([k, ic, n]) => `<button class="tb${navTab === k ? ' on' : ''}" data-tab="${k}" onclick="openTab('${k}')"><b>${ic}</b><span>${n}</span></button>`).join('');
+            bar.innerHTML = NAV_TABS().map(([k, ic, n]) => `<button class="tb${navTab === k ? ' on' : ''}" data-tab="${k}" onclick="openTab('${k}')"><b>${ic}</b><span${n.length > 12 ? ' class="lg"' : ''}>${n}</span></button>`).join('');
             let seg = document.getElementById('obs-seg');
             if (seg) seg.innerHTML = [['calendar', LT('📅 Takvim', '📅 Calendar')], ['locations', LT('📍 Konumlar', '📍 Places')], ['species', LT('🐦 Türler', '🐦 Species')]]
                 .map(([k, n]) => `<button class="${obsSub === k ? 'on' : ''}" onclick="setObsSub('${k}')">${n}</button>`).join('') + `<button class="sx" onclick="closeTabs()" aria-label="${LT('Kapat', 'Close')}">✕</button>`;
@@ -5436,7 +5568,7 @@
                 it('📖', LT('Kılavuz', 'User guide'), 'openGuide()') +
                 it('🎓', LT('Turu yeniden başlat', 'Restart the tour'), 'startTour(true)') +
                 '<div class="mh"></div>' +
-                `<button onclick="toggleLangMenu(event)">🌐 <span class="mt">${LT('Dil', 'Language')}</span><span class="mx">${flagSvg(LANG === 'en' ? 'en' : 'tr')} ${LANG.toUpperCase()} ▸</span></button>` +
+                `<button onclick="toggleLangMenu(event)">🌐 <span class="mt">${LT('Dil', 'Language')}</span><span class="mx">${flagSvg(LANG)} ${LANG.toUpperCase()} ▸</span></button>` +
                 ((!NativeCap && document.fullscreenEnabled) ? `<button onclick="closeMainMenu(); toggleFullscreen()"><span class="fs-ic">${document.fullscreenElement ? FS_OFF : FS_ON}</span> <span class="mt">${document.fullscreenElement ? LT('Tam ekrandan çık', 'Exit full screen') : LT('Tam ekran', 'Full screen')}</span></button>` : '') +
                 '<div class="mh"></div>' +
                 it('🗄️', LT('Verilerim', 'My data'), "openTab('data')", LT('yükle · elle kayıt', 'upload · manual')) +
@@ -5446,7 +5578,7 @@
                 it('⭐', LT('Değerlendir', 'Rate the app'), 'rateApp()') +
                 it('📣', LT('Arkadaşına öner', 'Recommend to a friend'), 'tellFriends()') +
                 `<a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">📷 <span class="mt">Instagram</span><span class="mx">@birdatlas.app</span></a>` +
-                `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'en' ? 'en' : 'tr'}" target="_blank" onclick="closeMainMenu()">🔒 <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>`;
+                `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'tr' ? 'tr' : 'en'}" target="_blank" onclick="closeMainMenu()">🔒 <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>`;
             m.style.display = 'block';
             document.getElementById('menu-btn').classList.add('on');
             setTimeout(() => document.addEventListener('click', function close(ev) { if (!m.contains(ev.target) && !(document.getElementById('lang-menu') || {}).contains?.(ev.target)) { closeMainMenu(); document.removeEventListener('click', close); } }), 0);
@@ -5569,7 +5701,7 @@
                 ['Larus michahellis', 'Sarı Bacaklı Martı', 'Yellow-legged Gull', 'yelgul1', 21], ['Podiceps cristatus', 'Bahri', 'Great Crested Grebe', 'grcgre1', 12],
                 ['Ardea cinerea', 'Gri Balıkçıl', 'Gray Heron', 'graher1', 6], ['Passer domesticus', 'Serçe', 'House Sparrow', 'houspa', 30],
                 ['Pica pica', 'Saksağan', 'Eurasian Magpie', 'eurmag1', 9], ['Erithacus rubecula', 'Kızılgerdan', 'European Robin', 'eurrob1', 4]];
-            exploreData = S.map(([sci, tr, en, code, n]) => ({ name: LANG === 'en' ? en : tr, count: n, code, sciName: sci }));
+            exploreData = S.map(([sci, tr, en, code, n]) => ({ name: LANG === 'tr' ? tr : (LOC_NAMES[sci] || en), count: n, code, sciName: sci }));
             renderExploreData();
             let ec = $t('explore-content');
             if (ec) ec.insertAdjacentHTML('afterbegin', `<div style="background:#FFF6D6; border:1px dashed #E9C440; border-radius:8px; padding:6px 8px; font-size:11.5px; margin-bottom:8px;">🎓 ${LT('Tur örneği: bu liste gerçek değil, yalnızca nasıl göründüğünü göstermek için.', 'Tour example: this list is made up, just to show how it looks.')}</div>`);
@@ -5588,7 +5720,7 @@
             if (preData) {
                 s.push({ id: 'welcome', pre: true, title: LT('Merhaba, ben Maviş! 👋', "Hi, I'm Maviş! 👋"),
                     text: LT('Kuş Atlası, eBird gözlemlerini kişisel haritana dönüştürür. Seni bir dakikada gezdireyim.', 'Bird Atlas turns your eBird sightings into your personal map. Let me show you around in a minute.')
-                        + `<div class="tl">${[['tr', 'Türkçe'], ['en', 'English']].map(([c, n]) => `<button class="${LANG === c ? 'on' : ''}" onclick="tourLang('${c}')">${flagSvg(c)} ${n}</button>`).join('')}</div>` });
+                        + `<div class="tl">${Object.entries(LANG_NAMES).map(([c, n]) => `<button class="${LANG === c ? 'on' : ''}" onclick="tourLang('${c}')">${flagSvg(c)} ${n}</button>`).join('')}</div>` });
                 s.push({ id: 'ask', pre: true, title: LT('eBird hesabın ve kayıtların var mı?', 'Do you have an eBird account with sightings?'),
                     text: LT('Varsa kendi verini nasıl yükleyeceğini göstereyim. Yoksa örnek veriyle gezelim; istediğin zaman kendi verine geçebilirsin.', "If so, I'll show you how to load your own data. If not, let's explore with sample data; you can switch to your own any time."),
                     buttons: [[LT('Evet, verim var', 'Yes, I have data'), 'tourOwnData()', true], [LT('Hayır, örnekle dene', 'No, try sample data'), 'tourSample()']] });
@@ -5778,7 +5910,7 @@
         }
         window.nextTour = () => goTour(tourIdx + 1);
         window.prevTour = () => { if (tourIdx > 0) goTour(tourIdx - 1); };
-        window.tourLang = function(l) { setLang(l); tourSteps = buildTourSteps(tourPre); renderTourStep(); };
+        window.tourLang = async function(l) { await setLang(l); tourSteps = buildTourSteps(tourPre); renderTourStep(); };
         window.endTour = function(done) {
             let cur = tourSteps[tourIdx];
             if (cur && cur.leave) { try { cur.leave(); } catch (e) {} }
@@ -5882,7 +6014,7 @@
             let rnd = priv === 'province' ? 1 : 3, f = Math.pow(10, rnd);
             let places = pl.map(p => [p.n, p.la.length ? Math.round(p.la.reduce((a, b) => a + b, 0) / p.la.length * f) / f : null, p.lo.length ? Math.round(p.lo.reduce((a, b) => a + b, 0) / p.lo.length * f) / f : null]);
             // v2 (daha kısa): tür adı yalnızca paylaşanın dilinde; gözlemler güne göre gruplu, günler farkla yazılır
-            let s2 = sp.map(([sci, tr, en]) => { let n = (LANG === 'en' ? en : tr) || en || tr || ''; return n && n !== sci ? [sci, n] : [sci]; });
+            let s2 = sp.map(([sci, tr, en]) => { let n = (LANG === 'tr' ? tr : (LOC_NAMES[sci] || en)) || en || tr || ''; return n && n !== sci ? [sci, n] : [sci]; });
             let byDay = new Map();
             o.forEach(([si, pi, dn, b]) => { if (!byDay.has(dn)) byDay.set(dn, new Map()); let m = byDay.get(dn); if (!m.has(pi)) m.set(pi, [pi]); m.get(pi).push(b ? [si, b] : si); });
             let o2 = [], prev = 0;
@@ -5912,7 +6044,8 @@
         document.documentElement.lang = LANG;
         updateLangBtn();
         i18nObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'title'] });
-        if (LANG === 'en') translateTree(document.body);
+        if (LANG !== 'tr') translateTree(document.body);
+        if (XL.includes(LANG)) loadLocNames().then(ok => { if (ok && obsData.length) { enToSciMap = null; renderAll(); if (liferArray.length) renderLiferCalendar(); } });
     </script>
 </body>
 </html>

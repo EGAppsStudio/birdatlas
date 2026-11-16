@@ -28,7 +28,8 @@ writeFileSync(sw, readFileSync(sw, 'utf8').replace('__VERSION__', ver));
 const appHtml = join(dist, 'app', 'index.html');
 writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
   .replace("fetch('data/ebird-taxonomy.json')", `fetch('data/ebird-taxonomy.json?v=${ver}')`)
-  .replace("fetch('data/ornek-veri.csv')", `fetch('data/ornek-veri.csv?v=${ver}')`));
+  .replace("fetch('data/ornek-veri.csv')", `fetch('data/ornek-veri.csv?v=${ver}')`)
+  .replace("var I18N_V = ''", `var I18N_V = '${ver}'`));
 
 // ---------- Tanıtım sayfasının dil sayfaları: /tr/ /en/ /es/ /pt/ /de/ /fr/ ----------
 // Kaynak: site/index.html (TR + EN) + scripts/site-diller.json (ES, PT, DE, FR). Google her dili kendi adresinde görür.

@@ -14,6 +14,7 @@ echo   3  Play magaza sayfasi         (once kontrol, sonra onay ister)
 echo   4  Simgeler + sync             (logo degisince / yeni surumden once)
 echo   5  Sadece sync                 (dosyalari Android projesine aktar)
 echo   6  Paketleri kur / guncelle    (npm install)
+echo   7  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari ister)
 echo.
 echo   0  Cikis
 echo.
@@ -25,6 +26,7 @@ if "%SEC%"=="3" goto magaza
 if "%SEC%"=="4" goto ikon
 if "%SEC%"=="5" goto sync
 if "%SEC%"=="6" goto install
+if "%SEC%"=="7" goto taksonomi
 if "%SEC%"=="0" exit /b 0
 goto menu
 
@@ -73,6 +75,18 @@ call npm run sync
 if errorlevel 1 goto hata
 echo.
 echo  Tamam. Android Studio aciksa yesil ucgen ile telefona kurabilirsin.
+goto bitti
+
+:taksonomi
+echo.
+echo  eBird API anahtarin (Ayarlar'a girdigin kisa kod). Yalnizca bu indirme icin kullanilir, hicbir yere kaydedilmez.
+set "KEY="
+set /p KEY=  Anahtar: 
+if "%KEY%"=="" goto bitti
+call npm run taksonomi -- %KEY%
+if errorlevel 1 goto hata
+echo.
+echo  Tamam. Simdi 5 (sync) ya da 1 (Android Studio).
 goto bitti
 
 :install

@@ -25,7 +25,7 @@ android/           depoda YOK (.gitignore); kullanıcının bilgisayarında duru
 - **Sohbetteki Claude değişiklik yapınca:** commit (Türkçe mesaj) → push. Kullanıcı GitHub Desktop'ta Fetch origin → Pull origin → `npm run sync` → Android Studio ▶.
 - **Kullanıcı / Android Studio'daki Claude değişiklik yapınca:** GitHub Desktop'ta Commit to main → Push origin (yoksa sohbetteki Claude görmez).
 - Web sitesi: Cloudflare Pages her push'ta kendisi derler (build: `npm install --omit=dev && npm run web`, çıktı: `dist`, ortam değişkeni `EBIRD_API_KEY`). 1-2 dakikada yayında.
-- Kısayol (kökte, çift tık): `KOMUTLAR.bat` – tek menü: 1 sync + Android Studio · 2 paylas (telefonda dene linki) · 3 magaza (önce --dene, onay sorar, sonra yükler) · 4 ikon + sync · 5 sync · 6 npm install.
+- Kısayol (kökte, çift tık): `KOMUTLAR.bat` – tek menü: 1 sync + Android Studio · 2 paylas (telefonda dene linki) · 3 magaza (önce --dene, onay sorar, sonra yükler) · 4 ikon + sync · 5 sync · 6 npm install · 7 tür adları (6 dil, eBird anahtarı ister).
 - Komutlar (proje klasöründe): `npm install` · `npm run sync` (kütüphaneleri kopyalar + `cap sync android` + ad/sürüm/yazı sınırı) · `npm run open` (Android Studio) · `npm run web` (dist/ – web) · `npm run taksonomi -- <eBird anahtarı>` (Türkçe tür adları dosyası).
 - Play mağaza sayfası (TR, EN ve çeviriler + iletişim/web sitesi): metinler `magaza/metinler/<dil>/`, görseller `magaza/gorseller/`, diller `magaza/ayarlar.json`. Kullanıcı çalıştırır: `npm run magaza -- --dene` (yalnız kontrol) → `npm run magaza` (yükler). Service account JSON proje DIŞINDA (`Documents\kus-atlasi\`), depoya asla girmez; izinleri: uygulama bilgisi görüntüle + mağaza varlığını yönet + test kanalları (üretim YOK).
 - **Planlanan (Enes, 15 Kasım):** mağaza komutu ikiye ayrılacak, menüde ayrı seçenekler: (1) yalnız METİNLER, tüm diller (TR, EN dahil) + iletişim/web sitesi; (2) yalnız GÖRSELLER (ekran görüntüleri + öne çıkan), tüm diller; TR ve EN'in kendi görselleri de `magaza/gorseller/tr`, `/en` ile yönetilecek. Komutlara bir sonraki dokunuşta böyle yap.
@@ -50,6 +50,11 @@ android/           depoda YOK (.gitignore); kullanıcının bilgisayarında duru
 
 ## Kod notları (www/index.html)
 - Çeviri: `LT('türkçe', 'english')` + `LANG`; sabit metinler `I18N_EXACT` sözlüğüyle MutationObserver üzerinden çevrilir; üretilen HTML'de `data-no-i18n` kullan.
+- **6 dil (1.14):** TR (kaynak) · EN · ES · PT · DE · FR. ES/PT/DE/FR sözlükleri `www/i18n/<dil>.js` (`window.I18N_ES` …), anahtar = İngilizce metin; şablonlarda `${…}` → `{0}`, `{1}`. `LT` ek dilde `trans(en)` çağırır; `tx` TR→EN→ek dil zinciri.
+  - Yeni/değişen İngilizce metinden sonra: `node scripts/ceviri.mjs kontrol` (eksikleri listeler, `-v` ayrıntı) → 4 dosyaya çeviri ekle.
+  - `LANG === 'en'` yazma: İngilizce yolu için `LANG !== 'tr'`, Türkçe için `LANG === 'tr'`. Tarih/ay/gün adları `mNice()`, `wdNames()`, `loc()`; sıra sayısı `ordN()`.
+  - Tür adları ek dillerde `data/ebird-names-<dil>.json` (`npm run taksonomi`, KOMUTLAR 7; Cloudflare kendisi indirir). Yoksa İngilizce ad.
+  - Maviş yerel cevapları: ek dilde soru `toEnQuery` ile İngilizceye yaklaştırılır (`MAVIS_Q`). Gemini talimatı İngilizce + dil kuralı (`LTen`).
 - Bayraklar emoji değil SVG (`flagSvg(code)`) – Windows bayrak emojisi göstermez.
 - Paylaşım kartları canvas ile cihazda çizilir (`drawCard`, `renderShareUI`, `openShare({type: ...})`); türler: year, month, day, trip, species, location, milestone, chart, obs.
 - Maviş: yerel cevaplar `localAssistant` / `smartAssist` / `birdCountAssist`; Gemini isteğe bağlı (`gemini-flash-latest`, model kapanırsa `resolveGeminiModel` ile otomatik yeni model, olmazsa yerel cevap).

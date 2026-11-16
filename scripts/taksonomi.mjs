@@ -1,4 +1,4 @@
-// eBird tür listesini (Türkçe + İngilizce adlar) BİR KERE indirip uygulamanın içine gömer.
+// eBird tür listesini (Türkçe + İngilizce adlar; ayrıca ES/PT/DE/FR adları) BİR KERE indirip uygulamanın içine gömer.
 // Kullanım:  npm run taksonomi -- EBIRD_API_ANAHTARIN
 // Anahtar yalnızca bu indirme için kullanılır; uygulamanın içine yazılmaz.
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -31,5 +31,15 @@ mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'ebird-taxonomy.json'),
   JSON.stringify({ source: 'eBird / Cornell Lab of Ornithology', downloaded: new Date().toISOString().slice(0, 10), rows }));
 
+// Ek diller (ES, PT, DE, FR): yalnız İngilizceden farklı adlar → www/data/ebird-names-<dil>.json  { bilimsel ad: ad }
+const EK = { es: 'es', pt: 'pt_BR', de: 'de', fr: 'fr' };
+for (const [dil, loc] of Object.entries(EK)) {
+  try {
+    const liste = await get(loc), m = {};
+    for (const x of liste) { const e = enByCode.get(x.speciesCode); if (x.comName && x.comName !== e) m[x.sciName] = x.comName; }
+    writeFileSync(join(outDir, `ebird-names-${dil}.json`), JSON.stringify(m));
+    console.log(`✓ ${dil}: ${Object.keys(m).length} tür adı → www/data/ebird-names-${dil}.json`);
+  } catch (e) { console.log(`(uyarı) ${dil} tür adları indirilemedi: ${e.message}`); }
+}
 console.log(`✓ ${rows.length} takson kaydedildi (${trCount} tanesinin Türkçe adı var) → www/data/ebird-taxonomy.json`);
 console.log('Şimdi:  npm run sync   ve Android Studio\'da ▶');
