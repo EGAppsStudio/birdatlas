@@ -3270,7 +3270,8 @@
 
             try {
                 const botReplyRaw = await callAIWithRetry(chatHistory, aiSystemPrompt(), n => { let el = document.getElementById(loadingId); if (el) el.querySelector('.msg-bubble').lastChild.textContent = ' ' + LT(`Gemini yoğun, tekrar deniyorum (${n})...`, `Gemini is busy, retrying (${n})...`); });
-                let parts = botReplyRaw.split('|||'); let actualReply = parts[0].trim(); let suggestionsHtml = '';
+                // öneri soruları '|||' ile ayrılır; Gemini bazen '||' yazıyor: iki ya da daha çok çizgi ayıraç sayılır
+                let parts = botReplyRaw.split(/\s*\|{2,}\s*/); if (parts.length > 2) parts = [parts[0], parts.slice(1).join('|')]; let actualReply = parts[0].trim(); let suggestionsHtml = '';
                 if(parts.length > 1) {
                     suggestionsHtml = suggestionButtons(parts[1].split('|').map(s => s.replace(/[*_`#]/g, '').trim()).filter(s => s.length > 0).slice(0, 3));
                 }

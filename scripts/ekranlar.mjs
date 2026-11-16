@@ -30,8 +30,15 @@ const SAZ_FOTO = path.join(KOK, 'magaza', 'ekran-foto', 'saz-delicesi.jpg');
 
 // ---------- Anahtarlar (yalnız bu çekimde, bellekte) ----------
 let GEMINI = process.env.GEMINI_KEY || '', EBIRD = process.env.EBIRD_KEY || '';
+// Hangi ekranlar: --ekran=9 ya da --ekran=8,9 (yoksa başta sorulur; Enter = hepsi)
+let SECILI = ((process.argv.find(a => a.startsWith('--ekran=')) || '').split('=')[1] || '').split(',').map(Number).filter(Boolean);
 if (process.stdin.isTTY) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  if (!SECILI.length) {
+    console.log('\nEkranlar: 1 harita · 2 takvim · 3 grafik · 4 konumlar · 5 türler · 6 kertik · 7 foto · 8 paylaş · 9 Maviş · 10 Keşfet');
+    SECILI = (await rl.question('  Hangileri çekilsin? (Enter = hepsi; ör. 9 ya da 8,9): ')).split(/[\s,]+/).map(Number).filter(Boolean);
+    console.log(SECILI.length ? `    ✓ yalnız: ${SECILI.join(', ')}` : '    ✓ hepsi');
+  }
   console.log('\nAnahtarlar yalnız bu çekim için kullanılır, hiçbir yere kaydedilmez. Boş bırakıp Enter: o ekran anahtarsız çekilir.');
   console.log('  (Yapıştırmak için pencereye farenin SAĞ tuşuyla tıkla, sonra Enter.)');
   GEMINI = (await rl.question('  Gemini anahtarı (Maviş cevabı için): ')).trim() || GEMINI;
@@ -213,7 +220,8 @@ const EKRANLAR = [
       await bekle(3000);
       // Gemini'nin cevabını bekle (yoğunsa birkaç kez dener; 4 dakikaya kadar)
       const geldi = await pg.waitForFunction(() => !document.querySelector('#chat-messages [id^="loading"]'), null, { timeout: 240000, polling: 1000 }).then(() => true).catch(() => false);
-      if (!geldi) process.stdout.write(' (Gemini cevap vermedi)');
+      if (!geldi) process.stdout.write('\n    ! Gemini 4 dakikada cevap vermedi');
+      else { let t = await pg.evaluate(() => { let b = [...document.querySelectorAll('#chat-messages .chat-bot .msg-bubble')].pop(); return b ? b.innerText.replace(/\s+/g, ' ') : ''; }); console.log(`    Cevap: ${t.slice(0, 110)}…`); }
     } else {
       await pg.evaluate(() => askMavisLocal(LT('En iyi günüm hangisi?', 'Which was my best day?')));
     }
@@ -272,17 +280,29 @@ for (const L of LANGS) {
   // saz delicesinin "eBird fotoğrafı": Macaulay adresine giden istek bilgisayardaki fotoğrafla cevaplanır
   if (process.env.EKRAN_SAHTE_EBIRD) await ctx.route(/api\.ebird\.org/, r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(['Larus michahellis|Yellow-legged Gull|yelgul', 'Phalacrocorax carbo|Great Cormorant|grecor', 'Fulica atra|Eurasian Coot|eurcoo', 'Cygnus olor|Mute Swan|mutswa', 'Pica pica|Eurasian Magpie|eurmag', 'Corvus cornix|Hooded Crow|hoocro', 'Anas platyrhynchos|Mallard|mallar', 'Ardea alba|Great Egret|greegr'].map((x, i) => { let [sciName, comName, speciesCode] = x.split('|'); return { sciName, comName, speciesCode, howMany: 40 - i * 4 }; })) }));
   if (fs.existsSync(SAZ_FOTO)) await ctx.route(new RegExp(`/api/v1/asset/${SAZ_ML}/`), r => r.fulfill({ status: 200, contentType: 'image/jpeg', body: fs.readFileSync(SAZ_FOTO) }));
-  await ctx.addInitScript(([L, css]) => {
+  await ctx.addInitScript(([L, css, gem]) => {
     try {
       localStorage.setItem('app_lang', L); localStorage.setItem('tour_done', '1'); localStorage.setItem('fbask_done', '1');
-      localStorage.setItem('launch_count', '1'); localStorage.setItem('milestone_seen', '99999'); localStorage.setItem('ai_provider', 'none');
+      localStorage.setItem('launch_count', '1'); localStorage.setItem('milestone_seen', '99999');
+      // Gemini anahtarı baştan girili olsun (yoksa Maviş ilk mesajında "çevrimdışı mod" der)
+      if (gem) { localStorage.setItem('ai_provider', 'gemini'); localStorage.setItem('ai_key_gemini', gem); } else localStorage.setItem('ai_provider', 'none');
     } catch (e) {}
     document.addEventListener('DOMContentLoaded', () => {
       let s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
       let o = document.createElement('style'); o.id = 'ekran-ozel'; document.head.appendChild(o);
     });
-  }, [L, css]);
+  }, [L, css, GEMINI]);
   const pg = await ctx.newPage();
+  // Gemini'ye giden her isteği pencereye yaz: sorun çıkarsa kaynağı görünsün
+  const gTime = new Map();
+  pg.on('request', q => { if (q.url().includes('generativelanguage')) gTime.set(q, Date.now()); });
+  pg.on('response', async r => {
+    if (!r.url().includes('generativelanguage')) return;
+    let sn = ((Date.now() - (gTime.get(r.request()) || Date.now())) / 1000).toFixed(1), model = (r.url().match(/models\/([^:?]+)/) || [])[1] || 'liste';
+    let not = ''; if (!r.ok()) { try { not = ' · ' + (await r.text()).replace(/\s+/g, ' ').slice(0, 160); } catch (e) {} }
+    console.log(`\n    Gemini ${model}: ${r.status()} (${sn} sn)${not}`);
+  });
+  pg.on('requestfailed', q => { if (q.url().includes('generativelanguage')) console.log(`\n    Gemini isteği başarısız: ${q.failure() && q.failure().errorText}`); });
   pg.on('dialog', d => d.dismiss().catch(() => {}));
   process.stdout.write(`• ${L}: açılıyor`);
   await pg.goto(ADRES + 'index.html');
@@ -294,6 +314,7 @@ for (const L of LANGS) {
   let no = 0;
   for (const [ad, hazirla] of EKRANLAR) {
     no++;
+    if (SECILI.length && !SECILI.includes(no)) continue;
     await sifirla(pg);
     try { await hazirla(pg, L); } catch (e) { console.log(`\n  ! ${ad}: ${e.message}`); }
     await oturt(pg);
