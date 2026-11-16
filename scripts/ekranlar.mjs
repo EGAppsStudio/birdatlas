@@ -33,8 +33,11 @@ let GEMINI = process.env.GEMINI_KEY || '', EBIRD = process.env.EBIRD_KEY || '';
 if (process.stdin.isTTY) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   console.log('\nAnahtarlar yalnız bu çekim için kullanılır, hiçbir yere kaydedilmez. Boş bırakıp Enter: o ekran anahtarsız çekilir.');
+  console.log('  (Yapıştırmak için pencereye farenin SAĞ tuşuyla tıkla, sonra Enter.)');
   GEMINI = (await rl.question('  Gemini anahtarı (Maviş cevabı için): ')).trim() || GEMINI;
+  console.log(GEMINI ? `    ✓ alındı (${GEMINI.length} karakter, …${GEMINI.slice(-4)})` : '    – boş: Maviş kendisi cevaplayacak');
   EBIRD = (await rl.question('  eBird anahtarı (Keşfet için): ')).trim() || EBIRD;
+  console.log(EBIRD ? `    ✓ alındı (${EBIRD.length} karakter, …${EBIRD.slice(-4)})` : '    – boş: Keşfet örnek listeyle çekilecek');
   rl.close();
 }
 
@@ -54,11 +57,6 @@ async function indir(url, hedef) {
     al(url);
   });
 }
-if (!fs.existsSync(EMOJI_TTF)) {
-  process.stdout.write('Android emoji yazı tipi indiriliyor (bir kez, ~10 MB)... ');
-  try { await indir('https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf', EMOJI_TTF); console.log('tamam'); }
-  catch (e) { console.log('olmadı, Windows emojileri kullanılacak (' + e.message + ')'); }
-}
 const EMOJI_ARALIK = 'U+00A9,U+00AE,U+200D,U+203C,U+2049,U+20E3,U+2122,U+2139,U+2194-21AA,U+231A-23FF,U+24C2,U+25AA-25FE,U+2600-27BF,U+2934-2935,U+2B05-2B55,U+3030,U+303D,U+3297,U+3299,U+FE0F,U+1F000-1FAFF,U+E0020-E007F';
 function fontCss() {
   let css = '';
@@ -67,6 +65,10 @@ function fontCss() {
     const p = path.join(rob, f); if (!fs.existsSync(p)) continue;
     css += fs.readFileSync(p, 'utf8').replace(/font-family:\s*'[^']+'/g, "font-family: 'Segoe UI'").replace(/url\(\.\/files\//g, 'url(/__font/roboto/files/');
   }
+  // emoji: Android'in Noto Color Emoji'si (npm paketi @fontsource/noto-color-emoji); önce o, sonra Roboto tanımlanır,
+  // ikisinde de olan karakterlerde (rakamlar vb.) sonra tanımlanan Roboto kazanır
+  const emo = path.join(KOK, 'node_modules', '@fontsource', 'noto-color-emoji', '400.css');
+  if (!fs.existsSync(EMOJI_TTF) && fs.existsSync(emo)) css = fs.readFileSync(emo, 'utf8').replace(/font-family:\s*'[^']+'/g, "font-family: 'Segoe UI'").replace(/url\(\.\/files\//g, 'url(/__font/noto-color-emoji/files/') + '\n' + css;
   if (fs.existsSync(EMOJI_TTF)) for (const w of [400, 700]) css += `\n@font-face{font-family:'Segoe UI';src:url(/__emoji.ttf) format('truetype');font-weight:${w};unicode-range:${EMOJI_ARALIK};}`;
   return css + `\n.fchip.sample{display:none!important}\n`;
 }
