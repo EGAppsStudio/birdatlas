@@ -3975,11 +3975,21 @@
             ctx.textBaseline = 'alphabetic';
             return h;
         }
-        function bubble(ctx, txt, x, y, px) {
-            ctx.font = font(700, px); let w = ctx.measureText(txt).width + 60, h = px + 44;
+        // Konuşma balonu, sağ kenarı x'te. minX verilirse balon oraya taşmaz: önce yazı küçülür, yetmezse iki satıra bölünür (uzun dillerde)
+        function bubble(ctx, txt, x, y, px, minX) {
+            let lines = [txt], lim = minX != null ? x - minX : Infinity;
+            const wOf = (ls, p) => { ctx.font = font(700, p); return Math.max(...ls.map(l => ctx.measureText(l).width)) + 60; };
+            while (wOf(lines, px) > lim && px > 24) px -= 2;
+            if (wOf(lines, px) > lim && txt.includes(' ')) {
+                let i = txt.lastIndexOf(' '); lines = [txt.slice(0, i), txt.slice(i + 1)];
+                while (wOf(lines, px) > lim && px > 18) px -= 2;
+            }
+            let w = wOf(lines, px), lh = px * 1.2, h = lh * lines.length + 44 - px * 0.2;
             ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.15)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 6;
             rr(ctx, x - w, y, w, h, 26); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
-            ctx.fillStyle = C.navy; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(txt, x - w + 30, y + h / 2 + 2); ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = C.navy; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            lines.forEach((l, k) => ctx.fillText(l, x - w + 30, y + 22 + lh * (k + 0.5) - px * 0.1 + 2));
+            ctx.textBaseline = 'alphabetic';
         }
         function drawCover(ctx, img, x, y, w, h, fx, fy, zoom) {
             let s = Math.max(w / img.width, h / img.height) * (zoom || 1);
@@ -4141,7 +4151,8 @@
                 text(ctx, nf(s.sp.size), 74, story ? 380 : 280, { w: 700, px: story ? 230 : 170 });
                 text(ctx, LT('farklı tür gördün 🎉', 'species seen 🎉'), 84, story ? 470 : 350, { w: 500, px: story ? 56 : 44, maxW: story ? 620 : 600 });
                 await drawMavis(ctx, 'wave', W - (story ? 310 : 250), story ? 240 : 70, story ? 270 : 220);
-                bubble(ctx, `${LT('Seneye', 'Next year')} ${D.goal}?`, W - (story ? 300 : 250), story ? 300 : 110, story ? 34 : 30);
+                ctx.font = font(700, story ? 230 : 170); let numR = 74 + ctx.measureText(nf(s.sp.size)).width + 24;   // büyük sayının sağ kenarı
+                bubble(ctx, `${LT('Seneye', 'Next year')} ${D.goal}?`, W - (story ? 300 : 250), story ? 300 : 128, story ? 34 : 30, numR);
                 let cy = story ? 540 : 395;
                 chips(ctx, [`📍 ${s.locs.size} ${LT('konum', 'locations')}`, `📅 ${s.days.size} ${LT('gün', 'days')}`, `🏆 ${D.lif} ${LT('kertik', 'lifers')}`, s.birds ? `🔢 ${nf(s.birds)} ${LT('birey', 'birds')}` : null], 80, cy, { px: story ? 32 : 28, maxX: W - 60 });
                 let my = story ? 680 : 490, mh = story ? 600 : 470;
