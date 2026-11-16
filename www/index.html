@@ -434,6 +434,7 @@
                 <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
                     <label style="font-size:11px; display:flex; align-items:center; gap:3px; cursor:pointer; color:#0A3E70;"><input type="checkbox" id="show-dates" checked> 📅 Tarih</label>
                     <label style="font-size:11px; display:flex; align-items:center; gap:3px; cursor:pointer; color:#0A3E70;"><input type="checkbox" id="show-photos" checked> 📷 Fotolar</label>
+                    <label style="font-size:11px; display:flex; align-items:center; gap:3px; cursor:pointer; color:#0A3E70;"><input type="checkbox" id="show-names" checked> 🔤 Diğer adlar</label>
                     <label style="font-size:11px; display:flex; align-items:center; gap:3px; cursor:pointer; color:#0A3E70;"><input type="checkbox" id="show-links"> 🔗 eBird</label>
                     <label style="font-size:11px; display:flex; align-items:center; gap:3px; cursor:pointer; color:#0A3E70;"><input type="checkbox" id="show-locs" checked> 📍 Konum</label>
                     <label style="font-size:11px; display:flex; align-items:center; gap:3px; cursor:pointer; color:#0A3E70;"><input type="checkbox" id="show-birds" onchange="setShowBirds(this.checked)"> Birey sayısı</label>
@@ -751,7 +752,7 @@
             "📅 Takvim": "📅 Calendar", "📍 Konumlar": "📍 Locations", "🐦 Kuş Türleri": "🐦 Bird Species",
             "Tür 🔽": "Species 🔽", "Gözlem 🔽": "Obs. 🔽", "Nadirlik ⭐": "Rarity ⭐",
             "🗺️ İl/Bölge Bazında Grupla": "🗺️ Group by Province/Region",
-            "📅 Tarih": "📅 Date", "🐦 Türler": "🐦 Species", "📷 Fotolar": "📷 Photos", "📍 Konum": "📍 Location",
+            "📅 Tarih": "📅 Date", "🐦 Türler": "🐦 Species", "📷 Fotolar": "📷 Photos", "🔤 Diğer adlar": "🔤 Other names", "📍 Konum": "📍 Location",
             "Tarih 🔽": "Date 🔽", "Sayı 🔽": "Count 🔽", "Sayı 🔼": "Count 🔼", "Konum 🔽": "Location 🔽",
             "🏆 Kertikler": "🏆 Lifers", "🏆 Kertik Haritasını Aç": "🏆 Open Lifer Map", "❌ Kertik Haritasını Kapat": "❌ Close Lifer Map",
             "🏆 Kertik (İlk Gözlem)": "🏆 Lifer (First Sighting)", "Tüm gözlemlerin": "All your sightings",
@@ -2783,12 +2784,13 @@
                     if(d.ebird_code && !sData.ebird_code) sData.ebird_code = d.ebird_code;
                     if(d.img && !sData.img) sData.img = d.img;
                     if(d.sci_name && !sData.sci_name) sData.sci_name = d.sci_name;
+                    if(d.en_name && !sData.en_name) sData.en_name = d.en_name;
                 }
             });
 
             window.popupData.species = speciesStats;
 
-            let arr = Object.keys(speciesStats).map(k => ({ name: k, count: speciesStats[k].count, lastDate: speciesStats[k].lastDate, firstDate: speciesStats[k].firstDate, locCount: speciesStats[k].locs.size, dateCount: speciesStats[k].dates.size, birds: speciesStats[k].birds || 0, ebird_code: speciesStats[k].ebird_code, img: speciesStats[k].img, sci_name: speciesStats[k].sci_name })).filter(s => s.count > 0);
+            let arr = Object.keys(speciesStats).map(k => ({ name: k, count: speciesStats[k].count, lastDate: speciesStats[k].lastDate, firstDate: speciesStats[k].firstDate, locCount: speciesStats[k].locs.size, dateCount: speciesStats[k].dates.size, birds: speciesStats[k].birds || 0, ebird_code: speciesStats[k].ebird_code, img: speciesStats[k].img, sci_name: speciesStats[k].sci_name, en_name: speciesStats[k].en_name })).filter(s => s.count > 0);
             
             if(speciesSortMode === 'desc') arr.sort((a,b) => b.count - a.count || a.name.localeCompare(b.name));
             else if(speciesSortMode === 'alpha') arr.sort((a,b) => a.name.localeCompare(b.name));
@@ -2804,6 +2806,15 @@
             let showLinks = document.getElementById('show-links') ? document.getElementById('show-links').checked : false;
             let showLocs = document.getElementById('show-locs') ? document.getElementById('show-locs').checked : false;
             let showDates = document.getElementById('show-dates') ? document.getElementById('show-dates').checked : false;
+            let showNames = document.getElementById('show-names') ? document.getElementById('show-names').checked : true;
+            // Diğer adlar: İngilizce (seçili dilde ad İngilizceden farklıysa) + Latince; İngilizce arayüzde yalnız Latince
+            const otherNames = s => {
+                let en = s.en_name || (trToEnName && trToEnName[s.name]) || '', shown = LANG === 'tr' ? s.name : LANG === 'en' ? en : spLocal(en);
+                let parts = [];
+                if (en && LANG !== 'en' && normTxt(shown) !== normTxt(en)) parts.push(escHtml(en));
+                if (s.sci_name) parts.push(`<i>${escHtml(s.sci_name)}</i>`);
+                return parts.length ? `<div data-no-i18n class="sp-other" style="font-size:11px; margin-top:1px; opacity:0.8;">${parts.length === 2 ? `${parts[0]} (${parts[1]})` : parts[0]}</div>` : '';
+            };
 
             let anyFilter = selectedLocation || selectedProvince || selectedDates.size > 0;
             arr.forEach(s => {
@@ -2814,6 +2825,7 @@
                 html += `<div class="species-item" data-name="${s.name}" data-sci="${s.sci_name || ''}" style="padding:8px; margin-bottom:6px; background:${isSel ? '#1662B6' : '#f0f4f8'}; color:${isSel ? '#fff' : '#0A3E70'}; border-radius:4px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:${isSel ? 'bold' : 'normal'}; border: 1px solid ${isSel ? '#0A3E70' : '#e2e8f0'};">
                     <div style="flex:1; min-width:0;">
                         <span style="font-size:13px; font-weight:bold;">${s.name}</span>
+                        ${showNames ? otherNames(s) : ''}
                         ${(showDates && s.firstDate !== '9999-12-31') ? `<div style="font-size:10px; margin-top:2px; color:${isSel?'#FED008':'#1662B6'}; font-weight:bold;">İlk Gözlem: ${formatDisplayDate(s.firstDate)}</div>` : ''}
                         <div>${(showLinks && eBirdLink) ? `<a href="${eBirdLink}" target="_blank" onclick="event.stopPropagation();" style="font-size:10px; color:${isSel?'#cce':'#1662B6'}; margin-top:2px; display:inline-block;">eBird 🔗</a>` : ''}</div>
                         <div>
@@ -3213,7 +3225,7 @@
         });
         
         ['sort-date','sort-desc','sort-loc','sort-birds','sort-alpha'].forEach(id => document.getElementById(id).onclick = () => { speciesSortMode = id.split('-')[1]; renderSpecies(); });
-        ['show-photos','show-links','show-locs','show-dates'].forEach(id => { let el = document.getElementById(id); if(el) el.addEventListener('change', () => renderSpecies()); });
+        ['show-photos','show-links','show-locs','show-dates','show-names'].forEach(id => { let el = document.getElementById(id); if(el) el.addEventListener('change', () => renderSpecies()); });
         ['sort-loc-species','sort-loc-obs','sort-loc-alpha', 'sort-loc-rarity'].forEach(id => {
             let el = document.getElementById(id);
             if(el) el.onclick = () => { locationSortMode = id.replace('sort-loc-', ''); renderLocations(); };

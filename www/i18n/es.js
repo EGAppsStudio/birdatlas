@@ -410,6 +410,7 @@ window.I18N_ES = {
 "🗺️ Group by Province/Region": "🗺️ Agrupar por provincia/región",
 "📅 Date": "📅 Fecha",
 "📷 Photos": "📷 Fotos",
+"🔤 Other names": "🔤 Otros nombres",
 "📍 Location": "📍 Lugar",
 "Date 🔽": "Fecha 🔽",
 "Count 🔽": "Número 🔽",

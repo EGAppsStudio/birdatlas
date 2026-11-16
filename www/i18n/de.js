@@ -410,6 +410,7 @@ window.I18N_DE = {
 "🗺️ Group by Province/Region": "🗺️ Nach Bundesland/Region gruppieren",
 "📅 Date": "📅 Datum",
 "📷 Photos": "📷 Fotos",
+"🔤 Other names": "🔤 Weitere Namen",
 "📍 Location": "📍 Ort",
 "Date 🔽": "Datum 🔽",
 "Count 🔽": "Anzahl 🔽",
