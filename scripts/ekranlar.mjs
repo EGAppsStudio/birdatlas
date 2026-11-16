@@ -1,14 +1,17 @@
 // Mağaza ekran görüntüleri: uygulamanın web sürümünü telefon boyutunda açar, örnek veriyle
-// 10 ekranı 6 dilde çeker → magaza/ham-ekranlar/<dil>/01-harita.jpg … (60 görüntü).
+// 10 ekranı 6 dilde çeker → magaza/ham-ekranlar/<dil>/ps_<dil>_01_harita.jpg … (60 görüntü).
 // Claude bunlardan başlıklı, çerçeveli mağaza görsellerini (magaza/gorseller/<dil>/) hazırlar.
 //
 // Kullanım (KOMUTLAR.bat 9):   npm run ekranlar            → 6 dil
 //                              npm run ekranlar -- de fr   → yalnız bu diller
+// Başta Gemini ve eBird anahtarı sorulur (boş bırakılabilir); yalnız bu çekim için kullanılır, hiçbir yere yazılmaz.
 // Tarayıcı indirilmez: bilgisayardaki Microsoft Edge (yoksa Chrome) görünmez modda kullanılır.
-// Kişisel veri yok: uygulamanın kurgusal örnek verisi kullanılır. Keşfet ekranı turdaki örnek sonuçlarla çekilir (anahtar gerekmez).
+// Kişisel veri yok: uygulamanın kurgusal örnek verisi kullanılır.
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs';
 import path from 'node:path';
+import readline from 'node:readline/promises';
 import { createRequire } from 'node:module';
 
 const KOK = process.cwd(), WWW = path.join(KOK, 'www'), CIKTI = path.join(KOK, 'magaza', 'ham-ekranlar');
@@ -20,53 +23,227 @@ if (!fs.existsSync(path.join(WWW, 'lib', 'leaflet'))) { console.log('www/lib yok
 const DILLER = process.argv.slice(2).filter(a => /^[a-z]{2}$/.test(a));
 const LANGS = DILLER.length ? DILLER : ['tr', 'en', 'es', 'pt', 'de', 'fr'];
 const LOCALE = { tr: 'tr-TR', en: 'en-US', es: 'es-ES', pt: 'pt-BR', de: 'de-DE', fr: 'fr-FR' };
+const SORU = { tr: "2026'daki en iyi günüm hangisiydi?", en: 'What was my best day in 2026?', es: '¿Cuál fue mi mejor día en 2026?', pt: 'Qual foi meu melhor dia em 2026?', de: 'Was war mein bester Tag 2026?', fr: 'Quel a été mon meilleur jour en 2026 ?' };
+const KESFET = { lat: 44.5136, lng: 28.6356, km: 30 };        // Köstence yakınları
+const SAZ = 'Circus aeruginosus', SAZ_ML = '999000111';       // saz delicesi: eBird fotoğrafıymış gibi (sarı çerçeve)
+const SAZ_FOTO = path.join(KOK, 'magaza', 'ekran-foto', 'saz-delicesi.jpg');
+
+// ---------- Anahtarlar (yalnız bu çekimde, bellekte) ----------
+let GEMINI = process.env.GEMINI_KEY || '', EBIRD = process.env.EBIRD_KEY || '';
+if (process.stdin.isTTY) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  console.log('\nAnahtarlar yalnız bu çekim için kullanılır, hiçbir yere kaydedilmez. Boş bırakıp Enter: o ekran anahtarsız çekilir.');
+  GEMINI = (await rl.question('  Gemini anahtarı (Maviş cevabı için): ')).trim() || GEMINI;
+  EBIRD = (await rl.question('  eBird anahtarı (Keşfet için): ')).trim() || EBIRD;
+  rl.close();
+}
 
 // ---------- Android'deki yazı tipleri: Roboto + Noto Color Emoji ----------
-// Uygulama 'Segoe UI' yazı tipini ister; Windows'ta bu var, Android'de yok (orada Roboto çıkar).
-// Telefonla aynı görünsün diye 'Segoe UI' adını Roboto + Noto emoji dosyalarına bağlarız.
+// Uygulama 'Segoe UI' yazı tipini ister; Windows'ta bu var, Android'de yok (orada Roboto ve Noto emoji çıkar).
+// Telefonla aynı görünsün diye 'Segoe UI' adını bu iki yazı tipine bağlarız.
+const ONBELLEK = path.join(KOK, 'node_modules', '.ekranlar');
+const EMOJI_TTF = process.env.EMOJI_TTF || path.join(ONBELLEK, 'NotoColorEmoji.ttf');
+async function indir(url, hedef) {
+  fs.mkdirSync(path.dirname(hedef), { recursive: true });
+  await new Promise((ok, no) => {
+    const al = (u) => https.get(u, r => {
+      if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) return al(r.headers.location);
+      if (r.statusCode !== 200) return no(new Error('HTTP ' + r.statusCode));
+      const f = fs.createWriteStream(hedef + '.tmp'); r.pipe(f); f.on('finish', () => { f.close(); fs.renameSync(hedef + '.tmp', hedef); ok(); });
+    }).on('error', no);
+    al(url);
+  });
+}
+if (!fs.existsSync(EMOJI_TTF)) {
+  process.stdout.write('Android emoji yazı tipi indiriliyor (bir kez, ~10 MB)... ');
+  try { await indir('https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf', EMOJI_TTF); console.log('tamam'); }
+  catch (e) { console.log('olmadı, Windows emojileri kullanılacak (' + e.message + ')'); }
+}
+const EMOJI_ARALIK = 'U+00A9,U+00AE,U+200D,U+203C,U+2049,U+20E3,U+2122,U+2139,U+2194-21AA,U+231A-23FF,U+24C2,U+25AA-25FE,U+2600-27BF,U+2934-2935,U+2B05-2B55,U+3030,U+303D,U+3297,U+3299,U+FE0F,U+1F000-1FAFF,U+E0020-E007F';
 function fontCss() {
-  const fsrc = (pkg) => path.join(KOK, 'node_modules', '@fontsource', pkg);
   let css = '';
-  const al = (pkg, files, fam) => {
-    for (const f of files) {
-      const p = path.join(fsrc(pkg), f); if (!fs.existsSync(p)) continue;
-      css += fs.readFileSync(p, 'utf8')
-        .replace(/font-family:\s*'[^']+'/g, `font-family: '${fam}'`)
-        .replace(/url\(\.\/files\//g, `url(/__font/${pkg}/files/`);
-    }
-  };
-  al('noto-color-emoji', ['400.css'], 'Segoe UI');   // önce emoji, sonra Roboto: çakışan harflerde Roboto kazanır
-  al('roboto', ['400.css', '500.css', '700.css'], 'Segoe UI');
+  const rob = path.join(KOK, 'node_modules', '@fontsource', 'roboto');
+  for (const f of ['400.css', '500.css', '700.css']) {
+    const p = path.join(rob, f); if (!fs.existsSync(p)) continue;
+    css += fs.readFileSync(p, 'utf8').replace(/font-family:\s*'[^']+'/g, "font-family: 'Segoe UI'").replace(/url\(\.\/files\//g, 'url(/__font/roboto/files/');
+  }
+  if (fs.existsSync(EMOJI_TTF)) for (const w of [400, 700]) css += `\n@font-face{font-family:'Segoe UI';src:url(/__emoji.ttf) format('truetype');font-weight:${w};unicode-range:${EMOJI_ARALIK};}`;
   return css + `\n.fchip.sample{display:none!important}\n`;
 }
 
 // ---------- www/ klasörünü yerelde sun ----------
 const TIP = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.csv': 'text/csv', '.webmanifest': 'application/manifest+json' };
 const sunucu = http.createServer((q, r) => {
-  let u = decodeURIComponent(q.url.split('?')[0]);
-  let dosya = u.startsWith('/__font/') ? path.join(KOK, 'node_modules', '@fontsource', u.slice(8)) : path.join(WWW, u === '/' ? 'index.html' : u);
-  if (!dosya.startsWith(KOK) || !fs.existsSync(dosya) || fs.statSync(dosya).isDirectory()) { r.writeHead(404); return r.end(); }
+  let u = decodeURIComponent(q.url.split('?')[0]), dosya;
+  if (u === '/__emoji.ttf') dosya = EMOJI_TTF;
+  else if (u.startsWith('/__font/')) dosya = path.join(KOK, 'node_modules', '@fontsource', u.slice(8));
+  else dosya = path.join(WWW, u === '/' ? 'index.html' : u);
+  if (!fs.existsSync(dosya) || fs.statSync(dosya).isDirectory()) { r.writeHead(404); return r.end(); }
   r.writeHead(200, { 'content-type': TIP[path.extname(dosya)] || 'application/octet-stream' });
   fs.createReadStream(dosya).pipe(r);
 });
 await new Promise(ok => sunucu.listen(0, '127.0.0.1', ok));
 const ADRES = `http://127.0.0.1:${sunucu.address().port}/`;
 
-// ---------- Çekilecek ekranlar (uygulamanın tanıtım turu adımları kullanılır) ----------
+const bekle = (ms) => new Promise(ok => setTimeout(ok, ms));
+async function oturt(pg, ms = 1500) { await pg.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {}); await bekle(ms); }
+
+// Ekranlar arasında her şeyi kapat
+async function sifirla(pg) {
+  await pg.evaluate(() => {
+    try { if (typeof closeShare === 'function') closeShare(); } catch (e) {}
+    try { if (typeof closePhotoViewer === 'function') closePhotoViewer(); } catch (e) {}
+    try { let c = document.getElementById('chat-window'); if (c && c.style.display === 'flex') toggleChat(); } catch (e) {}
+    try { if (liferMode) toggleLiferMode(); } catch (e) {}
+    try { let m = document.getElementById('mini-popup'); if (m) m.style.display = 'none'; } catch (e) {}
+    try { mapObj.closePopup(); } catch (e) {}
+    try { closeTabs(); } catch (e) {}
+    try { selectedDates.clear(); selectedSpecies = null; selectedLocation = null; selectedProvince = null; expandedLocation = null; renderAll(); } catch (e) {}
+    let s = document.getElementById('ekran-ozel'); if (s) s.textContent = '';
+  });
+  await bekle(600);
+}
+// Bir öğeyi kaydırılabilir kutusunda ekranın belli bir yüksekliğine getir (oran: 0 = üst, 1 = alt)
+const KAYDIR = (el, oran) => {
+  let p = el.parentElement;
+  while (p && !(p.scrollHeight > p.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(p).overflowY))) p = p.parentElement;
+  if (!p) return;
+  let pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
+  p.scrollTop += (er.top - pr.top) - pr.height * oran;
+};
+
+// ---------- Çekilecek ekranlar ----------
 const EKRANLAR = [
-  ['01-harita', 'map'],
-  ['02-konumlar', 'locations'],
-  ['03-turler', 'species'],
-  ['04-takvim', 'calendar'],
-  ['05-grafik', 'calendar', async (pg) => { await pg.evaluate(() => { let c = document.querySelector('#filter-panels .year-chart'); if (c) c.scrollIntoView({ block: 'start' }); }); }],
-  ['06-kertik', 'lifer'],
-  ['07-foto', 'myphoto'],
-  ['08-paylas', 'share', async (pg) => { await pg.evaluate(() => { closeShare(); try { clearFilter('all'); } catch (e) {} openShare({ type: 'year' }); }); await bekle(2500); }],
-  ['09-mavis', 'mavis'],
-  ['10-kesfet', 'explore'],
+  ['harita', async (pg) => {
+    await pg.evaluate(() => { closeTabs(); mapObj.zoomIn(1, { animate: false }); });
+  }],
+  ['takvim', async (pg) => {
+    await pg.evaluate(() => {
+      openTab('obs'); setObsSub('calendar');
+      currentCalDate = new Date(2025, 7, 1); selectedDates.clear(); selectedDates.add('2025-08-12'); lastClickedDay = '2025-08-12'; renderAll();
+    });
+  }],
+  ['grafik', async (pg) => {
+    await pg.evaluate((K) => {
+      openTab('obs'); setObsSub('calendar');
+      currentCalDate = new Date(2025, 7, 1); selectedDates.clear(); selectedDates.add('2025-08-12'); lastClickedDay = '2025-08-12'; renderAll();
+      let sel = document.querySelector('#filter-panels .year-chart select');
+      let v = sel && [...sel.options].find(o => o.value === '2025'); setChart('obs', 'year', v ? v.value : '2025');
+      selChartBar('obs', 8);   // Eylül
+    });
+    await bekle(500);
+    await pg.evaluate((KAYDIR) => { let c = document.querySelector('#filter-panels .year-chart'); if (c) eval('(' + KAYDIR + ')')(c, 0.07); }, KAYDIR.toString());
+  }],
+  ['konumlar', async (pg) => {
+    await pg.evaluate(() => { openTab('obs'); setObsSub('locations'); });
+    await bekle(700);
+    await pg.evaluate(() => {
+      let s = [...document.querySelectorAll('#location-list span[onclick*="showLocDays"]')].find(x => x.getAttribute('onclick').includes('Central Park'));
+      if (s) s.click();
+    });
+  }],
+  ['turler', async (pg) => {
+    await pg.evaluate(() => { openTab('obs'); setObsSub('species'); speciesSortMode = 'loc'; renderSpecies(); });
+    await bekle(700);
+    await pg.evaluate((KAYDIR) => {
+      let it = document.querySelector('#species-list .species-item[data-sci="Merops apiaster"]'); if (!it) return;
+      eval('(' + KAYDIR + ')')(it, 0.12);
+      setTimeout(() => { let s = it.querySelector('span[onclick^="showObsList"]'); if (s) s.click(); }, 400);
+    }, KAYDIR.toString());
+  }],
+  ['kertik', async (pg) => {
+    await pg.evaluate(() => { openTab('lifer'); if (!liferMode) toggleLiferMode(); });
+    await bekle(1500);
+    await pg.evaluate(() => {
+      closeTabs();
+      try { mapObj.stop(); } catch (e) {}
+      let ll = L.latLng(-0.369728, 36.084359), sz = mapObj.getSize();
+      mapObj.setView(ll, 11, { animate: false }); mapObj.panBy([sz.x / 2 - sz.x * 0.62, sz.y / 2 - sz.y * 0.74], { animate: false });
+    });
+    await bekle(1500);
+    await pg.evaluate(() => {
+      let hedef = null;
+      markerLayerGroup.eachLayer(m => { let p = m.getPopup && m.getPopup(); if (!p || hedef) return; let c = p.getContent(); c = typeof c === 'function' ? c(m) : c; if (String(c).includes('Coracias caudatus')) hedef = m; });
+      if (hedef) hedef.openPopup();
+    });
+    await bekle(1200);
+    await pg.evaluate(() => {   // kutu üstteki filtre etiketlerinin altında kalmasın
+      let p = document.querySelector('.leaflet-popup'), fb = document.getElementById('filter-bar'); if (!p) return;
+      let alt = Math.max(fb && fb.offsetHeight ? fb.getBoundingClientRect().bottom : 0, document.getElementById('tabbar') ? document.getElementById('tabbar').getBoundingClientRect().bottom : 0) + 12;
+      let ust = p.getBoundingClientRect().top;
+      if (ust < alt) mapObj.panBy([0, ust - alt], { animate: false });
+    });
+  }],
+  ['foto', async (pg) => {
+    await pg.evaluate(([SAZ, N]) => {
+      try { localStorage.setItem('ml_photos', '1'); } catch (e) {}
+      ML_CANDS[SAZ] = [N]; mlOk[N] = 1; ML_PHOTOS[SAZ] = mlUrl(N); delete ML_PICK[SAZ]; applyMyPhoto(SAZ); renderAll();
+      openTab('obs'); setObsSub('species'); openPhotoViewer(SAZ);
+    }, [SAZ, SAZ_ML]);
+  }],
+  ['paylas', async (pg) => {
+    await pg.evaluate(() => {
+      document.getElementById('ekran-ozel').textContent = '#share-overlay .sp-pick{max-height:86px!important;overflow:hidden!important}';
+      closeTabs(); openShare({ type: 'year' });
+    });
+    await bekle(1500);
+    await pg.waitForFunction(() => { let b = document.getElementById('share-busy'); return !b || !b.offsetParent || getComputedStyle(b).display === 'none' || getComputedStyle(b).visibility === 'hidden' || getComputedStyle(b).opacity === '0'; }, null, { timeout: 30000 }).catch(() => {});
+    await bekle(1500);
+    await pg.evaluate((KAYDIR) => { let w = document.getElementById('share-preview-wrap'); if (w) eval('(' + KAYDIR + ')')(w, 0.5); }, KAYDIR.toString());
+  }],
+  ['mavis', async (pg, L) => {
+    await pg.evaluate(() => { closeTabs(); toggleChat(); });
+    await bekle(800);
+    const buyut = () => pg.evaluate(() => {   // pencereyi yukarı doğru olabildiğince büyüt (sekmelerin hemen altına kadar)
+      let cw = document.getElementById('chat-window'), cm = document.getElementById('chat-messages');
+      // uygulamada sürükleyerek varılabilen en üst: ☰ düğmesinin hemen altı
+      let ust = cw.getBoundingClientRect().top, mb = document.getElementById('menu-btn'), r = mb && mb.getBoundingClientRect();
+      let hedef = r && r.height ? r.bottom + 10 : 150;
+      cm.style.setProperty('height', Math.round(parseFloat(getComputedStyle(cm).height) + ust - hedef) + 'px', 'important');
+    });
+    await buyut(); await bekle(500); await buyut();
+    if (GEMINI) {
+      await pg.evaluate(([k, soru]) => { localStorage.setItem('ai_provider', 'gemini'); localStorage.setItem('ai_key_gemini', k); document.getElementById('chat-input').value = soru; sendChatMessage(); }, [GEMINI, SORU[L]]);
+      await bekle(2000);
+      await pg.waitForFunction(() => !document.querySelector('#chat-messages [id^="loading"], #chat-messages [id^="load"]'), null, { timeout: 90000 }).catch(() => {});
+    } else {
+      await pg.evaluate(() => askMavisLocal(LT('En iyi günüm hangisi?', 'Which was my best day?')));
+    }
+    await bekle(1500);
+    await buyut();
+    // ilk mesajdaki Maviş çizimi en üstte kalsın, altında soru ve cevap
+    await pg.evaluate((KAYDIR) => {
+      let cm = document.getElementById('chat-messages'), m = cm.querySelector('.chat-msg svg');
+      if (m) eval('(' + KAYDIR + ')')(m, 0.01); else cm.scrollTop = 0;
+    }, KAYDIR.toString());
+  }],
+  ['kesfet', async (pg) => {
+    await pg.evaluate(([K, key]) => {
+      document.getElementById('ekran-ozel').textContent = 'body #filter-panels{max-height:60vh!important}';
+      openTab('explore');
+      currentRadius = K.km; let sl = document.getElementById('radius-slider'); if (sl) { sl.value = K.km; sl.dispatchEvent(new Event('input')); }
+      if (key) { EBIRD_API = key; fetchExploreData(K.lat, K.lng); } else demoExplore();
+    }, [KESFET, EBIRD]);
+    await pg.waitForFunction(() => typeof exploreData !== 'undefined' && exploreData.length > 0, null, { timeout: 30000 }).catch(() => {});
+    await bekle(1000);
+    const altiTur = () => pg.evaluate(() => {   // listede 6 tür tam görünsün
+      let fp = document.getElementById('filter-panels');
+      let rows = [...fp.querySelectorAll('#explore-content a')].map(a => a.closest('div')).filter((d, i, A) => d && A.indexOf(d) === i);
+      if (rows.length < 6) return;
+      let kutu = rows[5].parentElement; while (kutu && !(kutu.scrollHeight > kutu.clientHeight + 4)) kutu = kutu.parentElement; kutu = kutu || fp;
+      let fazla = rows[5].getBoundingClientRect().bottom + 10 - Math.min(kutu.getBoundingClientRect().bottom, fp.getBoundingClientRect().bottom);
+      if (fazla > 0) document.getElementById('ekran-ozel').textContent = `body #filter-panels{max-height:${Math.ceil(fp.offsetHeight + fazla)}px!important}`;
+    });
+    await altiTur(); await bekle(400); await altiTur(); await bekle(400);
+    await pg.evaluate(() => {   // sarı daire paneli ile alttaki Maviş düğmesi arasındaki boşluğun ortasında
+      let circle = exploreCircle || (typeof demoCircle !== 'undefined' && demoCircle); if (!circle) return;
+      let alt = document.getElementById('filter-panels').getBoundingClientRect().bottom;
+      mapObj.fitBounds(circle.getBounds(), { paddingTopLeft: [50, alt + 40], paddingBottomRight: [50, 120], animate: false });
+    });
+    await bekle(800);
+  }],
 ];
 
-const bekle = (ms) => new Promise(ok => setTimeout(ok, ms));
 async function tarayici() {
   for (const channel of ['msedge', 'chrome', undefined]) {
     try { return await chromium.launch({ channel, headless: true }); } catch (e) {}
@@ -84,12 +261,18 @@ for (const L of LANGS) {
     viewport: { width: 412, height: 800 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: LOCALE[L],
     userAgent: 'Mozilla/5.0 (Linux; Android 15; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36',
   });
+  // saz delicesinin "eBird fotoğrafı": Macaulay adresine giden istek bilgisayardaki fotoğrafla cevaplanır
+  if (process.env.EKRAN_SAHTE_EBIRD) await ctx.route(/api\.ebird\.org/, r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(['Larus michahellis|Yellow-legged Gull|yelgul', 'Phalacrocorax carbo|Great Cormorant|grecor', 'Fulica atra|Eurasian Coot|eurcoo', 'Cygnus olor|Mute Swan|mutswa', 'Pica pica|Eurasian Magpie|eurmag', 'Corvus cornix|Hooded Crow|hoocro', 'Anas platyrhynchos|Mallard|mallar', 'Ardea alba|Great Egret|greegr'].map((x, i) => { let [sciName, comName, speciesCode] = x.split('|'); return { sciName, comName, speciesCode, howMany: 40 - i * 4 }; })) }));
+  if (fs.existsSync(SAZ_FOTO)) await ctx.route(new RegExp(`/api/v1/asset/${SAZ_ML}/`), r => r.fulfill({ status: 200, contentType: 'image/jpeg', body: fs.readFileSync(SAZ_FOTO) }));
   await ctx.addInitScript(([L, css]) => {
     try {
       localStorage.setItem('app_lang', L); localStorage.setItem('tour_done', '1'); localStorage.setItem('fbask_done', '1');
-      localStorage.setItem('launch_count', '1'); localStorage.setItem('milestone_seen', '99999');
+      localStorage.setItem('launch_count', '1'); localStorage.setItem('milestone_seen', '99999'); localStorage.setItem('ai_provider', 'none');
     } catch (e) {}
-    document.addEventListener('DOMContentLoaded', () => { let s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); });
+    document.addEventListener('DOMContentLoaded', () => {
+      let s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+      let o = document.createElement('style'); o.id = 'ekran-ozel'; document.head.appendChild(o);
+    });
   }, [L, css]);
   const pg = await ctx.newPage();
   pg.on('dialog', d => d.dismiss().catch(() => {}));
@@ -99,20 +282,14 @@ for (const L of LANGS) {
   await pg.evaluate(() => window.loadSampleData());
   await pg.waitForFunction(() => typeof obsData !== 'undefined' && obsData.length > 0 && document.getElementById('upload-overlay').style.display === 'none', null, { timeout: 120000 });
   await bekle(3000);
-  await pg.evaluate(() => { document.querySelectorAll('.app-alert, #fbask').forEach(e => e.remove()); startTour(true); });
-  for (const [ad, adim, sonra] of EKRANLAR) {
-    await pg.evaluate(async (adim) => {
-      let i = tourSteps.findIndex(s => s.id === adim);
-      if (i < 0) throw new Error('tur adımı yok: ' + adim);
-      if (tourIdx !== i) await goTour(i);
-    }, adim);
-    await bekle(adim === 'lifer' ? 3500 : 1800);
-    if (sonra) { await sonra(pg); await bekle(800); }
-    await pg.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-    await bekle(1500);   // harita parçaları ve fotoğraflar otursun
-    await pg.evaluate(() => { let t = document.getElementById('tour'); if (t) t.style.visibility = 'hidden'; });
-    await pg.screenshot({ path: path.join(klasor, ad + '.jpg'), type: 'jpeg', quality: 90 });
-    await pg.evaluate(() => { let t = document.getElementById('tour'); if (t) t.style.visibility = ''; });
+  await pg.evaluate(() => document.querySelectorAll('.app-alert, #fbask, #mlask').forEach(e => e.remove()));
+  let no = 0;
+  for (const [ad, hazirla] of EKRANLAR) {
+    no++;
+    await sifirla(pg);
+    try { await hazirla(pg, L); } catch (e) { console.log(`\n  ! ${ad}: ${e.message}`); }
+    await oturt(pg);
+    await pg.screenshot({ path: path.join(klasor, `ps_${L}_${String(no).padStart(2, '0')}_${ad}.jpg`), type: 'jpeg', quality: 90 });
     process.stdout.write('.'); toplam++;
   }
   console.log(' ✓');
