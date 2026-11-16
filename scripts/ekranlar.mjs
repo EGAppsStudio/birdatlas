@@ -70,6 +70,9 @@ function fontCss() {
   const emo = path.join(KOK, 'node_modules', '@fontsource', 'noto-color-emoji', '400.css');
   if (!fs.existsSync(EMOJI_TTF) && fs.existsSync(emo)) css = fs.readFileSync(emo, 'utf8').replace(/font-family:\s*'[^']+'/g, "font-family: 'Segoe UI'").replace(/url\(\.\/files\//g, 'url(/__font/noto-color-emoji/files/') + '\n' + css;
   if (fs.existsSync(EMOJI_TTF)) for (const w of [400, 700]) css += `\n@font-face{font-family:'Segoe UI';src:url(/__emoji.ttf) format('truetype');font-weight:${w};unicode-range:${EMOJI_ARALIK};}`;
+  // Üstteki 4 sekmenin simgeleri: Windows'un görünmez tarayıcısı bunları çizmiyor; Android'deki (Noto) emojilerin resmini koyarız
+  css += `\n#tabbar .tb b{font-size:0!important;height:21px;background:center/20px 20px no-repeat}`;
+  for (const k of ['obs', 'lifer', 'explore', 'share']) css += `\n#tabbar .tb[data-tab="${k}"] b{background-image:url(/__emoji/${k}.png)}`;
   return css + `\n.fchip.sample{display:none!important}\n`;
 }
 
@@ -78,6 +81,7 @@ const TIP = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/java
 const sunucu = http.createServer((q, r) => {
   let u = decodeURIComponent(q.url.split('?')[0]), dosya;
   if (u === '/__emoji.ttf') dosya = EMOJI_TTF;
+  else if (u.startsWith('/__emoji/')) dosya = path.join(KOK, 'magaza', 'ekran-foto', 'emoji', path.basename(u));
   else if (u.startsWith('/__font/')) dosya = path.join(KOK, 'node_modules', '@fontsource', u.slice(8));
   else dosya = path.join(WWW, u === '/' ? 'index.html' : u);
   if (!fs.existsSync(dosya) || fs.statSync(dosya).isDirectory()) { r.writeHead(404); return r.end(); }
@@ -117,7 +121,7 @@ const KAYDIR = (el, oran) => {
 // ---------- Çekilecek ekranlar ----------
 const EKRANLAR = [
   ['harita', async (pg) => {
-    await pg.evaluate(() => { closeTabs(); mapObj.zoomIn(1, { animate: false }); });
+    await pg.evaluate(() => { closeTabs(); mapObj.zoomIn(1, { animate: false }); mapObj.panBy([-70, 0], { animate: false }); });   // biraz sağa: Endülüs de girsin
   }],
   ['takvim', async (pg) => {
     await pg.evaluate(() => {
@@ -206,8 +210,10 @@ const EKRANLAR = [
     await buyut(); await bekle(500); await buyut();
     if (GEMINI) {
       await pg.evaluate(([k, soru]) => { localStorage.setItem('ai_provider', 'gemini'); localStorage.setItem('ai_key_gemini', k); document.getElementById('chat-input').value = soru; sendChatMessage(); }, [GEMINI, SORU[L]]);
-      await bekle(2000);
-      await pg.waitForFunction(() => !document.querySelector('#chat-messages [id^="loading"], #chat-messages [id^="load"]'), null, { timeout: 90000 }).catch(() => {});
+      await bekle(3000);
+      // Gemini'nin cevabını bekle (yoğunsa birkaç kez dener; 4 dakikaya kadar)
+      const geldi = await pg.waitForFunction(() => !document.querySelector('#chat-messages [id^="loading"]'), null, { timeout: 240000, polling: 1000 }).then(() => true).catch(() => false);
+      if (!geldi) process.stdout.write(' (Gemini cevap vermedi)');
     } else {
       await pg.evaluate(() => askMavisLocal(LT('En iyi günüm hangisi?', 'Which was my best day?')));
     }
