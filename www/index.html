@@ -369,6 +369,7 @@
             /* Kendi simgelerimiz (emoji yerine): yazının boyunda, rengi yazının rengi, vurgu sarı */
         .icw { display: inline-block; width: 1.18em; height: 1.18em; vertical-align: -0.24em; line-height: 0; }
         .icw .ic { width: 100%; height: 100%; display: block; }
+        #main-menu .icw { width: 20px; height: 20px; color: #0A3E70; vertical-align: 0; flex: none; }
         #tabbar .tb b { display: flex; justify-content: center; }
         #tabbar .tb .icw { width: 24px; height: 24px; vertical-align: 0; }
 </style>
@@ -900,11 +901,25 @@
             tur: _isv(`<path d="M3.5 12.5 L8 11.2 C8.8 7.2 13.2 5.6 16.4 8 C18.4 9.6 19.2 11.8 19.8 13.6 L29 11.2 C27.8 19.2 22.6 25.2 15 25.2 C10.2 25.2 7.4 21.6 8 16.4 Z" fill="${ICB}"/><path d="M12.2 16.2 C15.6 15 20.4 14.8 24.6 13.6 C22.8 18.8 18.6 21.8 13.4 21.2 C11.8 19.6 11.6 17.4 12.2 16.2 Z" fill="${ICA}"/><circle cx="12.6" cy="11.4" r="1.25" fill="#fff"/><path d="M13.5 25 L12.5 28.5 M17 25 L17 28.5" stroke="${ICB}" stroke-width="1.6"/>`),
             foto: _isv(`<path d="M11 10 L13 6.5 H19 L21 10" ${ICS} stroke="${ICB}" stroke-width="2"/><rect x="4" y="10" width="24" height="16" rx="3" ${ICS} stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="18" r="5.2" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="18" r="2" fill="${ICB}"/><circle cx="23.5" cy="13.6" r="1.1" fill="${ICB}"/>`),
             grafik: _isv(`<path d="M4 27 H28" stroke="${ICB}" stroke-width="2"/><rect x="6" y="16" width="4.5" height="9" rx="1" fill="${ICB}"/><rect x="13.75" y="11" width="4.5" height="14" rx="1" fill="${ICB}"/><rect x="21.5" y="5" width="4.5" height="20" rx="1" fill="${ICA}" stroke="${ICB}" stroke-width="1.6"/>`),
+            // menü simgeleri + bağlantı / kaydet
+            kilavuz: _isv(`<path d="M16 8 C12.5 5.8 8 5.5 4 6.5 V25 C8 24 12.5 24.3 16 26.5 C19.5 24.3 24 24 28 25 V6.5 C24 5.5 19.5 5.8 16 8 Z" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M16 8 V26.5" stroke="${ICB}" stroke-width="1.8"/><path d="M20.5 6.4 V14.5 L22.5 12.8 L24.5 14.5 V5.9" fill="${ICA}" stroke="${ICB}" stroke-width="1.5"/>`),
+            rehber: _isv(`<path d="M16 4 V28" stroke="${ICB}" stroke-width="2.4"/><path d="M16 6.5 H24.5 L28 10 L24.5 13.5 H16 Z" fill="${ICA}" stroke="${ICB}" stroke-width="1.8"/><path d="M16 15.5 H7.5 L4 19 L7.5 22.5 H16 Z" ${ICS} stroke="${ICB}" stroke-width="1.8"/><path d="M11 28 H21" stroke="${ICB}" stroke-width="2.4"/>`),
+            dil: _isv(`<path d="M17 12 H27 A2 2 0 0 1 29 14 V22 A2 2 0 0 1 27 24 H26 V27.5 L22 24 H17 A2 2 0 0 1 15 22 V14 A2 2 0 0 1 17 12 Z" fill="${ICA}" stroke="${ICB}" stroke-width="1.8"/><path d="M19 17 H25 M19 20 H23" stroke="${ICB}" stroke-width="1.6"/><path d="M5 4.5 H19 A2 2 0 0 1 21 6.5 V15.5 A2 2 0 0 1 19 17.5 H11 L7 21 V17.5 H5 A2 2 0 0 1 3 15.5 V6.5 A2 2 0 0 1 5 4.5 Z" fill="#fff" stroke="${ICB}" stroke-width="2"/><path d="M8.5 14.5 L12 7.5 L15.5 14.5 M9.8 12 H14.2" stroke="${ICB}" stroke-width="1.8"/>`),
+            veri: _isv(`<path d="M6 8 V24 C6 26 10.5 27.5 16 27.5 C21.5 27.5 26 26 26 24 V8" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M6 16 C6 18 10.5 19.5 16 19.5 C21.5 19.5 26 18 26 16" stroke="${ICB}" stroke-width="1.8"/><ellipse cx="16" cy="8" rx="10" ry="3.6" fill="${ICA}" stroke="${ICB}" stroke-width="2"/>`),
+            ayar: _isv(`<circle cx="16" cy="16" r="10.6" stroke="${ICB}" stroke-width="4.6" stroke-dasharray="4.15 4.17"/><circle cx="16" cy="16" r="8.3" ${ICS} stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="16" r="3.4" fill="${ICA}" stroke="${ICB}" stroke-width="1.8"/>`),
+            geri: _isv(`<path d="M6 5.5 H26 A2.5 2.5 0 0 1 28.5 8 V20 A2.5 2.5 0 0 1 26 22.5 H14 L8 27.5 V22.5 H6 A2.5 2.5 0 0 1 3.5 20 V8 A2.5 2.5 0 0 1 6 5.5 Z" ${ICS} stroke="${ICB}" stroke-width="2"/><circle cx="10.5" cy="14" r="1.8" fill="${ICB}"/><circle cx="16" cy="14" r="2.2" fill="${ICA}" stroke="${ICB}" stroke-width="1.2"/><circle cx="21.5" cy="14" r="1.8" fill="${ICB}"/>`),
+            yildiz: _isv(`<path d="M16 3.8 L19.6 11.2 L27.7 12.3 L21.8 17.9 L23.3 26 L16 22.1 L8.7 26 L10.2 17.9 L4.3 12.3 L12.4 11.2 Z" fill="${ICA}" stroke="${ICB}" stroke-width="2"/>`),
+            oner: _isv(`<path d="M9 19 L11.2 26.5 H14.8 L13.2 20" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M4.5 12.5 H9 L21.5 5.5 V26.5 L9 19.5 H4.5 Z" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M25 11.5 C27.4 13.5 27.4 18.5 25 20.5" stroke="${ICB}" stroke-width="4.4"/><path d="M25 11.5 C27.4 13.5 27.4 18.5 25 20.5" stroke="${ICA}" stroke-width="2.2"/>`),
+            instagram: _isv(`<rect x="5" y="5" width="22" height="22" rx="6.5" stroke="${ICB}" stroke-width="2.4"/><circle cx="16" cy="16" r="5.2" stroke="${ICB}" stroke-width="2.4"/><circle cx="22.4" cy="9.6" r="1.6" fill="${ICB}"/>`),
+            kilit: _isv(`<path d="M10.5 14 V10.5 A5.5 5.5 0 0 1 21.5 10.5 V14" stroke="${ICB}" stroke-width="2.4"/><rect x="6" y="14" width="20" height="14" rx="3" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="19.8" r="2" fill="${ICB}"/><path d="M16 21 V24" stroke="${ICB}" stroke-width="2"/>`),
+            link: _isv(`<path d="M13 19 L19 13" stroke="${ICB}" stroke-width="2.4"/><path d="M11.2 14.8 L8.4 17.6 A4.8 4.8 0 0 0 15.2 24.4 L18 21.6" stroke="${ICB}" stroke-width="2.6"/><path d="M20.8 17.2 L23.6 14.4 A4.8 4.8 0 0 0 16.8 7.6 L14 10.4" stroke="${ICB}" stroke-width="5"/><path d="M20.8 17.2 L23.6 14.4 A4.8 4.8 0 0 0 16.8 7.6 L14 10.4" stroke="${ICA}" stroke-width="2.2"/>`),
+            kaydet: _isv(`<path d="M6 16.5 V24.5 A2.5 2.5 0 0 0 8.5 27 H23.5 A2.5 2.5 0 0 0 26 24.5 V16.5" stroke="${ICB}" stroke-width="2.4"/><path d="M16 5 V19.5 M10.5 14 L16 19.6 L21.5 14" stroke="${ICB}" stroke-width="5.4"/><path d="M16 5 V19.5 M10.5 14 L16 19.6 L21.5 14" stroke="${ICA}" stroke-width="2.6"/>`),
         };
         const ICON_OF = { '\u{1F5FA}': 'harita', '\u{1F3C6}': 'kertik', '\u{1F30D}': 'kesfet', '\u{1F30E}': 'kesfet', '\u{1F30F}': 'kesfet', '\u{1F4E4}': 'paylas',
-            '\u{1F4C5}': 'takvim', '\u{1F4C6}': 'takvim', '\u{1F5D3}': 'takvim', '\u{1F4CD}': 'konum', '\u{1F426}': 'tur', '\u{1F4F7}': 'foto', '\u{1F4F8}': 'foto', '\u{1F4CA}': 'grafik' };
-        const ICON_RE = /(\u{1F5FA}|\u{1F3C6}|\u{1F30D}|\u{1F30E}|\u{1F30F}|\u{1F4E4}|\u{1F4C5}|\u{1F4C6}|\u{1F5D3}|\u{1F4CD}|\u{1F426}|\u{1F4F7}|\u{1F4F8}|\u{1F4CA})\uFE0F?/u;
+            '\u{1F4C5}': 'takvim', '\u{1F4C6}': 'takvim', '\u{1F5D3}': 'takvim', '\u{1F4CD}': 'konum', '\u{1F426}': 'tur', '\u{1F4F7}': 'foto', '\u{1F4F8}': 'foto', '\u{1F4CA}': 'grafik', '\u{1F517}': 'link', '\u{1F4BE}': 'kaydet' };
+        const ICON_RE = /(\u{1F5FA}|\u{1F3C6}|\u{1F30D}|\u{1F30E}|\u{1F30F}|\u{1F4E4}|\u{1F4C5}|\u{1F4C6}|\u{1F5D3}|\u{1F4CD}|\u{1F426}|\u{1F4F7}|\u{1F4F8}|\u{1F4CA}|\u{1F517}|\u{1F4BE})\uFE0F?/u;
         const ICON_RE_G = new RegExp(ICON_RE.source, 'gu');
+        const IC = k => `<span class="icw">${ICONS[k]}</span>`;
         function icSkip(el) { return !el || (el.closest && el.closest('script, style, textarea, select, option, svg, canvas, title, [contenteditable], .no-ic')); }
         // Bir metin düğümündeki emojileri simgeyle değiştir: düğümün kendisi son parça olarak kalır (çeviri bilgisi üstünde durur)
         function iconizeText(n) {
@@ -2472,7 +2487,7 @@
                         st.obs.forEach(o => {
                             let countStr = o.count > 1 ? ` <span style="background:#e2e8f0; color:#0A3E70; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${o.count} Gözlem</span>` : ``;
                             let eLink = o.ebird_code ? `https://ebird.org/species/${o.ebird_code}` : `https://en.wikipedia.org/wiki/${encodeURIComponent(o.sci_name)}`;
-                            popupHtml += `<div style="margin-bottom:8px; background:#f9f9f9; padding:5px; border-radius:4px; border-left:3px solid #FED008;"><a href="${eLink}" target="_blank" style="font-weight:bold; color:#1662B6; font-size:14px; text-decoration:none;">${o.tr_name} 🔗</a> ${countStr}<br/><span style="color:#282629; font-size:11px;">${LANG === 'en' ? `<i style="color:#777;">${o.sci_name}</i>` : `${o.en_name} (<i style="color:#777;">${o.sci_name}</i>)`}</span><br/><span style="color:#0A3E70; font-size:11px; font-weight:bold;">🗓️ Tarih: ${formatDisplayDate(o.date)}</span></div>`;
+                            popupHtml += `<div style="margin-bottom:8px; background:#f9f9f9; padding:5px; border-radius:4px; border-left:3px solid #FED008;"><a href="${eLink}" target="_blank" style="font-weight:bold; color:#1662B6; font-size:14px; text-decoration:none;">${o.tr_name}</a> ${countStr}<br/><span style="color:#282629; font-size:11px;">${LANG === 'en' ? `<i style="color:#777;">${o.sci_name}</i>` : `${o.en_name} (<i style="color:#777;">${o.sci_name}</i>)`}</span><br/><span style="color:#0A3E70; font-size:11px; font-weight:bold;">🗓️ Tarih: ${formatDisplayDate(o.date)}</span></div>`;
                         });
                         popupHtml += `</div>`;
                         markerLayerGroup.addLayer(L.circleMarker([st.lat, st.lon], {radius: 5, color: '#0A3E70', fillColor: '#FED008', fillOpacity: 0.9, weight: 1.5}).bindPopup(popupHtml));
@@ -2485,7 +2500,7 @@
                     birdArray.forEach(b => {
                         let imgHtml = b.img ? `<img class="sp-photo" onclick="openPhotoViewer('${escAttr(b.sci_name)}', event)" src="${b.img}" style="width:70px; height:70px; object-fit:cover; border-radius:6px;">` : `<div style="width:60px; height:60px; background:#f0f0f0; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:10px;">Görsel Yok</div>`;
                         let eLink = b.ebird_code ? `https://ebird.org/species/${b.ebird_code}` : `https://en.wikipedia.org/wiki/${encodeURIComponent(b.sci_name)}`;
-                        popupHtml += `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 4px; vertical-align: middle;"><a href="${eLink}" target="_blank" style="font-weight:600; font-size:14px; color:#1662B6; text-decoration:none;">${b.tr_name} 🔗</a><div style="margin-top:4px;">${countBadge(b.obs_count, b.ind)}</div><div style="font-size:11px; color:#1662B6; margin-top:3px;">📅 ${LT('Burada', 'Here')}: ${(() => { let ds = [...b.dates].sort().reverse(); return ds.length ? ds.slice(0, 3).map(formatDisplayDate).join(', ') + (ds.length > 3 ? ` +${ds.length - 3}` : '') : '–'; })()}</div><span style="font-size:11px; color:#282629; display:block; margin-top:4px;">${LANG === 'en' ? `<i style="color:#777;">${b.sci_name}</i>` : `${b.en_name} (<i style="color:#777;">${b.sci_name}</i>)`}</span><div><button class="where-btn" onclick="showObsList(event,'${escAttr(b.sci_name)}','${escAttr(loc)}','loc')">🌍📅 ${LT('Tüm gözlemlerim', 'All my sightings')}</button><button class="where-btn" onclick="openShare({type:'obs', sci:'${escAttr(b.sci_name)}', loc:'${escAttr(loc)}'})">📤 Paylaş</button></div></td><td style="width:80px; padding:4px; text-align:right;">${imgHtml}</td></tr>`;
+                        popupHtml += `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 4px; vertical-align: middle;"><a href="${eLink}" target="_blank" style="font-weight:600; font-size:14px; color:#1662B6; text-decoration:none;">${b.tr_name}</a><div style="margin-top:4px;">${countBadge(b.obs_count, b.ind)}</div><div style="font-size:11px; color:#1662B6; margin-top:3px;">📅 ${LT('Burada', 'Here')}: ${(() => { let ds = [...b.dates].sort().reverse(); return ds.length ? ds.slice(0, 3).map(formatDisplayDate).join(', ') + (ds.length > 3 ? ` +${ds.length - 3}` : '') : '–'; })()}</div><span style="font-size:11px; color:#282629; display:block; margin-top:4px;">${LANG === 'en' ? `<i style="color:#777;">${b.sci_name}</i>` : `${b.en_name} (<i style="color:#777;">${b.sci_name}</i>)`}</span><div><button class="where-btn" onclick="showObsList(event,'${escAttr(b.sci_name)}','${escAttr(loc)}','loc')">🌍📅 ${LT('Tüm gözlemlerim', 'All my sightings')}</button><button class="where-btn" onclick="openShare({type:'obs', sci:'${escAttr(b.sci_name)}', loc:'${escAttr(loc)}'})">📤 Paylaş</button></div></td><td style="width:80px; padding:4px; text-align:right;">${imgHtml}</td></tr>`;
                     });
                     popupHtml += `</table></div>`;
                     markerLayerGroup.addLayer(L.circleMarker([stat.lat, stat.lon], { radius: dynamicRadius, color: '#0A3E70', fillColor: color, fillOpacity: 0.85, weight: 1.5 }).bindPopup(popupHtml, {maxWidth: 360}));
@@ -5652,20 +5667,20 @@
             if (m.style.display === 'block') return closeMainMenu();
             let it = (ic, t, fn, extra) => `<button onclick="closeMainMenu(); ${fn}">${ic} <span class="mt">${t}</span>${extra ? `<span class="mx">${extra}</span>` : ''}</button>`;
             m.innerHTML =
-                it('📖', LT('Kılavuz', 'User guide'), 'openGuide()') +
-                it('🎓', LT('Turu yeniden başlat', 'Restart the tour'), 'startTour(true)') +
+                it(IC('kilavuz'), LT('Kılavuz', 'User guide'), 'openGuide()') +
+                it(IC('rehber'), LT('Turu yeniden başlat', 'Restart the tour'), 'startTour(true)') +
                 '<div class="mh"></div>' +
-                `<button onclick="toggleLangMenu(event)">🌐 <span class="mt">${LT('Dil', 'Language')}</span><span class="mx">${flagSvg(LANG)} ${LANG.toUpperCase()} ▸</span></button>` +
+                `<button onclick="toggleLangMenu(event)">${IC('dil')} <span class="mt">${LT('Dil', 'Language')}</span><span class="mx">${flagSvg(LANG)} ${LANG.toUpperCase()} ▸</span></button>` +
                 ((!NativeCap && document.fullscreenEnabled) ? `<button onclick="closeMainMenu(); toggleFullscreen()"><span class="fs-ic">${document.fullscreenElement ? FS_OFF : FS_ON}</span> <span class="mt">${document.fullscreenElement ? LT('Tam ekrandan çık', 'Exit full screen') : LT('Tam ekran', 'Full screen')}</span></button>` : '') +
                 '<div class="mh"></div>' +
-                it('🗄️', LT('Verilerim', 'My data'), "openTab('data')", LT('yükle · elle kayıt', 'upload · manual')) +
-                it('⚙️', LT('Ayarlar', 'Settings'), 'openSettings()', 'API') +
+                it(IC('veri'), LT('Verilerim', 'My data'), "openTab('data')", LT('yükle · elle kayıt', 'upload · manual')) +
+                it(IC('ayar'), LT('Ayarlar', 'Settings'), 'openSettings()', 'API') +
                 '<div class="mh"></div>' +
-                it('💬', LT('Geri bildirim', 'Feedback'), "openTab('feedback')") +
-                it('⭐', LT('Değerlendir', 'Rate the app'), 'rateApp()') +
-                it('📣', LT('Arkadaşına öner', 'Recommend to a friend'), 'tellFriends()') +
-                `<a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">📷 <span class="mt">Instagram</span><span class="mx">@birdatlas.app</span></a>` +
-                `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'tr' ? 'tr' : 'en'}" target="_blank" onclick="closeMainMenu()">🔒 <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>`;
+                it(IC('geri'), LT('Geri bildirim', 'Feedback'), "openTab('feedback')") +
+                it(IC('yildiz'), LT('Değerlendir', 'Rate the app'), 'rateApp()') +
+                it(IC('oner'), LT('Arkadaşına öner', 'Recommend to a friend'), 'tellFriends()') +
+                `<a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">${IC('instagram')} <span class="mt">Instagram</span><span class="mx">@birdatlas.app</span></a>` +
+                `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'tr' ? 'tr' : 'en'}" target="_blank" onclick="closeMainMenu()">${IC('kilit')} <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>`;
             m.style.display = 'block';
             document.getElementById('menu-btn').classList.add('on');
             setTimeout(() => document.addEventListener('click', function close(ev) { if (!m.contains(ev.target) && !(document.getElementById('lang-menu') || {}).contains?.(ev.target)) { closeMainMenu(); document.removeEventListener('click', close); } }), 0);
