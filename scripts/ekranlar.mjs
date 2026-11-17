@@ -29,8 +29,37 @@ const KESFET = { lat: 44.5136, lng: 28.6356, km: 30 };        // Köstence yakı
 const SAZ = 'Circus aeruginosus', SAZ_ML = '999000111';       // saz delicesi: eBird fotoğrafıymış gibi (sarı çerçeve)
 const SAZ_FOTO = path.join(KOK, 'magaza', 'ekran-foto', 'saz-delicesi.jpg');
 
-// ---------- Anahtarlar (yalnız bu çekimde, bellekte) ----------
-let GEMINI = process.env.GEMINI_KEY || '', EBIRD = process.env.EBIRD_KEY || '';
+// ---------- Anahtar YOK: Maviş'in Gemini cevabı ve Keşfet listesi sabit örnek (her dilde aynı, her çekimde aynı) ----------
+// Uygulama Gemini'ye / eBird'e gerçekten istek atar ama bu istekler bilgisayardan dışarı çıkmadan aşağıdaki örneklerle cevaplanır.
+const GEMINI = 'ekran', EBIRD = 'ekran';
+const MAVIS_CEVAP = {
+  tr: "Selam! Dürbünüm hazır, 2026 kayıtlarına baktım. En çeşitli günün **15 Ağustos 2026**'da **Eymir Gölü**'ndeydi: 15 farklı tür kaydetmişsin; aralarında yeşilbaş, sakarmeke, bahri ve boz kuyrukkakan var. Ne güzel bir gözlem günü! Bu arada ardıçkuşları ve ben, göçmen tüylerin hesabını bu kadar titiz tutanlara hep hayranızdır!",
+  en: "Hi! Binoculars ready, I've looked through your 2026 records. Your most diverse day was **15 August 2026** at **Eymir Gölü**, where you logged 15 different species, including Mallard, Eurasian Coot, Great Crested Grebe and Isabelline Wheatear. What a day in the field! By the way, the thrushes and I always admire anyone who keeps such an exact count of their feathered travellers!",
+  es: "¡Hola! Con mis prismáticos listos, he revisado tus registros de 2026. Tu día con mayor diversidad de avistamientos fue el **15 de agosto de 2026** en **Eymir Gölü**, donde registraste 15 especies diferentes, incluyendo el ánade real, la focha común, el somormujo lavanco y la collalba isabel. ¡Qué gran jornada de observación! Por cierto, ¡los tordos y yo siempre admiramos a quienes llevan la cuenta exacta de sus plumas viajeras!",
+  pt: "Olá! Com meus binóculos prontos, revisei seus registros de 2026. Seu dia com mais espécies foi **15 de agosto de 2026** no **Eymir Gölü**, onde você registrou 15 espécies diferentes, incluindo o pato-real, o galeirão-comum, o mergulhão-de-crista e a chasco-isabel. Que dia de campo incrível! Aliás, os sabiás e eu sempre admiramos quem leva a conta exata das suas penas viajantes!",
+  de: "Hallo! Fernglas bereit, ich habe mir deine Beobachtungen von 2026 angesehen. Dein artenreichster Tag war der **15. August 2026** am **Eymir Gölü**: 15 verschiedene Arten, darunter Stockente, Blässhuhn, Haubentaucher und Isabellsteinschmätzer. Was für ein Tag draußen! Übrigens bewundern die Drosseln und ich jeden, der so genau über seine gefiederten Reisenden Buch führt!",
+  fr: "Salut ! Jumelles prêtes, j'ai parcouru vos observations de 2026. Votre journée la plus riche a été le **15 août 2026** à **Eymir Gölü** : 15 espèces différentes, dont le canard colvert, la foulque macroule, le grèbe huppé et le traquet isabelle. Quelle belle journée de terrain ! D'ailleurs, les grives et moi admirons toujours ceux qui tiennent le compte exact de leurs voyageurs à plumes !",
+};
+// Keşfet: Köstence yakınlarında 30 km, son 30 gün (bilimsel ad, eBird kodu, sayı); adlar uygulamanın tür adı dosyalarından o dilde
+const KESFET_LISTE = [   // ilk 7: Enes'in gerçek Köstence sonucuyla aynı sıra ve sayılar
+  ['Recurvirostra avosetta', 'pieavo1', 550], ['Pluvialis apricaria', 'eugplo', 250], ['Spatula clypeata', 'norsho', 175], ['Tadorna tadorna', 'comshe', 65],
+  ['Grus grus', 'comcra', 13], ['Erithacus rubecula', 'eurrob1', 12], ['Panurus biarmicus', 'beares1', 9], ['Phoenicopterus roseus', 'grefla2', 8],
+  ['Anas crecca', 'gnwtea', 8], ['Mareca penelope', 'eurwig', 7], ['Anas platyrhynchos', 'mallar3', 7], ['Fulica atra', 'eurcoo', 6],
+  ['Chroicocephalus ridibundus', 'bkhgul', 6], ['Calidris alpina', 'dunlin', 6], ['Anas acuta', 'norpin', 5], ['Aythya ferina', 'compoc', 5],
+  ['Larus cachinnans', 'casgul', 5], ['Vanellus vanellus', 'norlap', 4], ['Phalacrocorax carbo', 'grecor', 4], ['Cygnus olor', 'mutswa', 4],
+  ['Sturnus vulgaris', 'eursta', 4], ['Ardea alba', 'greegr', 3], ['Egretta garzetta', 'litegr', 3], ['Ardea cinerea', 'graher1', 3],
+  ['Tringa totanus', 'comred1', 3], ['Pelecanus crispus', 'dalpel1', 2], ['Microcarbo pygmaeus', 'pygcor2', 2], ['Corvus cornix', 'hoocro1', 2],
+  ['Podiceps cristatus', 'grcgre1', 2], ['Tachybaptus ruficollis', 'litgre1', 2], ['Pica pica', 'eurmag1', 1], ['Alauda arvensis', 'skylar', 1],
+  ['Galerida cristata', 'creslar1', 1], ['Emberiza calandra', 'corbun1', 1], ['Motacilla alba', 'whiwag', 1], ['Circus aeruginosus', 'marhar1', 1],
+  ['Buteo buteo', 'combuz1', 1], ['Buteo lagopus', 'rolhaw', 1], ['Falco tinnunculus', 'eurkes', 1], ['Tringa erythropus', 'spored', 1],
+  ['Anarhynchus alexandrinus', 'kenplo1', 1],
+];
+const ADLAR = (() => {   // bilimsel ad → { tr, en, es, pt, de, fr }
+  const m = {}, v = path.join(WWW, 'data');
+  try { for (const [sci, tr, en] of JSON.parse(fs.readFileSync(path.join(v, 'ebird-taxonomy.json'), 'utf8')).rows) m[sci] = { tr, en }; } catch (e) {}
+  for (const d of ['es', 'pt', 'de', 'fr']) try { for (const [sci, ad] of Object.entries(JSON.parse(fs.readFileSync(path.join(v, `ebird-names-${d}.json`), 'utf8')))) (m[sci] = m[sci] || {})[d] = ad; } catch (e) {}
+  return m;
+})();
 // Hangi ekranlar: --ekran=9 ya da --ekran=8,9 (yoksa başta sorulur; Enter = hepsi)
 let SECILI = ((process.argv.find(a => a.startsWith('--ekran=')) || '').split('=')[1] || '').split(',').map(Number).filter(Boolean);
 if (process.stdin.isTTY) {
@@ -45,12 +74,6 @@ if (process.stdin.isTTY) {
     if (d.length) LANGS = d;
     console.log(`    ✓ ${LANGS.join(', ')}  (aynı adlı eski görüntülerin üstüne yazılır, silmene gerek yok)`);
   }
-  console.log('\nAnahtarlar yalnız bu çekim için kullanılır, hiçbir yere kaydedilmez. Boş bırakıp Enter: o ekran anahtarsız çekilir.');
-  console.log('  (Yapıştırmak için pencereye farenin SAĞ tuşuyla tıkla, sonra Enter.)');
-  GEMINI = (await rl.question('  Gemini anahtarı (Maviş cevabı için): ')).trim() || GEMINI;
-  console.log(GEMINI ? `    ✓ alındı (${GEMINI.length} karakter, …${GEMINI.slice(-4)})` : '    – boş: Maviş kendisi cevaplayacak');
-  EBIRD = (await rl.question('  eBird anahtarı (Keşfet için): ')).trim() || EBIRD;
-  console.log(EBIRD ? `    ✓ alındı (${EBIRD.length} karakter, …${EBIRD.slice(-4)})` : '    – boş: Keşfet örnek listeyle çekilecek');
   rl.close();
 }
 
@@ -292,7 +315,19 @@ for (const L of LANGS) {
     userAgent: 'Mozilla/5.0 (Linux; Android 15; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36',
   });
   // saz delicesinin "eBird fotoğrafı": Macaulay adresine giden istek bilgisayardaki fotoğrafla cevaplanır
-  if (process.env.EKRAN_SAHTE_EBIRD) await ctx.route(/api\.ebird\.org/, r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(['Larus michahellis|Yellow-legged Gull|yelgul', 'Phalacrocorax carbo|Great Cormorant|grecor', 'Fulica atra|Eurasian Coot|eurcoo', 'Cygnus olor|Mute Swan|mutswa', 'Pica pica|Eurasian Magpie|eurmag', 'Corvus cornix|Hooded Crow|hoocro', 'Anas platyrhynchos|Mallard|mallar', 'Ardea alba|Great Egret|greegr'].map((x, i) => { let [sciName, comName, speciesCode] = x.split('|'); return { sciName, comName, speciesCode, howMany: 40 - i * 4 }; })) }));
+  // Keşfet (eBird) ve Maviş (Gemini) istekleri dışarı çıkmadan örnek cevaplarla
+  await ctx.route(/api\.ebird\.org/, r => {
+    const u = r.request().url();
+    if (!/obs\/geo\/recent/.test(u)) return r.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+    const liste = KESFET_LISTE.map(([sci, kod, n], i) => { const a = ADLAR[sci] || {}; return { speciesCode: kod, sciName: sci, comName: a[L] || a.en || sci, howMany: n, locName: 'Lacul Siutghiol', obsDt: '2026-11-1' + (i % 7) + ' 09:00', lat: KESFET.lat + (i % 5) * 0.02, lng: KESFET.lng + (i % 4) * 0.02 }; });
+    r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(liste) });
+  });
+  await ctx.route(/generativelanguage\.googleapis\.com/, r => {
+    const u = r.request().url();
+    if (!/:generateContent/.test(u)) return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ models: [{ name: 'models/gemini-flash-latest', supportedGenerationMethods: ['generateContent'] }] }) });
+    setTimeout(() => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: MAVIS_CEVAP[L] }], role: 'model' }, finishReason: 'STOP' }] }) }), 1200);
+  });
+  if (process.env.EKRAN_SAHTE_EBIRD_ESKI) await ctx.route(/api\.ebird\.org/, r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(['Larus michahellis|Yellow-legged Gull|yelgul', 'Phalacrocorax carbo|Great Cormorant|grecor', 'Fulica atra|Eurasian Coot|eurcoo', 'Cygnus olor|Mute Swan|mutswa', 'Pica pica|Eurasian Magpie|eurmag', 'Corvus cornix|Hooded Crow|hoocro', 'Anas platyrhynchos|Mallard|mallar', 'Ardea alba|Great Egret|greegr'].map((x, i) => { let [sciName, comName, speciesCode] = x.split('|'); return { sciName, comName, speciesCode, howMany: 40 - i * 4 }; })) }));
   if (fs.existsSync(SAZ_FOTO)) await ctx.route(new RegExp(`/api/v1/asset/${SAZ_ML}/`), r => r.fulfill({ status: 200, contentType: 'image/jpeg', body: fs.readFileSync(SAZ_FOTO) }));
   await ctx.addInitScript(([L, css, gem]) => {
     try {
