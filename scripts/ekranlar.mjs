@@ -83,9 +83,7 @@ function fontCss() {
   const emo = path.join(KOK, 'node_modules', '@fontsource', 'noto-color-emoji', '400.css');
   if (!fs.existsSync(EMOJI_TTF) && fs.existsSync(emo)) css = fs.readFileSync(emo, 'utf8').replace(/font-family:\s*'[^']+'/g, "font-family: 'Segoe UI'").replace(/url\(\.\/files\//g, 'url(/__font/noto-color-emoji/files/') + '\n' + css;
   if (fs.existsSync(EMOJI_TTF)) for (const w of [400, 700]) css += `\n@font-face{font-family:'Segoe UI';src:url(/__emoji.ttf) format('truetype');font-weight:${w};unicode-range:${EMOJI_ARALIK};}`;
-  // Üstteki 4 sekmenin simgeleri: Windows'un görünmez tarayıcısı bunları çizmiyor; Android'deki (Noto) emojilerin resmini koyarız
-  css += `\n#tabbar .tb b{font-size:0!important;height:21px;background:center/20px 20px no-repeat}`;
-  for (const k of ['obs', 'lifer', 'explore', 'share']) css += `\n#tabbar .tb[data-tab="${k}"] b{background-image:url(/__emoji/${k}.png)}`;
+  // (1.14'ten beri sekmelerde ve panellerde uygulamanın kendi SVG simgeleri var; emoji yazı tipine gerek kalmadı)
   return css + `\n.fchip.sample{display:none!important}\n`;
 }
 
