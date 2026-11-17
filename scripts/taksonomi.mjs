@@ -44,4 +44,4 @@ for (const [dil, loc] of Object.entries(EK)) {
   } catch (e) { console.log(`(uyarı) ${dil} tür adları indirilemedi: ${e.message}`); }
 }
 console.log(`✓ ${rows.length} takson kaydedildi (${trCount} tanesinin Türkçe adı var) → www/data/ebird-taxonomy.json`);
-console.log('Şimdi:  npm run sync   ve Android Studio\'da ▶');
+console.log('Şimdi: GitHub Desktop → Commit + Push (web sitesi bu dosyaları kullanır, kendisi indirmez) · telefon için npm run sync');

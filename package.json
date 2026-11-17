@@ -13,7 +13,8 @@
     "taksonomi": "node scripts/taksonomi.mjs",
     "ikon": "node scripts/ikon.mjs",
     "web": "node scripts/web-build.mjs",
-    "ekranlar": "node scripts/ekranlar.mjs"
+    "ekranlar": "node scripts/ekranlar.mjs",
+    "ad-karsilastir": "node scripts/ad-karsilastir.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",

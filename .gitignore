@@ -1,8 +1,6 @@
 # bağımlılıklar ve derleme çıktıları
 node_modules/
 www/lib/
-www/data/ebird-taxonomy.json
-www/data/ebird-names-*.json
 package-lock.json.bak
 dist/
 # Android projesi kullanıcının bilgisayarında durur (depoya girmez)

@@ -12,7 +12,7 @@ Geliştirici: EG Apps Studio · destek: egapps.support@gmail.com · Instagram: @
 
 ```
 www/index.html     uygulamanın tamamı (tek dosya, ~4000 satır) – Android'de Capacitor, web'de /app/
-www/data/          ornek-veri.csv (kurgusal örnek veri, depoda) · ebird-taxonomy.json (üretilir, depoda YOK)
+www/data/          ornek-veri.csv (kurgusal örnek veri) · ebird-taxonomy.json + ebird-names-<dil>.json (KOMUTLAR 7 ile üretilir, depoda)
 www/img/           logo, PWA ikonları
 www/manifest.webmanifest, www/sw.js   yalnızca web (PWA); Android'i etkilemez
 www/lib/           npm install sonrası copy-libs ile dolar (depoda YOK)
@@ -54,7 +54,7 @@ android/           depoda YOK (.gitignore); kullanıcının bilgisayarında duru
 - **6 dil (1.14):** TR (kaynak) · EN · ES · PT · DE · FR. ES/PT/DE/FR sözlükleri `www/i18n/<dil>.js` (`window.I18N_ES` …), anahtar = İngilizce metin; şablonlarda `${…}` → `{0}`, `{1}`. `LT` ek dilde `trans(en)` çağırır; `tx` TR→EN→ek dil zinciri.
   - Yeni/değişen İngilizce metinden sonra: `node scripts/ceviri.mjs kontrol` (eksikleri listeler, `-v` ayrıntı) → 4 dosyaya çeviri ekle.
   - `LANG === 'en'` yazma: İngilizce yolu için `LANG !== 'tr'`, Türkçe için `LANG === 'tr'`. Tarih/ay/gün adları `mNice()`, `wdNames()`, `loc()`; sıra sayısı `ordN()`.
-  - Tür adları ek dillerde `data/ebird-names-<dil>.json` (`npm run taksonomi`, KOMUTLAR 7; Cloudflare kendisi indirir). Yoksa İngilizce ad.
+  - Tür adları ek dillerde `data/ebird-names-<dil>.json` (`npm run taksonomi`, KOMUTLAR 7, Enes'in bilgisayarında BİR KEZ; dosyalar depoya commit edilir, Cloudflare indirmez – web-build depodaki dosyayı kullanır). Yoksa İngilizce ad. eBird API şartları ticari olmayan kullanım: ücretli/reklamlı sürüm düşünülürse adlar için açık kaynak (Wikidata CC0, `npm run ad-karsilastir` raporu `rapor/`) değerlendiriliyor.
   - Maviş yerel cevapları: ek dilde soru `toEnQuery` ile İngilizceye yaklaştırılır (`MAVIS_Q`). Gemini talimatı İngilizce + dil kuralı (`LTen`).
 - Bayraklar emoji değil SVG (`flagSvg(code)`) – Windows bayrak emojisi göstermez.
 - Paylaşım kartları canvas ile cihazda çizilir (`drawCard`, `renderShareUI`, `openShare({type: ...})`); türler: year, month, day, trip, species, location, milestone, chart, obs.
