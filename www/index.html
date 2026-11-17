@@ -4407,7 +4407,7 @@
         async function drawObsCard(ctx, W, H, D, story) {
             let st = shareState, o = D.o;
             ctx.fillStyle = '#0F1B30'; ctx.fillRect(0, 0, W, H);
-            let ph = story ? H - 520 : H - 330;
+            let ph = story ? H - 390 : H - 330;   // hikâyede fotoğraf aşağı kadar uzar; altta yalnız yazılar ve imza kalır
             let img = st.photo || await cardImg(o.img);
             if (img) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ph); ctx.clip(); { let own = st.photo || st.framed, fr = own ? null : frameOf(o.sci_name); drawCover(ctx, img, 0, 0, W, ph, own ? st.photoX : fr.x, own ? st.photoY : fr.y, own ? st.photoZoom : fr.z); } ctx.restore(); }
             else { let g = ctx.createLinearGradient(0, 0, W, ph); g.addColorStop(0, '#5d7d94'); g.addColorStop(1, '#18283d'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, ph); }
