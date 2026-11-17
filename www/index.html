@@ -140,19 +140,19 @@
         .feedback-btn { border-color: #1662B6 !important; color: #1662B6 !important; justify-content: center !important; }
         .feedback-hint { font-size: 10.5px; color: #6b7a8c; margin-top: 6px; line-height: 1.35; }
         .ls-hide { display: none !important; }
-        #fbask, #mlask, #appmsg { position: fixed; inset: 0; z-index: 1000001; background: rgba(10,30,60,.45); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
-        #fbask .fa-card, #mlask .fa-card, #appmsg .fa-card { background: #FDFDFD; border-radius: 18px; max-width: 360px; width: 100%; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.25); color: #0A3E70; }
-        #fbask .fa-top, #mlask .fa-top, #appmsg .fa-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
-        #fbask .fa-top svg, #mlask .fa-top svg, #appmsg .fa-top svg { flex: 0 0 auto; }
-        #fbask .fa-top b, #mlask .fa-top b, #appmsg .fa-top b { font-size: 17px; }
-        #fbask .fa-sub, #mlask .fa-sub, #appmsg .fa-sub { font-size: 13px; color: #4A5B70; margin-top: 4px; line-height: 1.35; }
-        #fbask .fa-btn, #mlask .fa-btn, #appmsg .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
-        #fbask .fa-btn.fa-rate, #mlask .fa-btn.fa-rate, #appmsg .fa-btn.fa-rate { background: #1662B6; color: #fff; }
-        #fbask .fa-foot, #mlask .fa-foot, #appmsg .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
-        #appmsg .wn-lifer { background: #FFF6D6; border-radius: 12px; padding: 10px 12px; margin: 4px 0 6px; font-size: 14px; color: #0A3E70; }
-        #appmsg .wn-lifer span { display: inline-block; background: #fff; border-radius: 999px; padding: 3px 10px; margin: 6px 6px 0 0; font-size: 13px; }
-        #appmsg .wn-lifer i { color: #5B6B7E; font-style: normal; font-size: 11px; }
-        #fbask .fa-link, #mlask .fa-link, #appmsg .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
+        #fbask, #mlask, #appmsg, #updask { position: fixed; inset: 0; z-index: 1000001; background: rgba(10,30,60,.45); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+        #fbask .fa-card, #mlask .fa-card, #appmsg .fa-card, #updask .fa-card { background: #FDFDFD; border-radius: 18px; max-width: 360px; width: 100%; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.25); color: #0A3E70; }
+        #fbask .fa-top, #mlask .fa-top, #appmsg .fa-top, #updask .fa-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+        #fbask .fa-top svg, #mlask .fa-top svg, #appmsg .fa-top svg, #updask .fa-top svg { flex: 0 0 auto; }
+        #fbask .fa-top b, #mlask .fa-top b, #appmsg .fa-top b, #updask .fa-top b { font-size: 17px; }
+        #fbask .fa-sub, #mlask .fa-sub, #appmsg .fa-sub, #updask .fa-sub { font-size: 13px; color: #4A5B70; margin-top: 4px; line-height: 1.35; }
+        #fbask .fa-btn, #mlask .fa-btn, #appmsg .fa-btn, #updask .fa-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 12px; border: 1.5px solid #1662B6; background: #fff; color: #1662B6; font: inherit; font-weight: bold; font-size: 15px; cursor: pointer; }
+        #fbask .fa-btn.fa-rate, #mlask .fa-btn.fa-rate, #appmsg .fa-btn.fa-rate, #updask .fa-btn.fa-rate { background: #1662B6; color: #fff; }
+        #fbask .fa-foot, #mlask .fa-foot, #appmsg .fa-foot, #updask .fa-foot { display: flex; justify-content: space-between; margin-top: 6px; }
+        #appmsg .wn-lifer, #updask .wn-lifer { background: #FFF6D6; border-radius: 12px; padding: 10px 12px; margin: 4px 0 6px; font-size: 14px; color: #0A3E70; }
+        #appmsg .wn-lifer span, #updask .wn-lifer span { display: inline-block; background: #fff; border-radius: 999px; padding: 3px 10px; margin: 6px 6px 0 0; font-size: 13px; }
+        #appmsg .wn-lifer i, #updask .wn-lifer i { color: #5B6B7E; font-style: normal; font-size: 11px; }
+        #fbask .fa-link, #mlask .fa-link, #appmsg .fa-link, #updask .fa-link { background: none; border: none; color: #5B6B7E; font: inherit; font-size: 13px; cursor: pointer; padding: 6px; }
         /* Pencereleri tutamaçla boyutlandırma (sekme pencereleri + Maviş) */
         .rs-grip { display: none; justify-content: center; align-items: center; height: 22px; cursor: ns-resize; touch-action: none; pointer-events: auto; user-select: none; }
         .rs-grip span { width: 46px; height: 5px; border-radius: 3px; background: #1662B6; opacity: .55; box-shadow: 0 0 0 3px rgba(255,255,255,.85); }
@@ -2015,6 +2015,7 @@
                 : (() => { try { let b = JSON.parse(localStorage.getItem('manual_backup') || '[]'); localStorage.removeItem('manual_backup'); return b; } catch (e) { return []; } })();
             // Aynı kişinin güncellenmiş verisi mi? Öncekini hatırla; yüklemeden sonra "neler yeni" gösterilir
             window._prevUpload = (!_loadingSample && !isSample()) ? snapshotForUpdate(allRawRows) : null;
+            if (!_loadingSample) try { localStorage.setItem('last_upload_at', String(Date.now())); localStorage.removeItem('upd_remind_next'); } catch (e) {}
             try { localStorage.removeItem('is_sample'); } catch (e) {}
             allRawRows = [...validRows, ...oldManuals];
             safeSave();
@@ -3676,6 +3677,31 @@
             } catch (e) { return; }
             openFeedbackAsk();
         }
+        // Verini güncelle hatırlatması: son eBird yüklemesinin üstünden 14 gün geçince, açılışta bir kez (Sonra → 7 gün sonra; Bir daha hatırlatma → hiç)
+        function maybeRemindUpdate() {
+            try {
+                if (!obsData.length || isSample() || localStorage.getItem('upd_remind_off') || sessionStorage.getItem('upd_reminded')) return;
+                if ((typeof tourIdx !== 'undefined' && tourIdx >= 0) || document.querySelector('#fbask, #mlask, #appmsg, #updask, #share-overlay[style*="display: flex"]')) return;
+                let now = Date.now(), last = parseInt(localStorage.getItem('last_upload_at'), 10);
+                if (!last) { localStorage.setItem('last_upload_at', String(now)); return; }   // eski kullanıcı: saymaya bugünden başla
+                let days = Math.floor((now - last) / 86400000), next = parseInt(localStorage.getItem('upd_remind_next'), 10) || 0;
+                if (days < 14 || now < next) return;
+                sessionStorage.setItem('upd_reminded', '1');
+                let d = document.createElement('div'); d.id = 'updask'; d.setAttribute('data-no-i18n', '');
+                d.innerHTML = `<div class="fa-card" role="dialog" aria-modal="true">
+                    <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${LT('Yeni gözlemlerin var mı?', 'Any new sightings?')}</b><div class="fa-sub">${LT(`Verini en son ${days} gün önce yükledin.`, `You last updated your data ${days} days ago.`)} ${LT("Yeni gözlemlerin varsa eBird'den güncel dosyanı indirip yükle; haritan, kertiklerin ve grafiklerin güncellensin.", 'If you have new sightings, download your latest file from eBird and upload it to update your map, lifers and charts.')}</div></div></div>
+                    <button class="fa-btn fa-rate" data-a="go">${IC('yenile')} ${LT('Verilerimi güncelle', 'Update my data')}</button>
+                    <div class="fa-foot"><button class="fa-link" data-a="later">${LT('Sonra', 'Later')}</button><button class="fa-link" data-a="never">${LT('Bir daha hatırlatma', "Don't remind me again")}</button></div>
+                </div>`;
+                const close = k => {
+                    try { if (k === 'never') localStorage.setItem('upd_remind_off', '1'); else localStorage.setItem('upd_remind_next', String(Date.now() + 7 * 86400000)); } catch (e) {}
+                    d.remove();
+                    if (k === 'go') { openTab('data'); try { switchDbTab('ebird'); } catch (e) {} }
+                };
+                d.addEventListener('click', e => { let a = e.target.closest('[data-a]'); if (!a) { if (e.target === d) close('later'); return; } close(a.dataset.a); });
+                document.body.appendChild(d);
+            } catch (e) {}
+        }
         // Kuşçu arkadaşlarına öner: telefonun paylaş ekranı (WhatsApp vb.); birdatlas.app hem Play'e hem web/iPhone sürümüne götürür
         window.tellFriends = async function() {
             let url = 'https://birdatlas.app/' + LANG + '/';
@@ -3762,6 +3788,7 @@
             let seen = NaN; try { seen = parseInt(localStorage.getItem('milestone_seen'), 10); } catch (e) {}
             try { localStorage.setItem('milestone_seen', Math.max(top, isNaN(seen) ? 0 : seen)); } catch (e) {}
             let prev = window._prevUpload; window._prevUpload = null;
+            if (!prev && !afterDataLoaded._upd) { afterDataLoaded._upd = true; setTimeout(maybeRemindUpdate, 5000); }   // açılışta: yüklemeyi hatırlat
             if (prev && showWhatsNew(prev, !isNaN(seen) && top > seen ? top : 0)) return;
             if (!isNaN(seen) && top > seen) {
                 setTimeout(() => showToast(`🎉 ${LT(`${top}. türün kutlu olsun!`, `Your ${ordN(top)} species, congrats!`)}`,
