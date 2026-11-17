@@ -4012,9 +4012,9 @@
             if (shareState.privacy === 'province') {
                 let pv = {};
                 arr.forEach(l => { let k = l.province || l.name; let p = pv[k] || (pv[k] = { lat: 0, lon: 0, n: 0, label: provShort(l.province) }); p.lat += l.lat; p.lon += l.lon; p.n++; });
-                return Object.values(pv).map(p => ({ lat: p.lat / p.n, lon: p.lon / p.n, label: withLabels ? p.label : '', w: Math.min(2, 1 + p.n / 6) }));
+                return Object.values(pv).map(p => ({ lat: p.lat / p.n, lon: p.lon / p.n, label: p.label, imp: p.n, w: Math.min(2, 1 + p.n / 6) }));
             }
-            return arr.map(l => ({ lat: l.lat, lon: l.lon, label: withLabels ? l.name : '', w: 1 }));
+            return arr.map(l => ({ lat: l.lat, lon: l.lon, label: l.name, imp: (l.days ? l.days.size : 1) * 10 + (l.species ? l.species.size : 0), w: 1 }));   // tüm kartlarda etiket; yer kalmazsa mapPanel yazmaz
         }
 
         // ---------- kart verisi ----------
@@ -4249,23 +4249,38 @@
                 if (px < x - 20 || px > x + w + 20 || py < y - 20 || py > y + h + 20) return;
                 ctx.beginPath(); ctx.arc(px, py, r + 9, 0, Math.PI * 2); ctx.fillStyle = color + '33'; ctx.fill();
                 ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = '#fff'; ctx.stroke();
-                placed.push({ px, py, r, label: p.label });
+                placed.push({ px, py, r, label: p.label, imp: p.imp || 0 });
             });
-            // etiketler (çakışmayanlar)
-            let boxes = [];
-            ctx.font = font(600, 26);
-            placed.forEach(p => {
+            // Etiketler – tüm kartlarda aynı kural: önemli yer önce; etiket ne başka etiketin ne de başka bir noktanın üstüne biner,
+            // çerçeveden taşmaz. 8 yön denenir; sığmazsa kısaltılır (…); yine sığmazsa yazılmaz. Üst üste binen noktalardan yalnız biri etiketlenir.
+            const LBL = 25, PAD = 5, obst = placed.map(p => ({ x1: p.px - p.r - 6, x2: p.px + p.r + 6, y1: p.py - p.r - 6, y2: p.py + p.r + 6 }));
+            const temiz = n => { n = String(n || '').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim(); let k = n.indexOf('--'); if (k > 3) n = n.slice(0, k).trim(); return n; };
+            const kisalt = (t, max) => { if (t.length <= max) return t; let c = t.slice(0, max - 1); let sp = c.lastIndexOf(' '); if (sp > max * 0.55) c = c.slice(0, sp); return c.replace(/[\s,.;:–-]+$/, '') + '…'; };
+            const carp = (bx) => obst.some(b => bx.x1 < b.x2 && bx.x2 > b.x1 && bx.y1 < b.y2 && bx.y2 > b.y1);
+            ctx.font = font(600, LBL); ctx.textAlign = 'left';
+            let sirali = placed.map((p, i) => ({ ...p, i })).sort((a, b) => b.imp - a.imp);
+            let yazildi = [];
+            sirali.forEach(p => {
                 if (!p.label) return;
-                let t = p.label.length > 26 ? p.label.slice(0, 25) + '…' : p.label;
-                let tw = ctx.measureText(t).width;
-                let right = p.px + tw + p.r + 16 < x + w - 10;
-                let tx = right ? p.px + p.r + 14 : p.px - p.r - 14 - tw, ty = p.py + 9;
-                let tries = [[tx, ty], [p.px - tw / 2, p.py + p.r + 34], [p.px - tw / 2, p.py - p.r - 14]];
-                let ok = tries.find(([ax, ay]) => ax > x + 6 && ax + tw < x + w - 6 && ay > y + 28 && ay < y + h - 8 && !boxes.some(b => ax < b.x2 && ax + tw > b.x1 && ay - 26 < b.y2 && ay + 4 > b.y1));
-                if (!ok) return;
-                boxes.push({ x1: ok[0] - 4, x2: ok[0] + tw + 4, y1: ok[1] - 28, y2: ok[1] + 6 });
-                ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineJoin = 'round'; ctx.strokeText(t, ok[0], ok[1]);
-                ctx.fillStyle = C.navy; ctx.textAlign = 'left'; ctx.fillText(t, ok[0], ok[1]);
+                if (yazildi.some(o => Math.hypot(o.px - p.px, o.py - p.py) < Math.max(o.r, p.r) * 1.6)) return;   // aynı yerdeki noktalar
+                let tam = temiz(p.label);
+                for (let t of [kisalt(tam, 24), kisalt(tam, 14)]) {
+                    let tw = ctx.measureText(t).width, g = p.r + 12;
+                    // [sol x, taban y] adayları: sağ, sol, üst, alt, çaprazlar
+                    let aday = [[p.px + g, p.py + 9], [p.px - g - tw, p.py + 9], [p.px - tw / 2, p.py - g - 4], [p.px - tw / 2, p.py + g + 22],
+                        [p.px + g - 4, p.py - g + 6], [p.px + g - 4, p.py + g + 14], [p.px - g - tw + 4, p.py - g + 6], [p.px - g - tw + 4, p.py + g + 14]];
+                    let ok = aday.find(([ax, ay]) => {
+                        let bx = { x1: ax - PAD, x2: ax + tw + PAD, y1: ay - LBL + 2 - PAD, y2: ay + 6 + PAD };
+                        if (bx.x1 < x + 6 || bx.x2 > x + w - 6 || bx.y1 < y + 6 || bx.y2 > y + h - 6) return false;
+                        let self = obst[p.i]; obst[p.i] = { x1: 0, x2: 0, y1: 0, y2: 0 }; let c = carp(bx); obst[p.i] = self; return !c;
+                    });
+                    if (!ok) continue;
+                    obst.push({ x1: ok[0] - PAD, x2: ok[0] + tw + PAD, y1: ok[1] - LBL + 2 - PAD, y2: ok[1] + 6 + PAD });
+                    yazildi.push(p);
+                    ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(255,255,255,0.92)'; ctx.lineJoin = 'round'; ctx.strokeText(t, ok[0], ok[1]);
+                    ctx.fillStyle = C.navy; ctx.fillText(t, ok[0], ok[1]);
+                    break;
+                }
             });
         }
         async function mosaic(ctx, list, x, y, w, rows, cols, r) {
