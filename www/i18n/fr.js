@@ -129,6 +129,7 @@ window.I18N_FR = {
 "I have an idea": "J'ai une idée",
 "All good 👍": "Tout va bien 👍",
 "Later": "Plus tard",
+"Website": "Site web",
 "Any new sightings?": "De nouvelles observations ?",
 "You last updated your data {0} days ago.": "Vous avez mis à jour vos données il y a {0} jours.",
 "Update my data": "Mettre à jour mes données",

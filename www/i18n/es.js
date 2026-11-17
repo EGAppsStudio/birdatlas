@@ -129,6 +129,7 @@ window.I18N_ES = {
 "I have an idea": "Tengo una idea",
 "All good 👍": "Todo bien 👍",
 "Later": "Más tarde",
+"Website": "Sitio web",
 "Any new sightings?": "¿Tienes nuevos avistamientos?",
 "You last updated your data {0} days ago.": "Actualizaste tus datos por última vez hace {0} días.",
 "If you have new sightings, download your latest file from eBird and upload it to update your map, lifers and charts.": "Si tienes nuevos avistamientos, descarga tu archivo más reciente de eBird y súbelo para actualizar tu mapa, tus lifers y tus gráficos.",

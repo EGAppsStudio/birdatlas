@@ -369,6 +369,8 @@
             /* Kendi simgelerimiz (emoji yerine): yazının boyunda, rengi yazının rengi, vurgu sarı */
         .icw { display: inline-block; width: 1.18em; height: 1.18em; vertical-align: -0.24em; line-height: 0; }
         .icw .ic { width: 100%; height: 100%; display: block; }
+        #main-menu .mf { font-size: 11px; color: #6b7a8c; text-align: center; padding: 8px 6px 4px; border-top: 1px solid #E3EAF3; margin-top: 4px; }
+        #main-menu .mf a { display: inline; padding: 0; font-size: inherit; color: #1662B6; font-weight: 600; text-decoration: none; }
         #main-menu .icw { width: 20px; height: 20px; color: #0A3E70; vertical-align: 0; flex: none; }
         #tabbar .tb b { display: flex; justify-content: center; }
         #tabbar .tb .icw { width: 24px; height: 24px; vertical-align: 0; }
@@ -933,6 +935,7 @@
             madalya: _isv(`<path d="M10 3.5 H14.5 L17.5 12 L13 13.5 Z M22 3.5 H17.5 L14.5 12 L19 13.5 Z" ${ICS} stroke="${ICB}" stroke-width="1.8"/><circle cx="16" cy="20" r="8" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><path d="M14.5 17.5 L16.5 16.2 V24" stroke="${ICB}" stroke-width="2"/>`),
             saat: _isv(`<circle cx="16" cy="16" r="12" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M16 8.5 V16 L21 19" stroke="${ICB}" stroke-width="2.4"/><circle cx="16" cy="16" r="2.2" fill="${ICA}" stroke="${ICB}" stroke-width="1.4"/>`),
             goz: _isv(`<path d="M3 16 C7 9.5 11.5 7 16 7 C20.5 7 25 9.5 29 16 C25 22.5 20.5 25 16 25 C11.5 25 7 22.5 3 16 Z" ${ICS} stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="16" r="5.4" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="16" r="2.2" fill="${ICB}"/>`),
+            site: _isv(`<rect x="3.5" y="5.5" width="25" height="21" rx="3" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M3.5 8.5 A3 3 0 0 1 6.5 5.5 H25.5 A3 3 0 0 1 28.5 8.5 V11 H3.5 Z" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><circle cx="7.5" cy="8.3" r="1" fill="${ICB}"/><circle cx="10.8" cy="8.3" r="1" fill="${ICB}"/><path d="M8 16 H20 M8 20 H16" stroke="${ICB}" stroke-width="2"/>`),
             // menü simgeleri + bağlantı / kaydet
             kilavuz: _isv(`<path d="M16 8 C12.5 5.8 8 5.5 4 6.5 V25 C8 24 12.5 24.3 16 26.5 C19.5 24.3 24 24 28 25 V6.5 C24 5.5 19.5 5.8 16 8 Z" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M16 8 V26.5" stroke="${ICB}" stroke-width="1.8"/><path d="M20.5 6.4 V14.5 L22.5 12.8 L24.5 14.5 V5.9" fill="${ICA}" stroke="${ICB}" stroke-width="1.5"/>`),
             rehber: _isv(`<path d="M16 4 V28" stroke="${ICB}" stroke-width="2.4"/><path d="M16 6.5 H24.5 L28 10 L24.5 13.5 H16 Z" fill="${ICA}" stroke="${ICB}" stroke-width="1.8"/><path d="M16 15.5 H7.5 L4 19 L7.5 22.5 H16 Z" ${ICS} stroke="${ICB}" stroke-width="1.8"/><path d="M11 28 H21" stroke="${ICB}" stroke-width="2.4"/>`),
@@ -1218,7 +1221,7 @@
             document.getElementById('guide-title').textContent = g.title;
             document.getElementById('guide-body').innerHTML = g.sections.map((sec, i) =>
                 `<details${i === 0 ? ' open' : ''}><summary>${sec[0]}</summary><ul>${sec[1].map(li => `<li>${li}</li>`).join('')}</ul></details>`
-            ).join('') + `<div style="margin-top:12px; font-size:11px; color:#777; text-align:center;">${LT('Kuş Atlası', 'Bird Atlas')} v${APP_VERSION} · <a href="https://play.google.com/store/apps/dev?id=6200277267214996612" target="_blank" style="color:#1662B6;">EG Apps Studio</a><br><a href="${INSTAGRAM_URL}" target="_blank" style="color:#1662B6; font-weight:bold; text-decoration:none; display:inline-block; margin-top:6px;">${IC('instagram')} @birdatlas.app</a></div>`;
+            ).join('');   // sürüm, EG Apps Studio, Instagram ve web sitesi ☰ menünün altında
             document.getElementById('guide-overlay').style.display = 'flex';
         };
         window.closeGuide = function() { document.getElementById('guide-overlay').style.display = 'none'; };
@@ -5804,7 +5807,9 @@
                 it(IC('yildiz'), LT('Değerlendir', 'Rate the app'), 'rateApp()') +
                 it(IC('oner'), LT('Arkadaşına öner', 'Recommend to a friend'), 'tellFriends()') +
                 `<a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">${IC('instagram')} <span class="mt">Instagram</span><span class="mx">@birdatlas.app</span></a>` +
-                `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'tr' ? 'tr' : 'en'}" target="_blank" onclick="closeMainMenu()">${IC('kilit')} <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>`;
+                `<a href="https://birdatlas.app/${LANG}/" target="_blank" onclick="closeMainMenu()">${IC('site')} <span class="mt">${LT('Web sitesi', 'Website')}</span><span class="mx">birdatlas.app</span></a>` +
+                `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'tr' ? 'tr' : 'en'}" target="_blank" onclick="closeMainMenu()">${IC('kilit')} <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>` +
+                `<div class="mf">${LT('Kuş Atlası', 'Bird Atlas')} v${APP_VERSION} · <a href="https://play.google.com/store/apps/dev?id=6200277267214996612" target="_blank" onclick="closeMainMenu()">EG Apps Studio</a></div>`;
             m.style.display = 'block';
             document.getElementById('menu-btn').classList.add('on');
             setTimeout(() => document.addEventListener('click', function close(ev) { if (!m.contains(ev.target) && !(document.getElementById('lang-menu') || {}).contains?.(ev.target)) { closeMainMenu(); document.removeEventListener('click', close); } }), 0);
