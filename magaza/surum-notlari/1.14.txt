@@ -4,7 +4,7 @@
 • Fotoğrafları kadrajla; kaynağına göre renkli çerçeve
 • Verini güncelleyince yeni gözlemler, kertikler ve dönüm noktaları özetlenir
 • Paylaşım kartlarında yeni düzen: harita + 6 tür ya da yalnız türler (12'ye kadar)
-• Kuşçu arkadaşlarına öner; küçük düzeltmeler
+• Yeni simgeler; verini güncellemeyi hatırlatma; küçük düzeltmeler
 </tr-TR>
 <en-US>
 • Now in 6 languages: Spanish, Portuguese, German and French added
@@ -12,7 +12,7 @@
 • Frame your photos; colored borders show where each photo comes from
 • After updating your data, see your new sightings, lifers and milestones
 • New share card layouts: map + 6 species, or species only (up to 12)
-• Recommend to birding friends; small fixes
+• New icons; a reminder to update your data; small fixes
 </en-US>
 <es-419>
 • Ahora en 6 idiomas: se añaden español, portugués, alemán y francés
@@ -20,7 +20,7 @@
 • Encuadra tus fotos; un marco de color indica de dónde viene cada una
 • Al actualizar tus datos verás tus nuevos avistamientos, lifers e hitos
 • Nuevos diseños de tarjetas: mapa + 6 especies o solo especies (hasta 12)
-• Recomiéndala a amigos pajareros; pequeñas correcciones
+• Nuevos iconos; recordatorio para actualizar tus datos; correcciones
 </es-419>
 <es-ES>
 • Ahora en 6 idiomas: se añaden español, portugués, alemán y francés
@@ -28,7 +28,7 @@
 • Encuadra tus fotos; un marco de color indica de dónde viene cada una
 • Al actualizar tus datos verás tus nuevos avistamientos, lifers e hitos
 • Nuevos diseños de tarjetas: mapa + 6 especies o solo especies (hasta 12)
-• Recomiéndala a amigos pajareros; pequeñas correcciones
+• Nuevos iconos; recordatorio para actualizar tus datos; correcciones
 </es-ES>
 <pt-BR>
 • Agora em 6 idiomas: português, espanhol, alemão e francês adicionados
@@ -36,7 +36,7 @@
 • Enquadre suas fotos; uma moldura colorida mostra a origem de cada uma
 • Ao atualizar seus dados, veja novas observações, lifers e marcos
 • Novos layouts de cartões: mapa + 6 espécies ou só espécies (até 12)
-• Recomende a amigos observadores; pequenas correções
+• Novos ícones; lembrete para atualizar seus dados; pequenas correções
 </pt-BR>
 <de-DE>
 • Jetzt in 6 Sprachen: Deutsch, Spanisch, Portugiesisch und Französisch
@@ -44,7 +44,7 @@
 • Fotos zuschneiden; ein farbiger Rahmen zeigt die Herkunft jedes Fotos
 • Nach dem Aktualisieren: neue Beobachtungen, Lifer und Meilensteine im Überblick
 • Neue Teilen-Karten: Karte + 6 Arten oder nur Arten (bis zu 12)
-• Birding-Freunden empfehlen; kleine Korrekturen
+• Neue Symbole; Erinnerung, deine Daten zu aktualisieren; Korrekturen
 </de-DE>
 <fr-FR>
 • Désormais en 6 langues : français, espagnol, portugais et allemand ajoutés
@@ -52,5 +52,5 @@
 • Recadrez vos photos ; un cadre coloré indique leur provenance
 • Après une mise à jour de vos données : nouvelles observations, lifers et étapes
 • Nouvelles cartes à partager : carte + 6 espèces ou espèces seules (jusqu'à 12)
-• Recommandez-la à vos amis ornithos ; petites corrections
+• Nouvelles icônes ; rappel pour mettre à jour vos données ; corrections
 </fr-FR>
