@@ -372,6 +372,11 @@
         #main-menu .icw { width: 20px; height: 20px; color: #0A3E70; vertical-align: 0; flex: none; }
         #tabbar .tb b { display: flex; justify-content: center; }
         #tabbar .tb .icw { width: 24px; height: 24px; vertical-align: 0; }
+        /* kendiliğinden açılan pencere: yumuşak giriş + ilk 1,5 sn düğmeler soluk (dokunuş kabul edilmez) */
+        #fbask .fa-card, #updask .fa-card, #mlask .fa-card, #appmsg .fa-card { animation: dlgGir .25s ease-out; }
+        @keyframes dlgGir { from { transform: translateY(14px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+        .dlg-bekle button, .dlg-bekle a, .dlg-bekle .fa-link { opacity: .45; transition: opacity .3s; }
+        #fbask button, #updask button, #mlask button, #appmsg button { transition: opacity .3s; }
 </style>
 </head>
 <body>
@@ -982,6 +987,18 @@
                 else m.addedNodes.forEach(iconizeTree);
             });
         });
+        // Kendiliğinden açılan pencereler (geri bildirim, güncelleme hatırlatması, eBird fotoğrafları, "neler yeni", uyarılar):
+        // ilk 1,5 sn hiçbir dokunuşu kabul etmez (o an başka bir yere dokunurken yanlışlıkla kapanmasın); düğmeler bu sürede soluk görünür.
+        const DLG_IDS = ['fbask', 'updask', 'mlask', 'appmsg'], DLG_BEKLE = 1500;
+        new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1 || !DLG_IDS.includes(n.id)) return;
+            n.__acildi = Date.now(); n.classList.add('dlg-bekle');
+            setTimeout(() => n.classList.remove('dlg-bekle'), DLG_BEKLE);
+        }))).observe(document.documentElement, { childList: true, subtree: true });
+        ['click', 'pointerup', 'touchend'].forEach(ev => document.addEventListener(ev, e => {
+            let d = e.target && e.target.closest && e.target.closest(DLG_IDS.map(i => '#' + i).join(','));
+            if (d && d.__acildi && Date.now() - d.__acildi < DLG_BEKLE) { e.stopImmediatePropagation(); e.preventDefault(); }
+        }, true));
         const _alert = window.alert.bind(window), _confirm = window.confirm.bind(window);
         // Tarayıcının kendi uyarı penceresi yerine uygulama içi pencere ("birdatlas.app web sitesinin mesajı" görünmesin)
         window.appAlert = function(msg, opt) {
