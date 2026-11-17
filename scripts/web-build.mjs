@@ -57,7 +57,7 @@ writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
       });
     }
     const baslik = T ? T._title : BASLIK[L], aciklama = T ? T._desc : ACIKLAMA[L], og = T ? T._ogdesc : OG[L];
-    const resim = L === 'tr' ? 'tr' : 'en';
+    const resim = L === 'tr' ? 'tr' : 'en';   // og görseli (yalnız TR/EN var); ekran görüntüleri her dilde kendi dilinde
     h = h.replace('<html lang="tr" data-lang="tr">', `<html lang="${L}" data-lang="${L === 'tr' ? 'tr' : 'en'}">`)
       .replace(/<title>[^<]*<\/title>/, `<title>${esc(baslik)}</title>`)
       .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(aciklama)}">`)
@@ -67,7 +67,7 @@ writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
       .replace(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${esc(og)}">`)
       .replace('/img/og-en.jpg', `/img/og-${resim}.jpg`)
       .replace('<a class="brand" href="/">', `<a class="brand" href="/${L}/">`)
-      .replace(/<img data-shot="([a-z]+)"/g, (m, k) => `<img src="/img/shots/${k}-${resim}.webp" data-shot="${k}"`)
+      .replace(/<img data-shot="([a-z]+)"/g, (m, k) => `<img src="/img/shots/${k}-${L}.webp" data-shot="${k}"`)
       .replace(`data-set="${L}"`, `data-set="${L}" aria-current="true"`)
       .replace('<span class="cur">TR</span>', `<span class="cur">${L.toUpperCase()}</span>`)
       .replace(/\/\*DIL-BASLA\*\/[\s\S]*?\/\*DIL-BITIR\*\//,
