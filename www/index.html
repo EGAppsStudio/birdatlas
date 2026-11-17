@@ -923,6 +923,11 @@
             ara: _isv(`<circle cx="13.5" cy="13.5" r="8.5" fill="${ICA}" stroke="${ICB}" stroke-width="2.4"/><path d="M19.8 19.8 L27.5 27.5" stroke="${ICB}" stroke-width="3.4"/><path d="M9.5 12.5 A4 4 0 0 1 13 9.2" stroke="#fff" stroke-width="1.8"/>`),
             asagi: _isv(`<path d="M7 11 H25 L16 23 Z" fill="${ICA}" stroke="${ICB}" stroke-width="2"/>`),
             yukari: _isv(`<path d="M7 21 H25 L16 9 Z" fill="${ICA}" stroke="${ICB}" stroke-width="2"/>`),
+            konfeti: _isv(`<path d="M5 27.5 L11.5 10.5 L21.5 20.5 Z" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><path d="M8.2 19.3 L13.7 24.8" stroke="${ICB}" stroke-width="1.6"/><path d="M15.5 9.5 C16.5 6.5 19.5 6 20 3.5 M21.5 14 C24 12.5 26.5 13.8 28.5 12" stroke="${ICB}" stroke-width="2"/><circle cx="24.5" cy="6.5" r="1.7" fill="${ICA}" stroke="${ICB}" stroke-width="1.3"/><circle cx="27" cy="19.5" r="1.4" fill="${ICB}"/><circle cx="18.5" cy="4" r="1.2" fill="${ICB}"/>`),
+            sayi: _isv(`<rect x="4.5" y="4.5" width="23" height="23" rx="5" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><path d="M13.3 9 L11.3 23 M20.7 9 L18.7 23 M9 13.5 H23.5 M8.5 18.5 H23" stroke="${ICB}" stroke-width="2.2"/>`),
+            madalya: _isv(`<path d="M10 3.5 H14.5 L17.5 12 L13 13.5 Z M22 3.5 H17.5 L14.5 12 L19 13.5 Z" ${ICS} stroke="${ICB}" stroke-width="1.8"/><circle cx="16" cy="20" r="8" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><path d="M14.5 17.5 L16.5 16.2 V24" stroke="${ICB}" stroke-width="2"/>`),
+            saat: _isv(`<circle cx="16" cy="16" r="12" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M16 8.5 V16 L21 19" stroke="${ICB}" stroke-width="2.4"/><circle cx="16" cy="16" r="2.2" fill="${ICA}" stroke="${ICB}" stroke-width="1.4"/>`),
+            goz: _isv(`<path d="M3 16 C7 9.5 11.5 7 16 7 C20.5 7 25 9.5 29 16 C25 22.5 20.5 25 16 25 C11.5 25 7 22.5 3 16 Z" ${ICS} stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="16" r="5.4" fill="${ICA}" stroke="${ICB}" stroke-width="2"/><circle cx="16" cy="16" r="2.2" fill="${ICB}"/>`),
             // menü simgeleri + bağlantı / kaydet
             kilavuz: _isv(`<path d="M16 8 C12.5 5.8 8 5.5 4 6.5 V25 C8 24 12.5 24.3 16 26.5 C19.5 24.3 24 24 28 25 V6.5 C24 5.5 19.5 5.8 16 8 Z" ${ICS} stroke="${ICB}" stroke-width="2"/><path d="M16 8 V26.5" stroke="${ICB}" stroke-width="1.8"/><path d="M20.5 6.4 V14.5 L22.5 12.8 L24.5 14.5 V5.9" fill="${ICA}" stroke="${ICB}" stroke-width="1.5"/>`),
             rehber: _isv(`<path d="M16 4 V28" stroke="${ICB}" stroke-width="2.4"/><path d="M16 6.5 H24.5 L28 10 L24.5 13.5 H16 Z" fill="${ICA}" stroke="${ICB}" stroke-width="1.8"/><path d="M16 15.5 H7.5 L4 19 L7.5 22.5 H16 Z" ${ICS} stroke="${ICB}" stroke-width="1.8"/><path d="M11 28 H21" stroke="${ICB}" stroke-width="2.4"/>`),
@@ -942,8 +947,8 @@
             '\u{1F680}': 'roket', '\u{1F9ED}': 'pusula', '\u{1F511}': 'anahtar', '\u{1F512}': 'kilit', '\u{2795}': 'arti', '\u{1F4AC}': 'geri', '\u{1F4C2}': 'klasor', '\u{1F4C1}': 'klasor',
             '\u{1F4CB}': 'tablo', '\u{1F4E5}': 'kaydet', '\u{1F9EA}': 'ornek', '\u{1F4F1}': 'telefon', '\u{2B1B}': 'kare', '\u{1F4C4}': 'belge', '\u{2699}': 'ayar', '\u{1F5C4}': 'veri', '\u{1F4D6}': 'kilavuz',
             '\u{1F41E}': 'hata', '\u{1F4A1}': 'lamba', '\u{2B50}': 'yildiz', '\u{1F4E3}': 'oner', '\u{1F504}': 'yenile', '\u{1F986}': 'tur', '\u{21A9}': 'geriok', '\u{2B05}': 'geriok',
-            '\u{274C}': 'kapat', '\u{1F534}': 'konum', '\u{1F524}': 'harf', '\u{1F4C8}': 'grafik', '\u{1F5BC}': 'foto', '\u{1F393}': 'rehber', '\u{2705}': 'onay', '\u{1F499}': 'kalp', '\u{1F50D}': 'ara', '\u{1F53D}': 'asagi', '\u{1F53C}': 'yukari' };
-        const ICON_RE = /(\u{1F5FA}|\u{1F3C6}|\u{1F30D}|\u{1F30E}|\u{1F30F}|\u{1F4E4}|\u{1F4C5}|\u{1F4C6}|\u{1F5D3}|\u{1F4CD}|\u{1F426}|\u{1F4F7}|\u{1F4F8}|\u{1F4CA}|\u{1F517}|\u{1F4BE}|\u{1F9F3}|\u{1F680}|\u{1F9ED}|\u{1F511}|\u{1F512}|\u{2795}|\u{1F4AC}|\u{1F4C2}|\u{1F4C1}|\u{1F4CB}|\u{1F4E5}|\u{1F9EA}|\u{1F4F1}|\u{2B1B}|\u{1F4C4}|\u{2699}|\u{1F5C4}|\u{1F4D6}|\u{1F41E}|\u{1F4A1}|\u{2B50}|\u{1F4E3}|\u{1F504}|\u{1F986}|\u{21A9}|\u{2B05}|\u{274C}|\u{1F534}|\u{1F524}|\u{1F4C8}|\u{1F5BC}|\u{1F393}|\u{2705}|\u{1F499}|\u{1F50D}|\u{1F53D}|\u{1F53C})\uFE0F?/u;
+            '\u{274C}': 'kapat', '\u{1F534}': 'konum', '\u{1F524}': 'harf', '\u{1F4C8}': 'grafik', '\u{1F5BC}': 'foto', '\u{1F393}': 'rehber', '\u{2705}': 'onay', '\u{1F499}': 'kalp', '\u{1F50D}': 'ara', '\u{1F53D}': 'asagi', '\u{1F53C}': 'yukari', '\u{1F389}': 'konfeti', '\u{1F522}': 'sayi', '\u{1F947}': 'madalya', '\u{1F552}': 'saat', '\u{1F440}': 'goz' };
+        const ICON_RE = /(\u{1F5FA}|\u{1F3C6}|\u{1F30D}|\u{1F30E}|\u{1F30F}|\u{1F4E4}|\u{1F4C5}|\u{1F4C6}|\u{1F5D3}|\u{1F4CD}|\u{1F426}|\u{1F4F7}|\u{1F4F8}|\u{1F4CA}|\u{1F517}|\u{1F4BE}|\u{1F9F3}|\u{1F680}|\u{1F9ED}|\u{1F511}|\u{1F512}|\u{2795}|\u{1F4AC}|\u{1F4C2}|\u{1F4C1}|\u{1F4CB}|\u{1F4E5}|\u{1F9EA}|\u{1F4F1}|\u{2B1B}|\u{1F4C4}|\u{2699}|\u{1F5C4}|\u{1F4D6}|\u{1F41E}|\u{1F4A1}|\u{2B50}|\u{1F4E3}|\u{1F504}|\u{1F986}|\u{21A9}|\u{2B05}|\u{274C}|\u{1F534}|\u{1F524}|\u{1F4C8}|\u{1F5BC}|\u{1F393}|\u{2705}|\u{1F499}|\u{1F50D}|\u{1F53D}|\u{1F53C}|\u{1F389}|\u{1F522}|\u{1F947}|\u{1F552}|\u{1F440})\uFE0F?/u;
         const ICON_RE_G = new RegExp(ICON_RE.source, 'gu');
         const IC = k => `<span class="icw">${ICONS[k]}</span>`;
         function icSkip(el) { return !el || (el.closest && el.closest('script, style, textarea, select, option, svg, canvas, title, [contenteditable], .no-ic')); }
@@ -4047,6 +4052,39 @@
         function loadImgMemo(src, cors) { if (!src) return Promise.resolve(null); if (!_imgMemo[src]) _imgMemo[src] = loadImg(src, cors); return _imgMemo[src]; }
         function mavisImg(mode) { return loadImgMemo('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(mavisSVG(400, mode)), false); }
         function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+        // Paylaşım kartlarında (canvas) emojiler yerine kendi simgelerimiz: SVG → resim (renk başına önbellek), yazıyla aynı satırda çizilir
+        const IC_IMG = {};
+        function icImg(name, color) {
+            let c = String(color || C.navy).toLowerCase(), k = name + '|' + c;
+            if (IC_IMG[k]) return IC_IMG[k].complete && IC_IMG[k].naturalWidth ? IC_IMG[k] : null;
+            let svg = ICONS[name].replace('<svg class="ic"', '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"').replace(/currentColor/g, c);
+            let im = new Image(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); IC_IMG[k] = im;
+            return null;
+        }
+        function icPrep(colors) {   // kart çizilmeden önce simge resimleri hazır olsun
+            let ps = [];
+            colors.forEach(c => Object.keys(ICONS).forEach(n => { icImg(n, c); let im = IC_IMG[n + '|' + String(c).toLowerCase()]; if (!im.complete) ps.push(new Promise(ok => { im.onload = im.onerror = ok; })); }));
+            return Promise.all(ps);
+        }
+        function icParts(str) { return String(str).split(ICON_RE_G); }   // [metin, emoji, metin, ...]
+        function icPx(ctx) { let m = /(\d+(?:\.\d+)?)px/.exec(ctx.font); return m ? +m[1] : 30; }
+        function measureIc(ctx, str) {
+            if (!ICON_RE.test(str)) return ctx.measureText(str).width;
+            let px = icPx(ctx); return icParts(str).reduce((w, p, i) => w + (i % 2 ? px * 1.2 : ctx.measureText(p).width), 0);
+        }
+        function fillTextIc(ctx, str, x, y) {
+            str = String(str);
+            if (!ICON_RE.test(str)) return ctx.fillText(str, x, y);
+            let px = icPx(ctx), W = measureIc(ctx, str), al = ctx.textAlign, bl = ctx.textBaseline, col = ctx.fillStyle;
+            let cx = al === 'center' ? x - W / 2 : (al === 'right' || al === 'end') ? x - W : x;
+            let top = bl === 'middle' ? y - px * 0.55 : bl === 'top' ? y : y - px * 0.88;
+            ctx.textAlign = 'left';
+            icParts(str).forEach((p, i) => {
+                if (i % 2) { let im = icImg(ICON_OF[p], col) || icImg(ICON_OF[p], C.navy); if (im) ctx.drawImage(im, cx + px * 0.05, top, px * 1.1, px * 1.1); cx += px * 1.2; }
+                else if (p) { ctx.fillText(p, cx, y); cx += ctx.measureText(p).width; }
+            });
+            ctx.textAlign = al;
+        }
         function font(w, px, italic) { return `${italic ? 'italic ' : ''}${w} ${px}px Poppins, "Segoe UI", Roboto, sans-serif`; }
         function fitText(ctx, txt, maxW, w, px, minPx) {
             txt = String(txt || ''); let p = px;
@@ -4060,7 +4098,7 @@
             let f = fitText(ctx, txt, opt.maxW || 2000, opt.w || 600, opt.px || 40, opt.minPx);
             ctx.font = font(opt.w || 600, f.px, opt.italic); ctx.fillStyle = opt.color || C.navy; ctx.textAlign = opt.align || 'left'; ctx.textBaseline = opt.base || 'alphabetic';
             if (opt.spacing) { try { ctx.letterSpacing = opt.spacing + 'px'; } catch (e) {} }
-            ctx.fillText(f.txt, x, y);
+            fillTextIc(ctx, f.txt, x, y);
             try { ctx.letterSpacing = '0px'; } catch (e) {}
             return f.px;
         }
@@ -4068,11 +4106,11 @@
             opt = opt || {}; let px = opt.px || 32, h = px + 30, gap = 18, cx = x;
             ctx.font = font(600, px);
             items.filter(Boolean).forEach(t => {
-                let w = ctx.measureText(t).width + 52;
+                let w = measureIc(ctx, t) + 52;
                 if (opt.maxX && cx + w > opt.maxX) return;
                 ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.10)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 4;
                 rr(ctx, cx, y, w, h, h / 2); ctx.fillStyle = opt.bg || '#fff'; ctx.fill(); ctx.restore();
-                ctx.fillStyle = opt.color || C.navy; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(t, cx + 26, y + h / 2 + 1);
+                ctx.fillStyle = opt.color || C.navy; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; fillTextIc(ctx, t, cx + 26, y + h / 2 + 1);
                 cx += w + gap;
             });
             ctx.textBaseline = 'alphabetic';
@@ -4091,7 +4129,7 @@
             ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.15)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 6;
             rr(ctx, x - w, y, w, h, 26); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
             ctx.fillStyle = C.navy; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-            lines.forEach((l, k) => ctx.fillText(l, x - w + 30, y + 22 + lh * (k + 0.5) - px * 0.1 + 2));
+            lines.forEach((l, k) => fillTextIc(ctx, l, x - w + 30, y + 22 + lh * (k + 0.5) - px * 0.1 + 2));
             ctx.textBaseline = 'alphabetic';
         }
         function drawCover(ctx, img, x, y, w, h, fx, fy, zoom) {
@@ -4238,6 +4276,7 @@
         // ---------- kartlar ----------
         async function drawCard(ctx, W, H) {
             let st = shareState, D = buildCardData(), story = H > W * 1.4;
+            await icPrep([C.navy, '#fff', C.sky, C.blue, '#A9BBD6', '#8FB4F0', '#0A3E70']).catch(() => {});
             await Promise.all([document.fonts.load(font(700, 40)), document.fonts.load(font(400, 40)), document.fonts.load(font(600, 40))]).catch(() => {});
             if (st.type === 'obs') return drawObsCard(ctx, W, H, D, story);
             background(ctx, W, H);
