@@ -507,6 +507,7 @@ window.I18N_ES = {
 "Count (leave empty for X):": "Número (vacío para X):",
 "e.g. 12": "p. ej. 12",
 "📷 Follow us on Instagram": "📷 Síguenos en Instagram",
+"Follow us on Instagram": "Síguenos en Instagram",
 "Bird counts": "Número de ejemplares",
 "Source": "Origen",
 "Actions": "Acciones",

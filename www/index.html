@@ -534,7 +534,7 @@
                 <button class="fb-btn" onclick="sendFeedback('bug')">🐞 Hata bildir</button>
                 <button class="fb-btn" onclick="sendFeedback('idea')">💡 Öneri gönder</button>
                 <button class="fb-btn fb-rate" onclick="rateApp()">⭐ Uygulamayı değerlendir</button>
-                <a class="fb-btn" href="https://www.instagram.com/birdatlas.app" target="_blank" style="display:block; box-sizing:border-box; text-decoration:none;">📷 Instagram'da takip et</a>
+                <a class="fb-btn" href="https://www.instagram.com/birdatlas.app" target="_blank" style="display:block; box-sizing:border-box; text-decoration:none;"><span class="icw" data-ic="instagram"></span> Instagram'da takip et</a>
                 <div class="feedback-hint">İpucu: Sorunu gösteren bir ekran görüntüsü alıp (güç + ses kısma) e-postaya eklersen çok yardımcı olur.</div>
             </div>
         </div>
@@ -798,7 +798,7 @@
             "Pzt": "Mon", "Sal": "Tue", "Çar": "Wed", "Per": "Thu", "Cum": "Fri", "Cmt": "Sat", "Paz": "Sun",
             "< Önceki": "< Prev", "Sonraki >": "Next >", "📅 Tarihler": "📅 Dates",
             "🧪 Örnek veriyle dene": "🧪 Try with sample data", "Birey 🔽": "Birds 🔽", "Tarih ↓": "Date ↓", "Sayı ↓": "Count ↓", "Konum ↓": "Places ↓", "Birey ↓": "Birds ↓", "Adet (boş bırakırsan X):": "Count (leave empty for X):", "Örn: 12": "e.g. 12",
-            "📷 Instagram'da takip et": "📷 Follow us on Instagram", "Birey sayısı": "Bird counts", "Yer ↓": "Places ↓",
+            "📷 Instagram'da takip et": "📷 Follow us on Instagram", "Instagram'da takip et": "Follow us on Instagram", "Birey sayısı": "Bird counts", "Yer ↓": "Places ↓",
             "Tür": "Species", "Konum": "Location", "Kaynak": "Source", "İşlemler": "Actions", "Düzenle": "Edit", "Sil": "Delete", "Manuel": "Manual", "Kayıt yok.": "No records.",
             "eBird'e bağlanılıyor... ⏳": "Connecting to eBird... ⏳", "Hata: Ağa bağlanılamadı.": "Error: Could not connect.",
             "Son 30 günde kayıt bulunamadı.": "No records in the last 30 days.", "Son 30 Gün": "Last 30 Days", "Bulunan Tür:": "Species Found:",
@@ -6147,6 +6147,7 @@
         updateLangBtn();
         i18nObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'title'] });
         if (LANG !== 'tr') translateTree(document.body);
+        document.querySelectorAll('.icw[data-ic]').forEach(e => { e.innerHTML = ICONS[e.dataset.ic] || ''; });
         iconObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
         iconizeTree(document.body);
         if (XL.includes(LANG)) loadLocNames().then(ok => { if (ok && obsData.length) { enToSciMap = null; renderAll(); if (liferArray.length) renderLiferCalendar(); } });
