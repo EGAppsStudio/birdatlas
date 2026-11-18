@@ -81,6 +81,20 @@
         @keyframes mv-hold-r { 0%,100% { transform: rotate(0deg); } 30%,75% { transform: translate(-110px,-250px) rotate(25deg); } }
         @keyframes mv-strap { 0%,100% { opacity: 1; } 20%,85% { opacity: 0; } }
         @keyframes mv-pupil { 0%,100% { transform: translateX(0); } 15%,40% { transform: translateX(-28px); } 60%,85% { transform: translateX(28px); } }
+        #chat-window svg.mavis { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .mavis.mv-r-hop .mv-all { animation: mv-hop 0.6s ease-out 1; }
+        .mavis.mv-r-blink .mv-eyes { animation: mv-qblink-o 0.5s 1; }
+        .mavis.mv-r-blink .mv-eyes-c { animation: mv-qblink-c 0.5s 1; }
+        .mavis.mv-r-peek .mv-binoc { transform-origin: 50% 50%; animation: mv-peek 2.4s ease-in-out 1; }
+        .mavis.mv-r-peek .mv-wing-l { transform-origin: 75% 10%; animation: mv-hold-l 2.4s ease-in-out 1; }
+        .mavis.mv-r-peek .mv-wing-r { transform-origin: 25% 10%; animation: mv-hold-r 2.4s ease-in-out 1; }
+        .mavis.mv-r-peek .mv-strap { animation: mv-strap 2.4s ease-in-out 1; }
+        .mavis.mv-r-wave .mv-wing-r { transform-origin: 25% 10%; animation: mv-wave 0.55s ease-in-out 2; }
+        @keyframes mv-qblink-o { 0%,100% { opacity: 1; } 25%,75% { opacity: 0; } }
+        @keyframes mv-qblink-c { 0%,100% { opacity: 0; } 25%,75% { opacity: 1; } }
+        .mv-gem { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; font-weight: 600; color: #1662B6; cursor: pointer; text-decoration: none; }
+        #ai-settings.vurgu { animation: ai-vurgu 1.6s ease-out 1; border-radius: 8px; }
+        @keyframes ai-vurgu { 0%,40% { box-shadow: 0 0 0 3px #F5C518; } 100% { box-shadow: 0 0 0 3px rgba(245,197,24,0); } }
         @media (prefers-reduced-motion: reduce) { .mavis * { animation: none !important; } .mavis .mv-eyes-c { opacity: 0; } }
         .mavis-intro { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px; }
         .mavis-intro .msg-bubble { margin-bottom: 18px; }
@@ -1276,6 +1290,15 @@
               </g>
             </svg>`;
         }
+        // Sohbette Maviş'e dokununca sırayla tepki: zıplar → göz kırpar → dürbünle bakar → kanadıyla selam verir
+        const MAVIS_TEPKI = [['mv-r-hop', 700], ['mv-r-blink', 600], ['mv-r-peek', 2500], ['mv-r-wave', 1200]];
+        let mavisTepkiNo = 0;
+        function mavisTepki(svg) {
+            const [cls, ms] = MAVIS_TEPKI[mavisTepkiNo++ % MAVIS_TEPKI.length];
+            MAVIS_TEPKI.forEach(([c]) => svg.classList.remove(c)); void svg.getBoundingClientRect(); svg.classList.add(cls);
+            clearTimeout(svg.__tepki); svg.__tepki = setTimeout(() => svg.classList.remove(cls), ms);
+        }
+        document.addEventListener('click', e => { const s = e.target.closest && e.target.closest('#chat-window svg.mavis'); if (s) mavisTepki(s); });
         // ===== /Maviş =====
 
         // ===== Anahtarsız yerel asistan: soruları doğrudan verinden hesaplar =====
@@ -1682,6 +1705,8 @@
                 <input type="checkbox" ${mlOn() ? 'checked' : ''} onchange="setMlPhotos(this.checked)" style="margin-top:3px; width:18px; height:18px;">
                 <span><b>📷 ${LT('eBird fotoğraflarımı kullan', 'Use my eBird photos')}</b><br><span class="settings-help">${LT(`${n} türde eBird'e yüklediğin fotoğraf var; Wikipedia fotoğrafı yerine onlar gösterilir (Macaulay Library).`, `You have eBird photos of ${n} species; they're shown instead of Wikipedia photos (Macaulay Library).`)}</span></span></label>`;
         }
+        // Maviş sohbetindeki "Gemini'yi bağla": ayarlar açılır, yapay zekâ bölümüne kayar
+        function openAiSettings() { openSettings(); setTimeout(() => { let el = document.getElementById('ai-settings'); if (!el) return; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.remove('vurgu'); void el.offsetWidth; el.classList.add('vurgu'); }, 60); }
         function openSettings() { document.getElementById('input-ebird-api').value = EBIRD_API; renderAISettings(); renderEbirdHelp(); renderMlSettings(); document.getElementById('settings-overlay').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settings-overlay').style.display = 'none'; }
         function saveSettings() { EBIRD_API = document.getElementById('input-ebird-api').value.trim(); localStorage.setItem('user_ebird_api', EBIRD_API); saveAISettings(); closeSettings(); updateAIGreeting(); alert("API Şifreleri başarıyla kaydedildi!"); }
@@ -2211,6 +2236,7 @@
                 msg = LT(`Selam! Ben <b>Maviş</b> 👋 Dürbünümle verilerine bir göz attım.<br><br>En son <b>${uploadDate}</b> güncellenen verilerine göre;<br><b>${provCount}</b> farklı il/bölgede, toplam <b>${locCount}</b> farklı konumda gözlem yaptın. <b>${dateCount}</b> farklı günde doğaya çıktın, tam <b>${speciesCount}</b> farklı kuş türü kaydedip toplamda <b>${totalObs}</b> gözlem gerçekleştirdin!<br><br>Bugün sana nasıl yardımcı olabilirim?`,
                         `Hi! I'm <b>Maviş</b> (say "mah-VEESH" — Turkish for "little blue one", after the blue tit) 👋 I had a look at your data through my binoculars.<br><br>Based on your data last updated <b>${uploadDate}</b>:<br>you've birded at <b>${locCount}</b> locations in <b>${provCount}</b> provinces/regions, on <b>${dateCount}</b> different days, recording <b>${speciesCount}</b> species and <b>${totalObs}</b> observations in total!<br><br>How can I help you today?`);
                 if (!aiKey()) msg += LT(`<br><br><span style="font-size:11px; opacity:0.8;">(Çevrimdışı mod: istatistik sorularını cihazında cevaplıyorum.)</span>`, `<br><br><span style="font-size:11px; opacity:0.8;">(Offline mode: I answer stats questions on your device.)</span>`);
+                if (!aiKey()) msg += `<br><a class="mv-gem" onclick="openAiSettings()">${IC('ayar')} ${LT("Serbest sohbet için Gemini'yi bağla ›", 'Connect Gemini for free-form chat ›')}</a>`;
             } else {
                 msg = LT("Selam! Ben <b>Maviş</b> 👋 Dürbünümü hazırladım ama henüz verin yok. eBird dosyanı yükle, birlikte bakalım!", "Hi! I'm <b>Maviş</b> 👋 My binoculars are ready but there's no data yet. Upload your eBird file and let's take a look together!");
             }

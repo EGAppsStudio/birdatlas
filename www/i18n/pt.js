@@ -647,5 +647,6 @@ window.I18N_PT = {
 "<b>{0}</b> fewer": "<b>{0}</b> a menos",
 " for ": " para ",
 " – your lifer 🏆": " – seu lifer 🏆",
-" (+{0} records without a number, \"X\")": " (+{0} registros sem número, \"X\")"
+" (+{0} records without a number, \"X\")": " (+{0} registros sem número, \"X\")",
+"Connect Gemini for free-form chat ›": "Conecte o Gemini para conversar livremente ›"
 };
