@@ -5,7 +5,7 @@
 // Kullanım (KOMUTLAR.bat 9):   npm run ekranlar            → 6 dil
 //                              npm run ekranlar -- de fr   → yalnız bu diller
 // Başta Gemini ve eBird anahtarı sorulur (boş bırakılabilir); yalnız bu çekim için kullanılır, hiçbir yere yazılmaz.
-// Tarayıcı indirilmez: bilgisayardaki Microsoft Edge (yoksa Chrome) görünmez modda kullanılır.
+// Tarayıcı indirilmez: bilgisayardaki Microsoft Edge (yoksa Chrome) kullanılır; pencere görünür (adım adım izlenebilir, Ctrl+C durdurur).
 // Kişisel veri yok: uygulamanın kurgusal örnek verisi kullanılır.
 import fs from 'node:fs';
 import path from 'node:path';

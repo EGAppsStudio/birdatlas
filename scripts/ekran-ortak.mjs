@@ -273,7 +273,8 @@ export const EKRANLAR = [
 
 export async function tarayici() {
   for (const channel of ['msedge', 'chrome', undefined]) {
-    try { return await chromium.launch({ channel, headless: true }); } catch (e) {}
+    // Pencere görünür: Enes adım adım izler; bir sorun olursa siyah pencerede Ctrl+C ile durdurur. Görünmez çalıştırmak için: set GIZLI=1
+    try { return await chromium.launch({ channel, headless: process.env.GIZLI === '1' || !!process.env.CI }); } catch (e) {}
   }
   console.log('Edge ya da Chrome bulunamadı.'); process.exit(1);
 }

@@ -65,7 +65,8 @@ goto bitti
 
 :ekranlar
 echo.
-echo  Birkac dakika surer; bilgisayar bu sirada kullanilabilir.
+echo  Birkac dakika surer. Acilan Edge penceresinde adim adim izleyebilirsin; pencereye tiklama.
+echo  Bir sorun olursa bu siyah pencerede Ctrl+C ile durdur.
 call npm run ekranlar
 if errorlevel 1 goto hata
 call npm run gorseller
@@ -77,6 +78,7 @@ goto bitti
 :video
 echo.
 echo  Muzik: magaza\video\muzik klasorundeki ilk ses dosyasi. 5-10 dakika surer.
+echo  Acilan Edge penceresinde adim adim izleyebilirsin; pencereye tiklama. Durdurmak icin Ctrl+C.
 call npm run video
 if errorlevel 1 goto hata
 echo.
