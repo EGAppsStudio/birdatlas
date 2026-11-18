@@ -209,7 +209,15 @@ const srv = http.createServer((q, r) => {
 await new Promise(ok => srv.listen(0, '127.0.0.1', ok));
 const ADRES = `http://127.0.0.1:${srv.address().port}`;
 
-let FFMPEG = 'ffmpeg'; try { FFMPEG = require('ffmpeg-static') || 'ffmpeg'; } catch (e) {}
+// ffmpeg: ffmpeg-static paketi ilk videoda kendiliğinden kurulur (package.json'a yazılmaz; site derlemesini etkilemesin)
+let FFMPEG = 'ffmpeg';
+try { FFMPEG = require('ffmpeg-static') || 'ffmpeg'; } catch (e) {
+  try { execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' }); } catch (e2) {
+    console.log('  ffmpeg kuruluyor (yalnız ilk sefer)…');
+    execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['install', '--no-save', 'ffmpeg-static@5'], { stdio: 'inherit', cwd: KOK, shell: process.platform === 'win32' });
+    FFMPEG = createRequire(path.join(KOK, 'package.json'))('ffmpeg-static');
+  }
+}
 const md = path.join(VD, 'muzik'), muzik = fs.existsSync(md) && fs.readdirSync(md).filter(f => /\.(mp3|m4a|wav|ogg|aac)$/i.test(f)).sort()[0];
 console.log(`\n🎬 2/2 montaj · ${TOPLAM.toFixed(1)} sn · müzik: ${muzik || 'yok (sessiz)'}`);
 const b2 = await tarayici();

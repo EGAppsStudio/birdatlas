@@ -33,7 +33,6 @@
     "@capacitor/filesystem": "^8.0.0"
   },
   "devDependencies": {
-    "ffmpeg-static": "^5.2.0",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.0.0",
     "@fontsource/noto-color-emoji": "^5.1.0",
