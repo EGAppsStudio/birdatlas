@@ -46,7 +46,17 @@ const SAHNELER = [
     await pg.evaluate(() => mapObj.setView([39.3, 33.2], 6, { animate: false })); await hazir(pg);   // hedefin parçaları önceden insin
     await bas(); await hazir(pg, 800);
     k.basla(); await bekle(900);
-    await pg.evaluate(() => new Promise(ok => { mapObj.once('moveend', ok); mapObj.flyTo([39.3, 33.2], 6, { duration: 2.6, easeLinearity: 0.2 }); }));   // parmakla yaklaştırır gibi
+    // parmakla yaklaştırır gibi: küçük adımlarla, hiç uzaklaşmadan (flyTo önce uzaklaşıp tüm noktaları tek noktada topluyordu)
+    await pg.evaluate(async () => {
+      const z0 = mapObj.getZoom(), c0 = mapObj.getCenter(), z1 = 6, c1 = L.latLng(39.3, 33.2), snap = mapObj.options.zoomSnap, N = 56;
+      mapObj.options.zoomSnap = 0;
+      for (let i = 1; i <= N; i++) {
+        const t = i / N, e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        mapObj.setView([c0.lat + (c1.lat - c0.lat) * e, c0.lng + (c1.lng - c0.lng) * e], z0 + (z1 - z0) * e, { animate: false });
+        await new Promise(r => setTimeout(r, 45));
+      }
+      mapObj.options.zoomSnap = snap; mapObj.setView(c1, z1, { animate: false });
+    });
     await bekle(300); await hazir(pg, 900); k.dur();
   }],
   ['takvim', async (pg, L, k) => {
