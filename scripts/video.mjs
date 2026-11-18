@@ -5,6 +5,7 @@
 //   müzik : magaza/video/muzik/ içindeki ilk ses dosyası (mp3/m4a/wav); yoksa sessiz
 // Kullanım: npm run video                → İngilizce, kayıt + montaj
 //           npm run video -- montaj      → kayıt yapmadan yalnız montaj (başlık/müzik değişince)
+//           npm run video -- --sahne=paylas,mavis → yalnız bu sahneleri yeniden kaydet, sonra montaj
 //           npm run video -- tr          → başka dil (o dilin başlıkları aşağıda yoksa İngilizce başlık)
 // Sahne sırası, süreler ve başlıklar: aşağıdaki SAHNELER ve METIN. Ara dosyalar magaza/video/ham ve kare (depoya girmez).
 import http from 'node:http';
@@ -18,6 +19,7 @@ const require = createRequire(import.meta.url);
 const ARG = process.argv.slice(2);
 const L = ARG.find(a => /^[a-z]{2}$/.test(a)) || 'en';
 const YALNIZ_MONTAJ = ARG.includes('montaj');
+const SECILI = ((ARG.find(a => a.startsWith('--sahne=')) || '').split('=')[1] || '').split(',').filter(Boolean);   // ör. --sahne=paylas,mavis: yalnız bunları yeniden kaydet
 const FPS = 30, GECIS = 0.4;   // saniyede kare, sahne geçişi (sn)
 const VD = path.join(KOK, 'magaza', 'video'), HAM = path.join(VD, 'ham'), KARE = path.join(VD, 'kare');
 
@@ -37,7 +39,12 @@ const SAHNELER = [
   }],
   ['kertik', 3.8, async (pg, L) => { await bekle(300); await hazirla.kertik(pg, L); }],
   ['foto', 3.4, async (pg, L) => { await bekle(300); await hazirla.foto(pg, L); }],
-  ['paylas', 3.8, async (pg, L) => { await bekle(200); await hazirla.paylas(pg, L); }],
+  ['paylas', 4.2, async (pg) => {
+    await bekle(200);
+    await pg.evaluate(() => { document.getElementById('ekran-ozel').textContent = '#share-overlay .sp-pick{max-height:86px!important;overflow:hidden!important}'; closeTabs(); openShare({ type: 'year' }); });
+    await bekle(1300);   // kart hazırlanırken önizlemeye kay
+    await pg.evaluate(() => { let w = document.getElementById('share-preview-wrap'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  }],
   ['mavis', 5.2, async (pg, L) => {
     await bekle(200);
     await pg.evaluate(() => { closeTabs(); toggleChat(); });
@@ -108,6 +115,7 @@ if (!YALNIZ_MONTAJ) {
   const { ctx, pg } = await sayfaAc(b, L, 2);
   await pg.evaluate(() => { try { localStorage.setItem('ai_provider', 'gemini'); } catch (e) {} });
   for (const [ad, sure, eylem] of SAHNELER) {
+    if (SECILI.length && !SECILI.includes(ad)) continue;
     process.stdout.write(`• ${ad} `);
     await sifirla(pg); await oturt(pg, 800);
     const n = await kaydet(pg, ad, sure, eylem);
