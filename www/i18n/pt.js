@@ -70,7 +70,7 @@ window.I18N_PT = {
 "You have eBird photos of {0} species; they're shown instead of Wikipedia photos (Macaulay Library).": "Você tem fotos do eBird de {0} espécies; elas aparecem no lugar das fotos da Wikipédia (Macaulay Library).",
 "an unknown date": "uma data desconhecida",
 "Hi! I'm <b>Maviş</b> (say \"mah-VEESH\" — Turkish for \"little blue one\", after the blue tit) 👋 I had a look at your data through my binoculars.<br><br>Based on your data last updated <b>{0}</b>:<br>you've birded at <b>{1}</b> locations in <b>{2}</b> provinces/regions, on <b>{3}</b> different days, recording <b>{4}</b> species and <b>{5}</b> observations in total!<br><br>How can I help you today?": "Oi! Eu sou o <b>Maviş</b> (diga \"ma-VÍCH\" — em turco quer dizer \"azulzinho\", por causa do chapim-azul) 👋 Dei uma olhada nos seus dados com meus binóculos.<br><br>Com base nos seus dados atualizados em <b>{0}</b>:<br>você passarinhou em <b>{1}</b> locais de <b>{2}</b> estados/regiões, em <b>{3}</b> dias diferentes, registrando <b>{4}</b> espécies e <b>{5}</b> observações no total!<br><br>Como posso ajudar hoje?",
-"<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline mode: I answer stats questions on your device.)</span>": "<br><br><span style=\"font-size:11px; opacity:0.8;\">(Modo offline: respondo perguntas de estatística no seu aparelho.)</span>",
+"<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline mode: I answer stats questions on your device. <a class=\"mv-gem\" onclick=\"openAiSettings()\">Connect</a> Gemini for free-form chat.)</span>": "<br><br><span style=\"font-size:11px; opacity:0.8;\">(Modo offline: respondo perguntas de estatística no seu aparelho. <a class=\"mv-gem\" onclick=\"openAiSettings()\">Conecte</a> o Gemini para conversar livremente.)</span>",
 "Hi! I'm <b>Maviş</b> 👋 My binoculars are ready but there's no data yet. Upload your eBird file and let's take a look together!": "Oi! Eu sou o <b>Maviş</b> 👋 Meus binóculos estão prontos, mas ainda não há dados. Envie seu arquivo do eBird e vamos olhar juntos!",
 "loc.": "loc.",
 "latest": "mais recente",
@@ -647,6 +647,5 @@ window.I18N_PT = {
 "<b>{0}</b> fewer": "<b>{0}</b> a menos",
 " for ": " para ",
 " – your lifer 🏆": " – seu lifer 🏆",
-" (+{0} records without a number, \"X\")": " (+{0} registros sem número, \"X\")",
-"Connect Gemini for free-form chat ›": "Conecte o Gemini para conversar livremente ›"
+" (+{0} records without a number, \"X\")": " (+{0} registros sem número, \"X\")"
 };

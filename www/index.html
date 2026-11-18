@@ -92,7 +92,7 @@
         .mavis.mv-r-wave .mv-wing-r { transform-origin: 25% 10%; animation: mv-wave 0.55s ease-in-out 2; }
         @keyframes mv-qblink-o { 0%,100% { opacity: 1; } 25%,75% { opacity: 0; } }
         @keyframes mv-qblink-c { 0%,100% { opacity: 0; } 25%,75% { opacity: 1; } }
-        .mv-gem { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; font-weight: 600; color: #1662B6; cursor: pointer; text-decoration: none; }
+        .mv-gem { color: #1662B6; font-weight: 600; text-decoration: underline; cursor: pointer; }
         #ai-settings.vurgu { animation: ai-vurgu 1.6s ease-out 1; border-radius: 8px; }
         @keyframes ai-vurgu { 0%,40% { box-shadow: 0 0 0 3px #F5C518; } 100% { box-shadow: 0 0 0 3px rgba(245,197,24,0); } }
         @media (prefers-reduced-motion: reduce) { .mavis * { animation: none !important; } .mavis .mv-eyes-c { opacity: 0; } }
@@ -2235,8 +2235,7 @@
                 let uploadDate = localStorage.getItem('ebird_saved_csv_data_date') || LT("bilinmeyen bir tarihte", "an unknown date");
                 msg = LT(`Selam! Ben <b>Maviş</b> 👋 Dürbünümle verilerine bir göz attım.<br><br>En son <b>${uploadDate}</b> güncellenen verilerine göre;<br><b>${provCount}</b> farklı il/bölgede, toplam <b>${locCount}</b> farklı konumda gözlem yaptın. <b>${dateCount}</b> farklı günde doğaya çıktın, tam <b>${speciesCount}</b> farklı kuş türü kaydedip toplamda <b>${totalObs}</b> gözlem gerçekleştirdin!<br><br>Bugün sana nasıl yardımcı olabilirim?`,
                         `Hi! I'm <b>Maviş</b> (say "mah-VEESH" — Turkish for "little blue one", after the blue tit) 👋 I had a look at your data through my binoculars.<br><br>Based on your data last updated <b>${uploadDate}</b>:<br>you've birded at <b>${locCount}</b> locations in <b>${provCount}</b> provinces/regions, on <b>${dateCount}</b> different days, recording <b>${speciesCount}</b> species and <b>${totalObs}</b> observations in total!<br><br>How can I help you today?`);
-                if (!aiKey()) msg += LT(`<br><br><span style="font-size:11px; opacity:0.8;">(Çevrimdışı mod: istatistik sorularını cihazında cevaplıyorum.)</span>`, `<br><br><span style="font-size:11px; opacity:0.8;">(Offline mode: I answer stats questions on your device.)</span>`);
-                if (!aiKey()) msg += `<br><a class="mv-gem" onclick="openAiSettings()">${IC('ayar')} ${LT("Serbest sohbet için Gemini'yi bağla ›", 'Connect Gemini for free-form chat ›')}</a>`;
+                if (!aiKey()) msg += LT(`<br><br><span style="font-size:11px; opacity:0.8;">(Çevrimdışı mod: istatistik sorularını cihazında cevaplıyorum. Serbest sohbet için Gemini'yi <a class="mv-gem" onclick="openAiSettings()">bağla</a>.)</span>`, `<br><br><span style="font-size:11px; opacity:0.8;">(Offline mode: I answer stats questions on your device. <a class="mv-gem" onclick="openAiSettings()">Connect</a> Gemini for free-form chat.)</span>`);
             } else {
                 msg = LT("Selam! Ben <b>Maviş</b> 👋 Dürbünümü hazırladım ama henüz verin yok. eBird dosyanı yükle, birlikte bakalım!", "Hi! I'm <b>Maviş</b> 👋 My binoculars are ready but there's no data yet. Upload your eBird file and let's take a look together!");
             }

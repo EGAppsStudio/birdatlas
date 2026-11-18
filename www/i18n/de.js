@@ -70,7 +70,7 @@ window.I18N_DE = {
 "You have eBird photos of {0} species; they're shown instead of Wikipedia photos (Macaulay Library).": "Du hast eBird-Fotos von {0} Arten; sie werden statt der Wikipedia-Fotos gezeigt (Macaulay Library).",
 "an unknown date": "einem unbekannten Datum",
 "Hi! I'm <b>Maviş</b> (say \"mah-VEESH\" — Turkish for \"little blue one\", after the blue tit) 👋 I had a look at your data through my binoculars.<br><br>Based on your data last updated <b>{0}</b>:<br>you've birded at <b>{1}</b> locations in <b>{2}</b> provinces/regions, on <b>{3}</b> different days, recording <b>{4}</b> species and <b>{5}</b> observations in total!<br><br>How can I help you today?": "Hallo! Ich bin <b>Maviş</b> (gesprochen „ma-WISCH“ — Türkisch für „kleiner Blauer“, nach der Blaumeise) 👋 Ich habe mir deine Daten mit meinem Fernglas angeschaut.<br><br>Laut deinen Daten, zuletzt aktualisiert am <b>{0}</b>:<br>Du hast an <b>{1}</b> Orten in <b>{2}</b> Bundesländern/Regionen beobachtet, an <b>{3}</b> verschiedenen Tagen, mit insgesamt <b>{4}</b> Arten und <b>{5}</b> Beobachtungen!<br><br>Wie kann ich dir heute helfen?",
-"<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline mode: I answer stats questions on your device.)</span>": "<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline-Modus: Statistikfragen beantworte ich auf deinem Gerät.)</span>",
+"<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline mode: I answer stats questions on your device. <a class=\"mv-gem\" onclick=\"openAiSettings()\">Connect</a> Gemini for free-form chat.)</span>": "<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline-Modus: Statistikfragen beantworte ich auf deinem Gerät. Für freies Plaudern Gemini <a class=\"mv-gem\" onclick=\"openAiSettings()\">verbinden</a>.)</span>",
 "Hi! I'm <b>Maviş</b> 👋 My binoculars are ready but there's no data yet. Upload your eBird file and let's take a look together!": "Hallo! Ich bin <b>Maviş</b> 👋 Mein Fernglas ist bereit, aber noch gibt es keine Daten. Lade deine eBird-Datei hoch, dann schauen wir zusammen!",
 "loc.": "Orte",
 "latest": "neueste",
@@ -647,6 +647,5 @@ window.I18N_DE = {
 "<b>{0}</b> fewer": "<b>{0}</b> weniger",
 " for ": " für ",
 " – your lifer 🏆": " – dein Lifer 🏆",
-" (+{0} records without a number, \"X\")": " (+{0} Einträge ohne Zahl, „X“)",
-"Connect Gemini for free-form chat ›": "Gemini verbinden für freies Plaudern ›"
+" (+{0} records without a number, \"X\")": " (+{0} Einträge ohne Zahl, „X“)"
 };

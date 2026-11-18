@@ -69,8 +69,8 @@ window.I18N_FR = {
 "Use my eBird photos": "Utiliser mes photos eBird",
 "You have eBird photos of {0} species; they're shown instead of Wikipedia photos (Macaulay Library).": "Vous avez des photos eBird de {0} espèces ; elles s'affichent à la place des photos Wikipédia (Macaulay Library).",
 "an unknown date": "une date inconnue",
-"Hi! I'm <b>Maviş</b> (say \"mah-VEESH\" — Turkish for \"little blue one\", after the blue tit) 👋 I had a look at your data through my binoculars.<br><br>Based on your data last updated <b>{0}</b>:<br>you've birded at <b>{1}</b> locations in <b>{2}</b> provinces/regions, on <b>{3}</b> different days, recording <b>{4}</b> species and <b>{5}</b> observations in total!<br><br>How can I help you today?": "Bonjour ! Je suis <b>Maviş</b> (prononcez « ma-VICHE » — en turc, « petit bleu », comme la mésange bleue) 👋 J'ai jeté un œil à vos données avec mes jumelles.<br><br>D'après vos données mises à jour le <b>{0}</b> :<br>vous avez observé sur <b>{1}</b> sites dans <b>{2}</b> départements/régions, sur <b>{3}</b> jours différents, avec <b>{4}</b> espèces et <b>{5}</b> observations au total !<br><br>Comment puis-je vous aider aujourd'hui ?",
-"<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline mode: I answer stats questions on your device.)</span>": "<br><br><span style=\"font-size:11px; opacity:0.8;\">(Mode hors ligne : je réponds aux questions de statistiques sur votre appareil.)</span>",
+"Hi! I'm <b>Maviş</b> (say \"mah-VEESH\" — Turkish for \"little blue one\", after the blue tit) 👋 I had a look at your data through my binoculars.<br><br>Based on your data last updated <b>{0}</b>:<br>you've birded at <b>{1}</b> locations in <b>{2}</b> provinces/regions, on <b>{3}</b> different days, recording <b>{4}</b> species and <b>{5}</b> observations in total!<br><br>How can I help you today?": "Bonjour ! Je suis <b>Maviş</b> (prononcez « ma-VICHE » — en turc, « petit bleu », comme la mésange bleue) 👋 J'ai jeté un œil à vos données avec mes jumelles.<br><br>D'après vos données mises à jour le <b>{0}</b> :<br>vous avez observé sur <b>{1}</b> sites dans <b>{2}</b> départements/régions, sur <b>{3}</b> jours différents, avec <b>{4}</b> espèces et <b>{5}</b> observations au total !<br><br>Comment puis-je vous aider aujourd'hui ?",
+"<br><br><span style=\"font-size:11px; opacity:0.8;\">(Offline mode: I answer stats questions on your device. <a class=\"mv-gem\" onclick=\"openAiSettings()\">Connect</a> Gemini for free-form chat.)</span>": "<br><br><span style=\"font-size:11px; opacity:0.8;\">(Mode hors ligne : je réponds aux questions de statistiques sur votre appareil. <a class=\"mv-gem\" onclick=\"openAiSettings()\">Connecter</a> Gemini pour discuter librement.)</span>",
 "Hi! I'm <b>Maviş</b> 👋 My binoculars are ready but there's no data yet. Upload your eBird file and let's take a look together!": "Bonjour ! Je suis <b>Maviş</b> 👋 Mes jumelles sont prêtes, mais il n'y a pas encore de données. Importez votre fichier eBird et regardons ensemble !",
 "loc.": "sites",
 "latest": "dernier",
@@ -647,6 +647,5 @@ window.I18N_FR = {
 "<b>{0}</b> fewer": "<b>{0}</b> de moins",
 " for ": " pour ",
 " – your lifer 🏆": " – votre lifer 🏆",
-" (+{0} records without a number, \"X\")": " (+{0} données sans nombre, « X »)",
-"Connect Gemini for free-form chat ›": "Connecter Gemini pour discuter librement ›"
+" (+{0} records without a number, \"X\")": " (+{0} données sans nombre, « X »)"
 };
