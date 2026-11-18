@@ -22,62 +22,74 @@
         <div class="bubble">Hi! I'm Maviş 👋</div>
         <div class="mv" id="mv"></div>
         <script>        // ===== Maviş: maskotumuz (dürbünlü Mavi Baştankara) =====
-        // mode: 'wave' (el sallar), 'think' (dürbünle bakar), 'idle' (göz kırpar)
+        // Parçalar ayrı gruplar (animasyon için): mv-all, mv-wing-l, mv-wing-r, mv-head, mv-eyes, mv-pupil, mv-binoc, mv-strap
+        // mode: 'idle' (göz kırpar), 'wave' (el sallar), 'think' (dürbünü gözüne kaldırır), 'look' (sağa sola bakar)
         function mavisSVG(size, mode) {
             mode = mode || 'idle';
+            const N = '#0A3E70', B = '#2A7DE1', W = '#FFFFFF';
             return `<svg class="mavis mavis-${mode}" width="${size}" height="${size}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <g class="mv-all">
-                <ellipse cx="100" cy="188" rx="46" ry="7" fill="#0A3E70" opacity="0.12"/>
+                <ellipse cx="100" cy="191" rx="50" ry="6" fill="${N}" opacity="0.12"/>
                 <!-- kuyruk -->
-                <path d="M86,160 L80,186 L100,178 L120,186 L114,160 Z" fill="#1E5FB8"/>
+                <path d="M128,160 C142,158 160,164 170,174 C160,178 146,178 132,172 Z" fill="#1F64C4"/>
+                <path d="M130,166 C144,166 156,170 166,176" stroke="#5FA2F0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                 <!-- gövde -->
-                <ellipse cx="100" cy="128" rx="56" ry="52" fill="#7FA35A"/>
-                <ellipse cx="100" cy="134" rx="46" ry="44" fill="#FED008"/>
-                <path d="M100,104 C97,120 97,140 100,166 C103,140 103,120 100,104 Z" fill="#0A3E70" opacity="0.35"/>
+                <ellipse cx="100" cy="140" rx="54" ry="46" fill="#7FA35A"/>
+                <ellipse cx="100" cy="144" rx="42" ry="42" fill="#FCD116"/>
+                <path d="M100,122 C98,138 98,156 100,176 C102,156 102,138 100,122 Z" fill="#B59A1A" opacity="0.45"/>
                 <!-- ayaklar -->
-                <g stroke="#5C6B7A" stroke-width="4" stroke-linecap="round" fill="none">
-                  <path d="M86,176 l-4,10 M86,176 l3,10 M86,176 l-9,6"/>
-                  <path d="M114,176 l4,10 M114,176 l-3,10 M114,176 l9,6"/>
+                <g stroke="#5C6B7A" stroke-width="5" stroke-linecap="round" fill="none">
+                  <path d="M84,180 l-7,9 M84,180 l0,10 M84,180 l7,9"/>
+                  <path d="M116,180 l-7,9 M116,180 l0,10 M116,180 l7,9"/>
                 </g>
-                <!-- sol kanat (el sallayan) -->
+                <!-- dürbün askısı -->
+                <path class="mv-strap" d="M70,112 C76,130 82,138 88,140 M130,112 C124,130 118,138 112,140" stroke="#8B5A2B" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <!-- sol kanat (el sallar, dürbünü tutar) -->
                 <g class="mv-wing-l">
-                  <path d="M52,112 C30,104 22,130 34,148 C44,160 60,152 62,138 Z" fill="#2F7FE0"/>
-                  <path d="M34,128 C42,130 52,132 60,128" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+                  <path d="M54,112 C38,110 28,130 34,148 C38,160 52,162 58,150 C64,136 64,118 54,112 Z" fill="${B}"/>
+                  <path d="M37,136 C44,139 52,139 59,136" stroke="${W}" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                </g>
+                <!-- sağ kanat -->
+                <g class="mv-wing-r">
+                  <path d="M146,112 C162,110 172,130 166,148 C162,160 148,162 142,150 C136,136 136,118 146,112 Z" fill="${B}"/>
+                  <path d="M163,136 C156,139 148,139 141,136" stroke="${W}" stroke-width="4.5" stroke-linecap="round" fill="none"/>
                 </g>
                 <!-- baş -->
-                <circle cx="100" cy="70" r="47" fill="#FFFFFF" stroke="#0A3E70" stroke-width="5"/>
-                <path d="M55,64 C57,30 80,20 100,20 C120,20 143,30 145,64 C130,48 116,44 100,44 C84,44 70,48 55,64 Z" fill="#1E6FD9"/>
-                <path d="M58,58 C70,46 84,42 100,42 C116,42 130,46 142,58" stroke="#FFFFFF" stroke-width="4" fill="none" stroke-linecap="round"/>
-                <!-- göz bandı -->
-                <path d="M84,67 C74,65 62,68 54,76 C63,74 73,76 84,79 Z" fill="#0A3E70"/>
-                <path d="M116,67 C126,65 138,68 146,76 C137,74 127,76 116,79 Z" fill="#0A3E70"/>
-                <!-- yanaklar -->
-                <ellipse cx="70" cy="92" rx="9" ry="5" fill="#FF8FA3" opacity="0.55"/>
-                <ellipse cx="130" cy="92" rx="9" ry="5" fill="#FF8FA3" opacity="0.55"/>
-                <!-- gözler -->
-                <g class="mv-eyes">
-                  <ellipse cx="82" cy="72" rx="8" ry="9" fill="#1B1B22"/>
-                  <ellipse cx="118" cy="72" rx="8" ry="9" fill="#1B1B22"/>
-                  <circle cx="85" cy="68" r="3" fill="#FFFFFF"/>
-                  <circle cx="121" cy="68" r="3" fill="#FFFFFF"/>
+                <g class="mv-head">
+                  <circle cx="100" cy="72" r="50" fill="${W}"/>
+                  <!-- tepe (mavi taç + perçem) -->
+                  <path d="M51.5,60 A50,50 0 0 1 148.5,60 C138,52 120,48 100,48 C80,48 62,52 51.5,60 Z" fill="${B}"/>
+                  <path d="M78,30 C82,16 96,7 108,11 C103,13 100,16 99,19 C108,12 122,15 124,30 Z" fill="${B}"/>
+                  <!-- yüz deseni: gagadan gözlerin içinden enseye bant + yaka + çene -->
+                  <path d="M100,85 C93,77 86,69 74,66.5 C64,64.5 56,66 51.5,68 L50.4,77 C57,75 65,74.5 73,76.5 C84,79 92,84 100,91 Z" fill="${N}"/>
+                  <path d="M100,85 C107,77 114,69 126,66.5 C136,64.5 144,66 148.5,68 L149.6,77 C143,75 135,74.5 127,76.5 C116,79 108,84 100,91 Z" fill="${N}"/>
+                  <path d="M52,86 A50,50 0 0 0 148,86 C143,100 126,111 109,112.5 C105,109 102.5,104 101.5,92 L98.5,92 C97.5,104 95,109 91,112.5 C74,111 57,100 52,86 Z" fill="${N}"/>
+                  <path d="M51.5,60 A50,50 0 1 0 148.5,60" fill="none" stroke="${N}" stroke-width="3.5"/>
+                  <!-- yanaklar -->
+                  <ellipse cx="72" cy="92" rx="8" ry="5" fill="#FF8FA3" opacity="0.6"/>
+                  <ellipse cx="128" cy="92" rx="8" ry="5" fill="#FF8FA3" opacity="0.6"/>
+                  <!-- gözler -->
+                  <g class="mv-eyes">
+                    <g class="mv-pupil">
+                      <ellipse cx="81" cy="73" rx="9.5" ry="10.5" fill="#15151C" stroke="${W}" stroke-width="2"/>
+                      <ellipse cx="119" cy="73" rx="9.5" ry="10.5" fill="#15151C" stroke="${W}" stroke-width="2"/>
+                      <circle cx="84.5" cy="68.5" r="3.4" fill="${W}"/>
+                      <circle cx="122.5" cy="68.5" r="3.4" fill="${W}"/>
+                    </g>
+                  </g>
+                  <!-- gaga -->
+                  <path d="M93.5,82.5 Q100,80 106.5,82.5 Q103,90 100,92.5 Q97,90 93.5,82.5 Z" fill="#4A5260"/>
+                  <path d="M96.5,83 Q100,82 103.5,83" stroke="${W}" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.5"/>
                 </g>
-                <!-- gaga: kısa, yuvarlak uçlu -->
-                <path d="M95,84 Q100,81 105,84 Q103,90 100,91.5 Q97,90 95,84 Z" fill="#3A3F4A"/>
-                <path d="M97,84.2 Q100,83 102,84.2" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
-                <!-- sağ kanat -->
-                <path d="M148,112 C170,104 178,130 166,148 C156,160 140,152 138,138 Z" fill="#2F7FE0"/>
-                <path d="M144,130 C152,132 160,130 166,126" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none"/>
-                <!-- dürbün (öne bakan iki mercek) -->
-                <path d="M84,112 C96,124 140,124 152,112" stroke="#8B5A2B" stroke-width="3" fill="none"/>
+                <!-- dürbün -->
                 <g class="mv-binoc">
-                  <rect x="114" y="132" width="16" height="10" rx="3" fill="#3C4C68"/>
-                  <circle cx="110" cy="138" r="15" fill="#24324A"/>
-                  <circle cx="134" cy="138" r="15" fill="#24324A"/>
-                  <circle cx="110" cy="138" r="9" fill="#9FD3FF"/>
-                  <circle cx="134" cy="138" r="9" fill="#9FD3FF"/>
-                  <circle cx="107" cy="135" r="3" fill="#FFFFFF" opacity="0.9"/>
-                  <circle cx="131" cy="135" r="3" fill="#FFFFFF" opacity="0.9"/>
-                  <ellipse cx="146" cy="146" rx="9" ry="7" fill="#2F7FE0"/>
+                  <rect x="94" y="136" width="12" height="9" rx="3" fill="#2E3E5C"/>
+                  <circle cx="87" cy="142" r="13.5" fill="#1B2B45"/>
+                  <circle cx="113" cy="142" r="13.5" fill="#1B2B45"/>
+                  <circle cx="87" cy="142" r="8.5" fill="#9FD3FF"/>
+                  <circle cx="113" cy="142" r="8.5" fill="#9FD3FF"/>
+                  <circle cx="84" cy="139" r="3" fill="${W}" opacity="0.9"/>
+                  <circle cx="110" cy="139" r="3" fill="${W}" opacity="0.9"/>
                 </g>
               </g>
             </svg>`;
