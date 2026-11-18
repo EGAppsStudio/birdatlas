@@ -166,7 +166,7 @@ const sunucu = http.createServer((q, r) => {
 await new Promise(ok => sunucu.listen(0, '127.0.0.1', ok));
 const ADRES = `http://127.0.0.1:${sunucu.address().port}`;
 
-const b = await tarayici();
+const b = await tarayici({ gorunur: false });   // görsel çizimi: pencere gerekmez (ekran görüntüleri ekranlar.mjs'de görünür çekilir)
 async function cek(html, W, H, out, q = 92) {
   SAYFA = html;
   const pg = await b.newPage({ viewport: { width: W, height: H } });

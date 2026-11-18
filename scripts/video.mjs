@@ -1,132 +1,157 @@
 // Tanıtım videosu (KOMUTLAR 10): uygulamayı telefon boyutunda örnek veriyle açar, 7 kısa sahne kaydeder,
-// sonra telefon çerçevesi + başlıklar + geçişler + Maviş'li açılış/kapanış + müzikle birleştirir.
+// sonra telefon çerçevesi + başlıklar + geçişler + logo ve Maviş'li açılış/kapanış + müzikle birleştirir.
 //   çıktı : magaza/video/birdatlas-<dil>-yatay.mp4 (1920×1080; Play, YouTube, site)
 //           magaza/video/birdatlas-<dil>-dikey.mp4 (1080×1920; Instagram Reels / hikâye)
 //   müzik : magaza/video/muzik/ içindeki ilk ses dosyası (mp3/m4a/wav); yoksa sessiz
-// Kullanım: npm run video                → İngilizce, kayıt + montaj
+// Kullanım: npm run video                → 6 dil (başta sorar; Enter = hepsi), kayıt + montaj
+//           npm run video -- en de       → yalnız bu diller
 //           npm run video -- montaj      → kayıt yapmadan yalnız montaj (başlık/müzik değişince)
-//           npm run video -- --sahne=paylas,mavis → yalnız bu sahneleri yeniden kaydet, sonra montaj
-//           npm run video -- tr          → başka dil (o dilin başlıkları aşağıda yoksa İngilizce başlık)
-// Sahne sırası, süreler ve başlıklar: aşağıdaki SAHNELER ve METIN. Ara dosyalar magaza/video/ham ve kare (depoya girmez).
+//           npm run video -- en --sahne=paylas,mavis → yalnız bu sahneleri yeniden kaydet, sonra montaj
+// Her sahne önce KAYITSIZ hazırlanır (harita parçaları, fotoğraflar, kart yüklenene kadar); kayıt ekran hazır olunca başlar,
+// beklemelerde durur (k.basla / k.dur). Sahneler ve başlıklar aşağıda. Ara dosyalar magaza/video/ham ve kare (depoya girmez).
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
+import readline from 'node:readline/promises';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { KOK, tarayici, sayfaAc, sifirla, oturt, bekle, EKRANLAR, sunucu as appSunucu } from './ekran-ortak.mjs';
+import { KOK, TUM_DILLER, SORU, tarayici, sayfaAc, sifirla, oturt, bekle, EKRANLAR, sunucu as appSunucu } from './ekran-ortak.mjs';
 
 const require = createRequire(import.meta.url);
 const ARG = process.argv.slice(2);
-const L = ARG.find(a => /^[a-z]{2}$/.test(a)) || 'en';
+let DILLER = ARG.filter(a => TUM_DILLER.includes(a));
 const YALNIZ_MONTAJ = ARG.includes('montaj');
 const SECILI = ((ARG.find(a => a.startsWith('--sahne=')) || '').split('=')[1] || '').split(',').filter(Boolean);   // ör. --sahne=paylas,mavis: yalnız bunları yeniden kaydet
+if (!DILLER.length && process.stdin.isTTY) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  DILLER = (await rl.question('\n  Hangi diller? (Enter = hepsi: tr en es pt de fr; ör. en ya da en,de): ')).toLowerCase().split(/[\s,]+/).filter(x => TUM_DILLER.includes(x));
+  rl.close();
+}
+if (!DILLER.length) DILLER = TUM_DILLER;
 const FPS = 30, GECIS = 0.4;   // saniyede kare, sahne geçişi (sn)
-const VD = path.join(KOK, 'magaza', 'video'), HAM = path.join(VD, 'ham'), KARE = path.join(VD, 'kare');
+const VW = 412, VH = 800;      // telefon ekranı (CSS piksel); kayıt ×2
+const VD = path.join(KOK, 'magaza', 'video'), KARE = path.join(VD, 'kare');
+const HAMD = (L) => path.join(VD, 'ham', L);
 
-// ---------- sahneler: [ad, süre (sn), eylem] — eylem kayıt başlarken çalışır ----------
+// ---------- yardımcılar ----------
 const hazirla = Object.fromEntries(EKRANLAR);
-const SORU = { tr: "2026'daki en iyi günüm hangisiydi?", en: 'What was my best day in 2026?' };
+const resimler = (pg) => pg.waitForFunction(() => [...document.images].filter(i => i.offsetParent && i.src).every(i => i.complete), null, { timeout: 20000, polling: 300 }).catch(() => {});
+const hazir = async (pg, ms = 400) => { await oturt(pg, 300); await resimler(pg); await bekle(ms); };   // harita parçaları + görünen resimler yüklendi
+const ozel = (pg, css) => pg.evaluate(c => { document.getElementById('ekran-ozel').textContent = c; }, css);
+
+// ---------- sahneler: [ad, eylem(pg, L, k)] — k.basla() kaydı başlatır, k.dur() durdurur (arada hazırlık kayda girmez) ----------
 const SAHNELER = [
-  ['harita', 4.2, async (pg) => {
-    await bekle(300);
-    await pg.evaluate(() => mapObj.flyTo([39.86, 32.83], 9, { duration: 3.2 }));
+  ['harita', async (pg, L, k) => {
+    const bas = () => pg.evaluate(() => { closeTabs(); mapObj.setView([30, 22], 2, { animate: false }); });
+    await pg.evaluate(() => mapObj.setView([39.3, 33.2], 6, { animate: false })); await hazir(pg);   // hedefin parçaları önceden insin
+    await bas(); await hazir(pg, 800);
+    k.basla(); await bekle(900);
+    await pg.evaluate(() => new Promise(ok => { mapObj.once('moveend', ok); mapObj.flyTo([39.3, 33.2], 6, { duration: 2.6, easeLinearity: 0.2 }); }));   // parmakla yaklaştırır gibi
+    await bekle(300); await hazir(pg, 900); k.dur();
   }],
-  ['takvim', 3.8, async (pg) => {
-    await bekle(300);
+  ['takvim', async (pg, L, k) => {
     await pg.evaluate(() => { openTab('obs'); setObsSub('calendar'); currentCalDate = new Date(2025, 7, 1); selectedDates.clear(); renderAll(); });
-    await bekle(1200);
+    await hazir(pg, 600);
+    k.basla(); await bekle(1000);
     await pg.evaluate(() => { selectedDates.add('2025-08-12'); lastClickedDay = '2025-08-12'; renderAll(); });
+    await bekle(2400); k.dur();
   }],
-  ['kertik', 3.8, async (pg, L) => { await bekle(300); await hazirla.kertik(pg, L); }],
-  ['foto', 3.4, async (pg, L) => { await bekle(300); await hazirla.foto(pg, L); }],
-  ['paylas', 4.2, async (pg) => {
-    await bekle(200);
-    await pg.evaluate(() => { document.getElementById('ekran-ozel').textContent = '#share-overlay .sp-pick{max-height:86px!important;overflow:hidden!important}'; closeTabs(); openShare({ type: 'year' }); });
-    await bekle(1300);   // kart hazırlanırken önizlemeye kay
+  ['kertik', async (pg, L, k) => {
+    await hazirla.kertik(pg, L); await hazir(pg, 400);              // kertik haritası + açık kutu, önce sessizce
+    await pg.evaluate(() => mapObj.closePopup()); await hazir(pg, 500);
+    k.basla(); await bekle(900);
+    await pg.evaluate(() => { let h = null; markerLayerGroup.eachLayer(m => { let p = m.getPopup && m.getPopup(); if (!p || h) return; let c = p.getContent(); c = typeof c === 'function' ? c(m) : c; if (String(c).includes('Coracias caudatus')) h = m; }); if (h) h.openPopup(); });
+    await resimler(pg); await bekle(2400); k.dur();
+  }],
+  ['foto', async (pg, L, k) => {
+    await hazirla.foto(pg, L); await hazir(pg, 800);                // fotoğraf tamamen yüklenince
+    k.basla(); await bekle(3200); k.dur();
+  }],
+  ['paylas', async (pg, L, k) => {
+    await ozel(pg, '#share-overlay .sp-pick{max-height:86px!important;overflow:hidden!important}');
+    await pg.evaluate(() => { closeTabs(); openShare({ type: 'year' }); });
+    await bekle(800);
+    await pg.waitForFunction(() => { let b = document.getElementById('share-busy'); return !b || !b.offsetParent || getComputedStyle(b).display === 'none' || getComputedStyle(b).visibility === 'hidden' || getComputedStyle(b).opacity === '0'; }, null, { timeout: 40000 }).catch(() => {});
+    await bekle(1200);                                                // kart çizildi ("Hazırlanıyor" bitti)
+    await pg.evaluate(() => { let w = document.getElementById('share-preview-wrap'), p = w; while (p && !(p.scrollHeight > p.clientHeight + 4)) p = p.parentElement; if (p) p.scrollTop = 0; });
+    await bekle(400);
+    k.basla(); await bekle(800);
     await pg.evaluate(() => { let w = document.getElementById('share-preview-wrap'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    await bekle(2800); k.dur();
   }],
-  ['mavis', 5.2, async (pg, L) => {
-    await bekle(200);
+  ['mavis', async (pg, L, k) => {
     await pg.evaluate(() => { closeTabs(); toggleChat(); });
-    await bekle(500);
-    await pg.evaluate(() => { let cw = document.getElementById('chat-window'), cm = document.getElementById('chat-messages'), mb = document.getElementById('menu-btn').getBoundingClientRect(); cm.style.setProperty('height', Math.round(parseFloat(getComputedStyle(cm).height) + cw.getBoundingClientRect().top - mb.bottom - 10) + 'px', 'important'); });
+    await bekle(700);
+    await pg.evaluate(() => { let cw = document.getElementById('chat-window'), cm = document.getElementById('chat-messages'), mb = document.getElementById('menu-btn').getBoundingClientRect(); cm.style.setProperty('height', Math.round(parseFloat(getComputedStyle(cm).height) + cw.getBoundingClientRect().top - mb.bottom - 10) + 'px', 'important'); cm.scrollTop = cm.scrollHeight; });
+    await hazir(pg, 500);
+    k.basla(); await bekle(600);
     const soru = SORU[L] || SORU.en;
-    for (let i = 1; i <= soru.length; i++) { await pg.evaluate(s => { document.getElementById('chat-input').value = s; }, soru.slice(0, i)); await bekle(32); }
-    await bekle(250);
+    for (let i = 1; i <= soru.length; i++) { await pg.evaluate(s => { document.getElementById('chat-input').value = s; }, soru.slice(0, i)); await bekle(34); }
+    await bekle(300);
     await pg.evaluate(() => sendChatMessage());
-    await bekle(1700);
-    await pg.evaluate(() => { let cm = document.getElementById('chat-messages'), b = [...cm.querySelectorAll('.chat-msg.chat-user')].pop(); if (b) cm.scrollTo({ top: b.offsetTop - 8, behavior: 'smooth' }); });
+    await bekle(700); k.dur();                                        // "dürbünle bakıyorum" kısa görünsün, bekleme kayda girmesin
+    await pg.waitForFunction(() => !document.querySelector('#chat-messages [id^="loading"]'), null, { timeout: 60000, polling: 200 }).catch(() => {});
+    await pg.evaluate(() => { let cm = document.getElementById('chat-messages'), b = [...cm.querySelectorAll('.chat-msg.chat-user')].pop(); if (b) cm.scrollTop = b.offsetTop - 8; });
+    await bekle(300);
+    k.basla(); await bekle(3200); k.dur();
   }],
-  ['kesfet', 3.8, async (pg, L) => { await bekle(300); await hazirla.kesfet(pg, L); }],
+  ['kesfet', async (pg, L, k) => {
+    await hazirla.kesfet(pg, L); await hazir(pg, 800);              // liste + sarı daire + harita hazır
+    k.basla(); await bekle(3400); k.dur();
+  }],
 ];
-const ACILIS = 2.8, KAPANIS = 3.4;
+const ACILIS = 3.0, KAPANIS = 3.4;
 
 // ---------- başlıklar ----------
 const METIN = {
-  en: {
-    acilis: ['Bird Atlas', 'Your personal birding map'],
-    harita: ['All your eBird sightings', 'on one map'],
-    takvim: ['Tap a day,', 'relive it'],
-    kertik: ['Every lifer,', 'a memory'],
-    foto: ['Your own photos', 'on every species'],
-    paylas: ['Beautiful cards', 'to share'],
-    mavis: ['Ask Maviş', 'about your birds'],
-    kesfet: ["What's around you", 'right now?'],
-    kapanis: ['birdatlas.app', 'Android & web · free'],
-  },
-  tr: {
-    acilis: ['Kuş Atlası', 'Kişisel kuş gözlem haritan'],
-    harita: ['Tüm eBird gözlemlerin', 'tek haritada'],
-    takvim: ['Bir güne dokun,', 'yeniden yaşa'],
-    kertik: ['Her yeni tür', 'bir hatıra'],
-    foto: ['Kendi fotoğrafların', 'her türde'],
-    paylas: ['Paylaşmaya değer', 'kartlar'],
-    mavis: ["Maviş'e sor,", 'verilerin konuşsun'],
-    kesfet: ['Çevrende şu an', 'neler var?'],
-    kapanis: ['birdatlas.app', 'Android ve web · ücretsiz'],
-  },
+  en: { acilis: ['Bird Atlas', 'Your personal birding map'], harita: ['All your eBird sightings', 'on one map'], takvim: ['Tap a day,', 'relive it'], kertik: ['Every lifer,', 'a memory'], foto: ['Your own photos', 'on every species'], paylas: ['Beautiful cards', 'to share'], mavis: ['Ask Maviş', 'about your birds'], kesfet: ["What's around you", 'right now?'], kapanis: ['birdatlas.app', 'Android & web · free'] },
+  tr: { acilis: ['Kuş Atlası', 'Kişisel kuş gözlem haritan'], harita: ['Tüm eBird gözlemlerin', 'tek haritada'], takvim: ['Bir güne dokun,', 'yeniden yaşa'], kertik: ['Her yeni tür', 'bir hatıra'], foto: ['Kendi fotoğrafların', 'her türde'], paylas: ['Paylaşmaya değer', 'kartlar'], mavis: ["Maviş'e sor,", 'verilerin konuşsun'], kesfet: ['Çevrende şu an', 'neler var?'], kapanis: ['birdatlas.app', 'Android ve web · ücretsiz'] },
+  es: { acilis: ['Bird Atlas', 'Tu mapa personal de aves'], harita: ['Todos tus avistamientos de eBird', 'en un mapa'], takvim: ['Toca un día,', 'revívelo'], kertik: ['Cada lifer,', 'un recuerdo'], foto: ['Tus propias fotos', 'en cada especie'], paylas: ['Tarjetas preciosas', 'para compartir'], mavis: ['Pregunta a Maviş', 'sobre tus aves'], kesfet: ['¿Qué hay a tu alrededor', 'ahora mismo?'], kapanis: ['birdatlas.app', 'Android y web · gratis'] },
+  pt: { acilis: ['Bird Atlas', 'Seu mapa pessoal de aves'], harita: ['Todas as suas observações do eBird', 'em um mapa'], takvim: ['Toque em um dia,', 'reviva-o'], kertik: ['Cada lifer,', 'uma lembrança'], foto: ['Suas próprias fotos', 'em cada espécie'], paylas: ['Cartões lindos', 'para compartilhar'], mavis: ['Pergunte ao Maviş', 'sobre suas aves'], kesfet: ['O que há perto de você', 'agora mesmo?'], kapanis: ['birdatlas.app', 'Android e web · grátis'] },
+  de: { acilis: ['Bird Atlas', 'Deine persönliche Vogelkarte'], harita: ['Alle deine eBird-Beobachtungen', 'auf einer Karte'], takvim: ['Tippe auf einen Tag,', 'erlebe ihn neu'], kertik: ['Jeder Lifer', 'eine Erinnerung'], foto: ['Deine eigenen Fotos', 'bei jeder Art'], paylas: ['Schöne Karten', 'zum Teilen'], mavis: ['Frag Maviş', 'nach deinen Vögeln'], kesfet: ['Was ist gerade', 'in deiner Nähe?'], kapanis: ['birdatlas.app', 'Android & Web · kostenlos'] },
+  fr: { acilis: ['Bird Atlas', 'Votre carte ornitho personnelle'], harita: ['Toutes vos observations eBird', 'sur une carte'], takvim: ['Touchez un jour,', 'revivez-le'], kertik: ['Chaque lifer,', 'un souvenir'], foto: ['Vos propres photos', 'pour chaque espèce'], paylas: ['De belles cartes', 'à partager'], mavis: ['Demandez à Maviş', 'tout sur vos oiseaux'], kesfet: ["Qu'y a-t-il autour de vous", 'en ce moment ?'], kapanis: ['birdatlas.app', 'Android et web · gratuit'] },
 };
-const M = METIN[L] || METIN.en;
 
-// ---------- 1) kayıt: sahneler ekran yayınıyla (CDP screencast) kaydedilir, 30 kare/sn'ye çevrilir ----------
-async function kaydet(pg, ad, sure, eylem) {
-  const d = path.join(HAM, ad); fs.rmSync(d, { recursive: true, force: true }); fs.mkdirSync(d, { recursive: true });
-  const cdp = await pg.context().newCDPSession(pg), kareler = [];
-  cdp.on('Page.screencastFrame', f => { kareler.push({ t: f.metadata.timestamp, b: f.data }); cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => {}); });
-  await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 92, everyNthFrame: 1 });
-  await bekle(400);
-  const bas = kareler.length ? kareler[kareler.length - 1].t : Date.now() / 1000;
-  const is = eylem(pg, L).catch(e => console.log(`\n  ! ${ad}: ${e.message}`));
-  await bekle(sure * 1000 + 300);
-  await is;
+// ---------- 1) kayıt: ekran yayını (CDP screencast) sürekli açık; yalnız k.basla()–k.dur() arası 30 kare/sn'ye çevrilir ----------
+async function kaydet(pg, L, ad, eylem) {
+  const d = path.join(HAMD(L), ad); fs.rmSync(d, { recursive: true, force: true }); fs.mkdirSync(d, { recursive: true });
+  const cdp = await pg.context().newCDPSession(pg), kareler = [], simdi = () => Date.now() / 1000;
+  // yalnız telefon boyutundaki kareler (pencere boyutu değişirken gelen farklı boyutlu kareler titreme yapıyordu)
+  cdp.on('Page.screencastFrame', f => { if (Math.abs(f.metadata.deviceWidth - VW) < 2 && Math.abs(f.metadata.deviceHeight - VH) < 2) kareler.push({ t: f.metadata.timestamp, b: f.data }); cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => {}); });
+  await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 92, maxWidth: VW * 2, maxHeight: VH * 2, everyNthFrame: 1 });
+  const k = { parca: [], basla() { this.parca.push([simdi(), null]); }, dur() { const p = this.parca[this.parca.length - 1]; if (p && p[1] === null) p[1] = simdi(); } };
+  try { await eylem(pg, L, k); } catch (e) { console.log(`\n  ! ${ad}: ${e.message}`); }
+  k.dur(); await bekle(200);
   await cdp.send('Page.stopScreencast').catch(() => {}); await cdp.detach().catch(() => {});
-  let j = 0;
-  for (let i = 0; i < Math.round(sure * FPS); i++) {
-    const t = bas + i / FPS;
+  let no = 0, j = 0;
+  for (const [t0, t1] of k.parca) for (let t = t0; t < t1; t += 1 / FPS) {
     while (j + 1 < kareler.length && kareler[j + 1].t <= t) j++;
-    fs.writeFileSync(path.join(d, String(i + 1).padStart(5, '0') + '.jpg'), Buffer.from(kareler[j].b, 'base64'));
+    if (!kareler.length) break;
+    fs.writeFileSync(path.join(d, String(++no).padStart(5, '0') + '.jpg'), Buffer.from(kareler[j].b, 'base64'));
   }
-  return kareler.length;
+  return no;
 }
 
 if (!YALNIZ_MONTAJ) {
-  console.log(`\n🎬 Tanıtım videosu · ${L} · 1/2 kayıt`);
-  const b = await tarayici();
-  const { ctx, pg } = await sayfaAc(b, L, 2);
-  await pg.evaluate(() => { try { localStorage.setItem('ai_provider', 'gemini'); } catch (e) {} });
-  for (const [ad, sure, eylem] of SAHNELER) {
-    if (SECILI.length && !SECILI.includes(ad)) continue;
-    process.stdout.write(`• ${ad} `);
-    await sifirla(pg); await oturt(pg, 800);
-    const n = await kaydet(pg, ad, sure, eylem);
-    console.log(`✓ (${n} kare)`);
+  const b = await tarayici({ pencere: [460, 900] });
+  for (const L of DILLER) {
+    console.log(`\n🎬 Tanıtım videosu · ${L} · kayıt (Edge penceresinde izleyebilirsin; tıklama)`);
+    const { ctx, pg } = await sayfaAc(b, L, 2);
+    await pg.evaluate(() => { try { localStorage.setItem('ai_provider', 'gemini'); } catch (e) {} });
+    for (const [ad, eylem] of SAHNELER) {
+      if (SECILI.length && !SECILI.includes(ad)) continue;
+      process.stdout.write(`• ${ad} `);
+      await sifirla(pg); await oturt(pg, 500);
+      const n = await kaydet(pg, L, ad, eylem);
+      console.log(`✓ (${(n / FPS).toFixed(1)} sn)`);
+    }
+    await ctx.close();
   }
-  await ctx.close(); await b.close();
+  await b.close();
 }
 appSunucu.closeAllConnections(); appSunucu.close();
 
 // ---------- 2) montaj: HTML sahne kare kare çizilir (yatay + dikey), ffmpeg ile mp4 ----------
-for (const [ad, sure] of SAHNELER) if (!fs.existsSync(path.join(HAM, ad, '00001.jpg'))) { console.log(`\n  ! ${ad} kaydı yok: önce kayıtla birlikte çalıştır (npm run video)`); process.exit(1); }
 const index = fs.readFileSync(path.join(KOK, 'www', 'index.html'), 'utf8');
 const mavisJs = index.slice(index.indexOf('        const MAVIS_P ='), index.indexOf('        // ===== /Maviş ====='));
 const mavisCss = index.slice(index.indexOf('/* ===== Maviş animasyonları ===== */'), index.indexOf('@media (prefers-reduced-motion: reduce) { .mavis'));
@@ -136,13 +161,22 @@ function poppinsCss() {
   if (!css && process.env.POPPINS_DIR) css = `@font-face{font-family:P;src:url('/__poppins/Poppins-Bold.ttf');font-weight:700}@font-face{font-family:P;src:url('/__poppins/Poppins-Regular.ttf');font-weight:400}`;
   return css;
 }
-const SAHNE = SAHNELER.map(([ad, sure]) => ({ ad, sure, n: Math.round(sure * FPS), m: M[ad] }));
-const TOPLAM = ACILIS + SAHNE.reduce((a, s) => a + s.sure, 0) - GECIS * (SAHNE.length - 1) + KAPANIS - GECIS;
+// sahne süreleri kayıttan: kare sayısı / 30
+function sahneler(L) {
+  const M = METIN[L] || METIN.en;
+  return SAHNELER.map(([ad]) => {
+    const d = path.join(HAMD(L), ad), n = fs.existsSync(d) ? fs.readdirSync(d).filter(f => f.endsWith('.jpg')).length : 0;
+    if (!n) { console.log(`\n  ! ${L}/${ad} kaydı yok: önce kayıtla çalıştır (npm run video -- ${L})`); process.exit(1); }
+    return { ad, n, sure: n / FPS, m: M[ad] };
+  });
+}
+const toplam = (S) => ACILIS + S.reduce((a, s) => a + s.sure, 0) - GECIS * (S.length - 1) + KAPANIS - GECIS;
 
-const sahneHtml = (W, H) => {
+const sahneHtml = (W, H, L, SAHNE) => {
+  const M = METIN[L] || METIN.en;
   const yatay = W > H;
   // telefon: yatayda sağda, dikeyde altta; başlık yatayda solda, dikeyde üstte
-  const ph = yatay ? { h: 960, x: 1180, y: 60 } : { h: 1420, x: (W - 1420 / 1.94) / 2, y: 420 };
+  const ph = yatay ? { h: 960, x: 1180, y: 60 } : { h: 1400, x: (W - 1400 / 1.94) / 2, y: 470 };
   const pw = ph.h / 1.94;
   return `<html><head><meta charset="utf-8"><style>${poppinsCss()}
   ${mavisCss}
@@ -159,18 +193,19 @@ const sahneHtml = (W, H) => {
   .dots{margin:${yatay ? '30px 0 0' : '26px auto 0'}}
   #kap,#ac{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
   #ac h1,#kap h1{font-size:${yatay ? 120 : 130}px} #ac h2,#kap h2{margin:18px 0 0;font-weight:400;color:#4A5B70;font-size:${yatay ? 46 : 52}px}
-  .mvk{margin-bottom:10px}
+  .mvk{margin-bottom:6px}
+  .lr{display:flex;align-items:center;justify-content:center;gap:${yatay ? 28 : 30}px} .lr img{width:${yatay ? 120 : 130}px;height:${yatay ? 120 : 130}px;border-radius:50%;box-shadow:0 10px 28px rgba(10,62,112,.25);border:5px solid #fff}
   </style></head><body><div class="bg"></div>
   <div class="glow g1" style="width:1100px;height:1100px;left:-420px;top:${yatay ? 300 : 1100}px"></div><div class="glow g2" style="width:1200px;height:1200px;right:-480px;top:${yatay ? -500 : 300}px"></div>
   <div id="sah"><div id="tel"><div id="ekr"><img id="i1"><img id="i2"></div></div><div id="cap"><h1 id="h"></h1><div class="dots"><svg width="72" height="14"><circle cx="11" cy="7" r="6" fill="#2E62B5"/><circle cx="36" cy="7" r="6" fill="#E9C440"/><circle cx="61" cy="7" r="6" fill="#1C3A6B"/></svg></div></div></div>
-  <div id="ac"><div class="mvk" id="mv1"></div><h1>${M.acilis[0].replace(/ (\S+)$/, ' <span>$1</span>')}</h1><h2>${M.acilis[1]}</h2></div>
-  <div id="kap"><div class="mvk" id="mv2"></div><h1>${M.kapanis[0]}</h1><h2>${M.kapanis[1]}</h2></div>
+  <div id="ac"><div class="mvk" id="mv1"></div><div class="lr"><img src="/www/img/logo.png"><h1>${M.acilis[0].replace(/ (\S+)$/, ' <span>$1</span>')}</h1></div><h2>${M.acilis[1]}</h2></div>
+  <div id="kap"><div class="mvk" id="mv2"></div><div class="lr"><img src="/www/img/logo.png"><h1>${M.kapanis[0]}</h1></div><h2>${M.kapanis[1]}</h2></div>
   <script>${mavisJs}
   const S = ${JSON.stringify(SAHNE)}, ACILIS = ${ACILIS}, KAPANIS = ${KAPANIS}, G = ${GECIS}, FPS = ${FPS};
   document.getElementById('mv1').innerHTML = mavisSVG(${yatay ? 360 : 460}, 'look', k => '/www/img/mavis/' + k + '.webp');
   document.getElementById('mv2').innerHTML = mavisSVG(${yatay ? 360 : 460}, 'wave', k => '/www/img/mavis/' + k + '.webp');
   const $ = id => document.getElementById(id), ease = x => x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3);
-  const kare = (s, t) => '/magaza/video/ham/' + s.ad + '/' + String(Math.min(s.n, Math.max(1, Math.floor(t * FPS) + 1))).padStart(5, '0') + '.jpg';
+  const kare = (s, t) => '/magaza/video/ham/${L}/' + s.ad + '/' + String(Math.min(s.n, Math.max(1, Math.floor(t * FPS) + 1))).padStart(5, '0') + '.jpg';
   async function yukle(img, src) { if (img.getAttribute('src') !== src) { img.src = src; await img.decode().catch(() => {}); } }
   function mvZaman(el, ms) { el.querySelectorAll('svg.mavis').forEach(s => s.getAnimations({ subtree: true }).forEach(a => { a.pause(); a.currentTime = ms; })); }
   window.ciz = async (t) => {
@@ -187,7 +222,12 @@ const sahneHtml = (W, H) => {
       await yukle($('i2'), kare(s, yerel));
       if (gecis) { await yukle($('i1'), kare(S[i - 1], S[i - 1].sure - G + yerel)); $('i2').style.opacity = ease(yerel / G); }
       else $('i2').style.opacity = 1;
-      $('h').innerHTML = s.m[0] + '<br><span>' + s.m[1] + '</span>';
+      const yazi = s.m[0] + '<br><span>' + s.m[1] + '</span>';
+      if ($('h').innerHTML !== yazi) {   // yeni başlık: telefona çarpmayacak (yatayda taşmayacak) büyüklüğe küçült
+        $('h').innerHTML = yazi; let fs = ${yatay ? 92 : 88}; $('h').style.fontSize = fs + 'px'; $('cap').style.transform = 'none';
+        const sinir = ${yatay ? 'h => h.offsetHeight > 700' : 'h => $("cap").getBoundingClientRect().bottom > ' + (ph.y - 28)};
+        while (fs > 44 && sinir($('h'))) { fs -= 4; $('h').style.fontSize = fs + 'px'; }
+      }
       const a = ease(yerel / 0.6);
       $('cap').style.opacity = a; $('cap').style.transform = 'translate' + (${yatay} ? 'X(' + (1 - a) * -50 : 'Y(' + (1 - a) * -30) + 'px)';
       const z = 1 + 0.02 * Math.min(1, yerel / s.sure);   // telefon hafifçe yaklaşır
@@ -219,28 +259,31 @@ try { FFMPEG = require('ffmpeg-static') || 'ffmpeg'; } catch (e) {
   }
 }
 const md = path.join(VD, 'muzik'), muzik = fs.existsSync(md) && fs.readdirSync(md).filter(f => /\.(mp3|m4a|wav|ogg|aac)$/i.test(f)).sort()[0];
-console.log(`\n🎬 2/2 montaj · ${TOPLAM.toFixed(1)} sn · müzik: ${muzik || 'yok (sessiz)'}`);
-const b2 = await tarayici();
-for (const [tur, W, H] of [['yatay', 1920, 1080], ['dikey', 1080, 1920]]) {
-  SAYFA = sahneHtml(W, H);
-  fs.rmSync(KARE, { recursive: true, force: true }); fs.mkdirSync(KARE, { recursive: true });
-  const pg = await b2.newPage({ viewport: { width: W, height: H } });
-  await pg.goto(ADRES + '/__sahne'); await pg.evaluate(() => document.fonts.ready); await bekle(500);
-  const N = Math.round(TOPLAM * FPS);
-  process.stdout.write(`• ${tur} (${W}×${H}) `);
-  for (let i = 0; i < N; i++) {
-    await pg.evaluate(t => window.ciz(t), i / FPS);
-    await pg.screenshot({ path: path.join(KARE, String(i + 1).padStart(5, '0') + '.jpg'), type: 'jpeg', quality: 92 });
-    if (i % FPS === 0) process.stdout.write('.');
+const b2 = await tarayici({ gorunur: false });   // montaj görünmez çizilir (görünür pencerede kare kare çekim titriyor)
+for (const L of DILLER) {
+  const SAHNE = sahneler(L), TOPLAM = toplam(SAHNE);
+  console.log(`\n🎞  ${L} · montaj · ${TOPLAM.toFixed(1)} sn · müzik: ${muzik || 'yok (sessiz)'}`);
+  for (const [tur, W, H] of [['yatay', 1920, 1080], ['dikey', 1080, 1920]]) {
+    SAYFA = sahneHtml(W, H, L, SAHNE);
+    fs.rmSync(KARE, { recursive: true, force: true }); fs.mkdirSync(KARE, { recursive: true });
+    const pg = await b2.newPage({ viewport: { width: W, height: H } });
+    await pg.goto(ADRES + '/__sahne'); await pg.evaluate(() => document.fonts.ready); await bekle(500);
+    const N = Math.round(TOPLAM * FPS);
+    process.stdout.write(`• ${tur} (${W}×${H}) `);
+    for (let i = 0; i < N; i++) {
+      await pg.evaluate(t => window.ciz(t), i / FPS);
+      await pg.screenshot({ path: path.join(KARE, String(i + 1).padStart(5, '0') + '.jpg'), type: 'jpeg', quality: 92 });
+      if (i % FPS === 0) process.stdout.write('.');
+    }
+    await pg.close();
+    const out = path.join(VD, `birdatlas-${L}-${tur}.mp4`);
+    const a = ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(KARE, '%05d.jpg')];
+    if (muzik) a.push('-i', path.join(md, muzik), '-filter_complex', `[1:a]atrim=0:${TOPLAM.toFixed(2)},asetpts=PTS-STARTPTS,afade=t=in:d=0.6,afade=t=out:st=${(TOPLAM - 2.2).toFixed(2)}:d=2.2,volume=0.85[a]`, '-map', '0:v', '-map', '[a]', '-c:a', 'aac', '-b:a', '160k');
+    a.push('-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-t', TOPLAM.toFixed(2), out);
+    execFileSync(FFMPEG, a, { stdio: 'inherit' });
+    console.log(` ✓ ${path.relative(KOK, out)} (${(fs.statSync(out).size / 1048576).toFixed(1)} MB)`);
   }
-  await pg.close();
-  const out = path.join(VD, `birdatlas-${L}-${tur}.mp4`);
-  const a = ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(KARE, '%05d.jpg')];
-  if (muzik) a.push('-i', path.join(md, muzik), '-filter_complex', `[1:a]atrim=0:${TOPLAM.toFixed(2)},asetpts=PTS-STARTPTS,afade=t=in:d=0.6,afade=t=out:st=${(TOPLAM - 2.2).toFixed(2)}:d=2.2,volume=0.85[a]`, '-map', '0:v', '-map', '[a]', '-c:a', 'aac', '-b:a', '160k');
-  a.push('-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-t', TOPLAM.toFixed(2), out);
-  execFileSync(FFMPEG, a, { stdio: 'inherit' });
-  console.log(` ✓ ${path.relative(KOK, out)} (${(fs.statSync(out).size / 1048576).toFixed(1)} MB)`);
 }
 await b2.close(); srv.closeAllConnections(); srv.close();
 fs.rmSync(KARE, { recursive: true, force: true });
-console.log('\n✅ Video hazır: magaza/video/. Commit → Push (Claude baksın); yatay olanı YouTube\'a "Liste dışı" yükle.\n');
+console.log('\n✅ Videolar hazır: magaza/video/. Commit → Push (Claude baksın); yatay olanları YouTube\'a "Liste dışı" yükle.\n');

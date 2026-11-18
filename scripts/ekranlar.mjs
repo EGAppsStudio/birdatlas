@@ -32,7 +32,7 @@ if (process.stdin.isTTY) {
   rl.close();
 }
 
-const b = await tarayici();
+const b = await tarayici({ pencere: [460, 900] });
 let toplam = 0;
 console.log(`\n📸 Mağaza ekran görüntüleri · diller: ${LANGS.join(', ')}\n`);
 for (const L of LANGS) {

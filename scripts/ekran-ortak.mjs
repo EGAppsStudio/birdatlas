@@ -14,7 +14,7 @@ if (!fs.existsSync(path.join(WWW, 'lib', 'leaflet'))) { console.log('www/lib yok
 
 export const TUM_DILLER = ['tr', 'en', 'es', 'pt', 'de', 'fr'];
 export const LOCALE = { tr: 'tr-TR', en: 'en-US', es: 'es-ES', pt: 'pt-BR', de: 'de-DE', fr: 'fr-FR' };
-const SORU = { tr: "2026'daki en iyi günüm hangisiydi?", en: 'What was my best day in 2026?', es: '¿Cuál fue mi mejor día en 2026?', pt: 'Qual foi meu melhor dia em 2026?', de: 'Was war mein bester Tag 2026?', fr: 'Quel a été mon meilleur jour en 2026 ?' };
+export const SORU = { tr: "2026'daki en iyi günüm hangisiydi?", en: 'What was my best day in 2026?', es: '¿Cuál fue mi mejor día en 2026?', pt: 'Qual foi meu melhor dia em 2026?', de: 'Was war mein bester Tag 2026?', fr: 'Quel a été mon meilleur jour en 2026 ?' };
 const KESFET = { lat: 44.5136, lng: 28.6356, km: 30 };        // Köstence yakınları
 const SAZ = 'Circus aeruginosus', SAZ_ML = '999000111';       // saz delicesi: eBird fotoğrafıymış gibi (sarı çerçeve)
 const SAZ_FOTO = path.join(KOK, 'magaza', 'ekran-foto', 'saz-delicesi.jpg');
@@ -271,10 +271,12 @@ export const EKRANLAR = [
   }],
 ];
 
-export async function tarayici() {
+// gorunur: pencere açık (Enes adım adım izler; sorun olursa siyah pencerede Ctrl+C). Görünmez için: set GIZLI=1
+// pencere: [genişlik, yükseklik] — pencere sayfa boyutuna yakın olsun (büyük pencerede kayıt titriyor)
+export async function tarayici({ gorunur = true, pencere = null } = {}) {
+  const args = pencere ? [`--window-size=${pencere[0]},${pencere[1]}`] : [];
   for (const channel of ['msedge', 'chrome', undefined]) {
-    // Pencere görünür: Enes adım adım izler; bir sorun olursa siyah pencerede Ctrl+C ile durdurur. Görünmez çalıştırmak için: set GIZLI=1
-    try { return await chromium.launch({ channel, headless: process.env.GIZLI === '1' || !!process.env.CI }); } catch (e) {}
+    try { return await chromium.launch({ channel, args, headless: !gorunur || process.env.GIZLI === '1' || !!process.env.CI }); } catch (e) {}
   }
   console.log('Edge ya da Chrome bulunamadı.'); process.exit(1);
 }
