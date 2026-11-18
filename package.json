@@ -1,6 +1,6 @@
 {
   "name": "kus-atlasi",
-  "version": "1.14.1",
+  "version": "1.15.0",
   "private": true,
   "description": "Kuş Atlası / Bird Atlas – kişisel kuş gözlem haritası (Android + web)",
   "scripts": {

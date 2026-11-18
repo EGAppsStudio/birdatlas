@@ -1,0 +1,56 @@
+<tr-TR>
+• Maviş yenilendi: yeni çizim; dokununca zıplar, göz kırpar, dürbünle bakar, el sallar
+• Paylaşım kartlarındaki haritalarda yer adları artık üst üste binmiyor
+• Maviş sohbetinden Gemini'yi tek dokunuşla bağla
+• Menü sadeleşti: web sitesi ve Instagram en altta
+• Açılışta çıkan pencereler yanlışlıkla kapanmıyor
+• Küçük düzeltmeler
+</tr-TR>
+<en-US>
+• Maviş has a new look: tap to make it hop, blink, peek through binoculars or wave
+• Place names on share card maps no longer overlap
+• Connect Gemini right from the Maviş chat
+• Simpler menu: website and Instagram at the bottom
+• Pop-up windows at launch no longer close by accident
+• Small fixes
+</en-US>
+<es-419>
+• Maviş tiene nuevo aspecto: tócalo y salta, parpadea, mira con prismáticos o saluda
+• Los nombres de lugares en los mapas de las tarjetas ya no se superponen
+• Conecta Gemini directamente desde el chat de Maviş
+• Menú más sencillo: sitio web e Instagram al final
+• Las ventanas al abrir la app ya no se cierran por accidente
+• Pequeñas correcciones
+</es-419>
+<es-ES>
+• Maviş tiene nuevo aspecto: tócalo y salta, parpadea, mira con prismáticos o saluda
+• Los nombres de lugares en los mapas de las tarjetas ya no se superponen
+• Conecta Gemini directamente desde el chat de Maviş
+• Menú más sencillo: sitio web e Instagram al final
+• Las ventanas al abrir la app ya no se cierran por accidente
+• Pequeñas correcciones
+</es-ES>
+<pt-BR>
+• Maviş está de cara nova: toque e ele pula, pisca, olha de binóculos ou acena
+• Os nomes de lugares nos mapas dos cartões não se sobrepõem mais
+• Conecte o Gemini direto do chat do Maviş
+• Menu mais simples: site e Instagram no final
+• As janelas ao abrir o app não fecham mais por engano
+• Pequenas correções
+</pt-BR>
+<de-DE>
+• Maviş in neuem Look: antippen und er hüpft, blinzelt, schaut durchs Fernglas oder winkt
+• Ortsnamen auf den Karten der Teilen-Karten überlappen nicht mehr
+• Gemini direkt aus dem Maviş-Chat verbinden
+• Einfacheres Menü: Website und Instagram ganz unten
+• Fenster beim Start schließen sich nicht mehr versehentlich
+• Kleine Korrekturen
+</de-DE>
+<fr-FR>
+• Maviş fait peau neuve : touchez-le et il saute, cligne des yeux, regarde aux jumelles ou salue
+• Les noms de lieux sur les cartes à partager ne se chevauchent plus
+• Connectez Gemini directement depuis la discussion avec Maviş
+• Menu simplifié : site web et Instagram en bas
+• Les fenêtres au démarrage ne se ferment plus par erreur
+• Petites corrections
+</fr-FR>
