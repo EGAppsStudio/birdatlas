@@ -31,6 +31,14 @@ writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
   .replace("fetch('data/ornek-veri.csv')", `fetch('data/ornek-veri.csv?v=${ver}')`)
   .replace("var I18N_V = ''", `var I18N_V = '${ver}'`));
 
+// ---------- Tanıtım sayfasındaki hareketli Maviş: uygulamanın kendi çizimi ve animasyonları (www/index.html'den) ----------
+{
+  const h = readFileSync(join(www, 'index.html'), 'utf8');
+  const css = h.slice(h.indexOf('/* ===== Maviş animasyonları ===== */'), h.indexOf('.mavis-intro {'));
+  const js = h.slice(h.indexOf('        const MAVIS_P ='), h.indexOf('        // ===== /Maviş =====')).replace(/#chat-window svg\.mavis/g, '#mv-site svg.mavis');
+  writeFileSync(join(dist, 'mavis.js'), `(function(){\nconst st=document.createElement('style');st.textContent=${JSON.stringify(css)};document.head.appendChild(st);\n${js}\nconst el=document.getElementById('mv-site');if(el)el.innerHTML=mavisSVG(104,'look',k=>'/app/img/mavis/'+k+'.webp');\n})();\n`);
+}
+
 // ---------- Tanıtım sayfasının dil sayfaları: /tr/ /en/ /es/ /pt/ /de/ /fr/ ----------
 // Kaynak: site/index.html (TR + EN) + scripts/site-diller.json (ES, PT, DE, FR). Google her dili kendi adresinde görür.
 {
