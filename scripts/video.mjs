@@ -9,6 +9,9 @@
 //           npm run video -- en --sahne=paylas,mavis → yalnız bu sahneleri yeniden kaydet, sonra montaj
 // Her sahne önce KAYITSIZ hazırlanır (harita parçaları, fotoğraflar, kart yüklenene kadar); kayıt ekran hazır olunca başlar,
 // beklemelerde durur (k.basla / k.dur). Sahneler ve başlıklar aşağıda. Ara dosyalar magaza/video/ham ve kare (depoya girmez).
+// SONRAKİ KAYITTA (Enes, 19 Kasım 2026): harita sahnesindeki yaklaşma biraz yavaş/kasık görünüyor (adım sayısı ve
+// bekleme ayarlanmalı, belki daha az nokta yeniden çizimi); takvim, konumlar gibi ekranlarda menüde biraz gezinmek
+// (sekme/alt sekme değiştirmek, listeyi kaydırmak) videoyu canlandırır.
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';

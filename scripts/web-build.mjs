@@ -31,6 +31,17 @@ writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
   .replace("fetch('data/ornek-veri.csv')", `fetch('data/ornek-veri.csv?v=${ver}')`)
   .replace("var I18N_V = ''", `var I18N_V = '${ver}'`));
 
+// ---------- Tanıtım videoları: magaza/video/birdatlas-<dil>-yatay.mp4 → dist/video/tanitim-<dil>.mp4 (depoda tek kopya) ----------
+{
+  mkdirSync(join(dist, 'video'), { recursive: true });
+  let n = 0;
+  for (const L of ['tr', 'en', 'es', 'pt', 'de', 'fr']) {
+    const k = join(root, 'magaza', 'video', `birdatlas-${L}-yatay.mp4`);
+    if (existsSync(k)) { cpSync(k, join(dist, 'video', `tanitim-${L}.mp4`)); n++; }
+  }
+  console.log(`✓ tanıtım videosu: ${n} dil`);
+}
+
 // ---------- Tanıtım sayfasındaki hareketli Maviş: uygulamanın kendi çizimi ve animasyonları (www/index.html'den) ----------
 {
   const h = readFileSync(join(www, 'index.html'), 'utf8');
@@ -76,11 +87,12 @@ writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
       .replace('/img/og-en.jpg', `/img/og-${resim}.jpg`)
       .replace('<a class="brand" href="/">', `<a class="brand" href="/${L}/">`)
       .replace(/<img data-shot="([a-z]+)"/g, (m, k) => `<img src="/img/shots/${k}-${L}.webp" data-shot="${k}"`)
+      .replace(/poster="\/img\/video\/poster-tr\.jpg" src="\/video\/tanitim-tr\.mp4"/, `poster="/img/video/poster-${L}.jpg" src="/video/tanitim-${L}.mp4"`)
       .replace(`data-set="${L}"`, `data-set="${L}" aria-current="true"`)
       .replace('<span class="cur">TR</span>', `<span class="cur">${L.toUpperCase()}</span>`)
       .replace(/\/\*DIL-BASLA\*\/[\s\S]*?\/\*DIL-BITIR\*\//,
         `try { localStorage.setItem('site_lang', '${L}'); localStorage.setItem('app_lang', '${L}'); } catch (e) {}`);
-    if (T && T._uygulama_dili) h = h.replace('<p class="note">', `<p class="note applang">${T._uygulama_dili}</p>\n        <p class="note">`);
+    if (T && T._uygulama_dili) h = h.replace('<div class="mavis-sor">', `<p class="note applang">${T._uygulama_dili}</p>\n        <div class="mavis-sor">`);
     mkdirSync(join(dist, L), { recursive: true });
     writeFileSync(join(dist, L, 'index.html'), h);
   }
