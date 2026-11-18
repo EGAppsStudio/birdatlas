@@ -150,7 +150,7 @@ with sync_playwright() as p:
             shot(page(1440, 2560, h1, h2, [ham(L, n) for n in nums]), 1440, 2560, f'{OUT}/{L}/telefon-{i:02d}.jpg')
         if L in FG:   # öne çıkan görsel, o dilde
             t1, t2, alt, chips, selam = FG[L]; e1, e2, ealt, echips, eselam = FG_EN
-            h = open(f'{KAYNAK}/one-cikan.html', encoding='utf-8').read().replace('src="map.png', f'src="file://{KAYNAK}/map.png').replace('src="logo.png', f'src="file://{KAYNAK}/logo.png')
+            h = open(f'{KAYNAK}/one-cikan.html', encoding='utf-8').read().replace('src="map.png', f'src="file://{KAYNAK}/map.png').replace('src="logo.png', f'src="file://{KAYNAK}/logo.png').replace('../../www/img/mavis/', f'file://{KOK}/www/img/mavis/')
             h = h.replace(f'>{ealt}<', f'>{alt}<').replace(f'>{eselam}<', f'>{selam}<')
             for a, c in zip(echips, chips): h = h.replace(f'>{a}<', f'>{c}<')
             shot(h, 1024, 500, f'{OUT}/{L}/one-cikan.jpg', 94)
