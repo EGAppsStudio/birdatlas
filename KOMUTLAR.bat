@@ -18,6 +18,7 @@ echo   7  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari is
 echo   8  Magaza GORSELLERI yukle     (ikon + ekran goruntuleri + one cikan gorsel)
 echo   9  Ekran goruntuleri + tum gorseller (magaza, one cikan, site, Instagram; sonra Commit + Push)
 echo  10  Tanitim videosu             (kayit + montaj + muzik; yatay ve dikey mp4)
+echo  11  Video yalniz montaj         (kayit yok; baslik/muzik degisince)
 echo.
 echo   0  Cikis
 echo.
@@ -33,6 +34,7 @@ if "%SEC%"=="7" goto taksonomi
 if "%SEC%"=="8" goto gorsel
 if "%SEC%"=="9" goto ekranlar
 if "%SEC%"=="10" goto video
+if "%SEC%"=="11" goto montaj
 if "%SEC%"=="0" exit /b 0
 goto menu
 
@@ -73,6 +75,14 @@ call npm run gorseller
 if errorlevel 1 goto hata
 echo.
 echo  Tamam. GitHub Desktop: Commit + Push. Magazaya yuklemek icin 8.
+goto bitti
+
+:montaj
+echo.
+call npm run video -- montaj
+if errorlevel 1 goto hata
+echo.
+echo  Tamam. Video: magaza\video klasorunde. GitHub Desktop: Commit + Push.
 goto bitti
 
 :video

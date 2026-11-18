@@ -202,7 +202,7 @@ const sahneHtml = (W, H, L, SAHNE) => {
   h1 span{color:#2E62B5}
   .dots{margin:${yatay ? '30px 0 0' : '26px auto 0'}}
   #kap,#ac{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  #ac h1,#kap h1{font-size:${yatay ? 120 : 130}px} #ac h2,#kap h2{margin:18px 0 0;font-weight:400;color:#4A5B70;font-size:${yatay ? 46 : 52}px}
+  #ac h1,#kap h1{font-size:${yatay ? 120 : 112}px} #ac h2,#kap h2{margin:18px 0 0;font-weight:400;color:#4A5B70;font-size:${yatay ? 46 : 52}px}
   .mvk{margin-bottom:6px}
   .lr{display:flex;align-items:center;justify-content:center;gap:${yatay ? 28 : 30}px} .lr img{width:${yatay ? 120 : 130}px;height:${yatay ? 120 : 130}px;border-radius:50%;box-shadow:0 10px 28px rgba(10,62,112,.25);border:5px solid #fff}
   </style></head><body><div class="bg"></div>
@@ -212,6 +212,8 @@ const sahneHtml = (W, H, L, SAHNE) => {
   <div id="kap"><div class="mvk" id="mv2"></div><div class="lr"><img src="/www/img/logo.png"><h1>${M.kapanis[0]}</h1></div><h2>${M.kapanis[1]}</h2></div>
   <script>${mavisJs}
   const S = ${JSON.stringify(SAHNE)}, ACILIS = ${ACILIS}, KAPANIS = ${KAPANIS}, G = ${GECIS}, FPS = ${FPS};
+  // açılış/kapanış başlığı (logo + yazı) ekrana yanlardan pay bırakarak sığsın
+  document.fonts.ready.then(() => document.querySelectorAll('.lr').forEach(r => { const h = r.querySelector('h1'); let fs = parseFloat(getComputedStyle(h).fontSize); while (fs > 40 && r.scrollWidth > ${W} - 160) { fs -= 4; h.style.fontSize = fs + 'px'; } }));
   document.getElementById('mv1').innerHTML = mavisSVG(${yatay ? 360 : 460}, 'look', k => '/www/img/mavis/' + k + '.webp');
   document.getElementById('mv2').innerHTML = mavisSVG(${yatay ? 360 : 460}, 'wave', k => '/www/img/mavis/' + k + '.webp');
   const $ = id => document.getElementById(id), ease = x => x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3);
@@ -277,7 +279,7 @@ for (const L of DILLER) {
     SAYFA = sahneHtml(W, H, L, SAHNE);
     fs.rmSync(KARE, { recursive: true, force: true }); fs.mkdirSync(KARE, { recursive: true });
     const pg = await b2.newPage({ viewport: { width: W, height: H } });
-    await pg.goto(ADRES + '/__sahne'); await pg.evaluate(() => document.fonts.ready); await bekle(500);
+    await pg.goto(ADRES + '/__sahne'); await pg.evaluate(() => document.fonts.ready); await bekle(800);
     const N = Math.round(TOPLAM * FPS);
     process.stdout.write(`• ${tur} (${W}×${H}) `);
     for (let i = 0; i < N; i++) {
