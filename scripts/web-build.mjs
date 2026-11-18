@@ -9,7 +9,7 @@ const www = join(root, 'www'), dist = join(root, 'dist');
 
 if (!existsSync(join(www, 'lib', 'leaflet'))) execFileSync('node', ['scripts/copy-libs.mjs'], { stdio: 'inherit' });
 
-// Tür adları: depoda hazır dosya varsa (KOMUTLAR 7 ile Enes'in bilgisayarında BİR KEZ indirilip commit edilir) hiçbir şey indirilmez.
+// Tür adları: depoda hazır dosya varsa (KOMUTLAR 12 ile Enes'in bilgisayarında BİR KEZ indirilip commit edilir) hiçbir şey indirilmez.
 // Yalnız dosya depoda yoksa ve Cloudflare'de EBIRD_API_KEY tanımlıysa indirilir (eski yol; anahtar silinebilir).
 if (existsSync(join(www, 'data', 'ebird-taxonomy.json'))) console.log('✓ tür adları depodaki dosyadan (indirme yok)');
 else if (process.env.EBIRD_API_KEY) execFileSync('node', ['scripts/taksonomi.mjs'], { stdio: 'inherit' });

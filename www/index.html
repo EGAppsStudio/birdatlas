@@ -3670,6 +3670,7 @@
         const PLAY_ID = 'tr.kusatlasi.app';
         let launchCount = 0;
         try { launchCount = (parseInt(localStorage.getItem('launch_count'), 10) || 0) + 1; localStorage.setItem('launch_count', launchCount); } catch (e) {}
+        try { if (!localStorage.getItem('first_open_at')) localStorage.setItem('first_open_at', String(Date.now())); } catch (e) {}
         window.rateApp = async function() {
             try { localStorage.setItem('review_asked', '1'); } catch (e) {}
             let IR = NativePlugins.InAppReview;
@@ -3685,8 +3686,12 @@
                 if ((typeof tourIdx !== 'undefined' && tourIdx >= 0) || document.querySelector('#share-overlay[style*="display: flex"]')) return void setTimeout(() => maybeAskReview(reason), 60000);   // tur / paylaşım bitince
                 if (localStorage.getItem('fbask_done')) return;
                 if (document.querySelector('.ov[style*="display: flex"], #share-overlay[style*="display: flex"]')) return;   // başka pencere açıkken araya girme
-                // İlk kullanımda (birkaç dakika gezindikten sonra) yalnız "ilk izlenim": hata / öneri. Değerlendirme isteği 4. açılıştan sonra.
-                if (!localStorage.getItem('fbask_first')) { localStorage.setItem('fbask_first', '1'); return openFeedbackAsk(true); }
+                // "İlk izlenim" (hata / öneri) ilk oturumda değil: en erken 2. açılışta ve ilk açılıştan 1 gün sonra (1.15). Değerlendirme isteği 4. açılıştan sonra.
+                if (!localStorage.getItem('fbask_first')) {
+                    let ilk = parseInt(localStorage.getItem('first_open_at'), 10) || Date.now();
+                    if (launchCount < 2 || Date.now() - ilk < 86400000) return;
+                    localStorage.setItem('fbask_first', '1'); return openFeedbackAsk(true);
+                }
                 let next = parseInt(localStorage.getItem('fbask_next'), 10) || 4;   // en erken 4. açılış
                 if (launchCount < next) return;
             } catch (e) { return; }

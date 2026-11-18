@@ -1,4 +1,4 @@
-// Tanıtım videosu (KOMUTLAR 10): uygulamayı telefon boyutunda örnek veriyle açar, 7 kısa sahne kaydeder,
+// Tanıtım videosu (KOMUTLAR 8): uygulamayı telefon boyutunda örnek veriyle açar, 7 kısa sahne kaydeder,
 // sonra telefon çerçevesi + başlıklar + geçişler + logo ve Maviş'li açılış/kapanış + müzikle birleştirir.
 //   çıktı : magaza/video/birdatlas-<dil>-yatay.mp4 (1920×1080; Play, YouTube, site)
 //           magaza/video/birdatlas-<dil>-dikey.mp4 (1080×1920; Instagram Reels / hikâye)

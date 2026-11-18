@@ -1,6 +1,6 @@
 // Mağaza ekran görüntüleri: uygulamanın web sürümünü telefon boyutunda açar, örnek veriyle
 // 10 ekranı 6 dilde çeker → magaza/ham-ekranlar/<dil>/ps_<dil>_01_harita.jpg … (60 görüntü).
-// Başlıklı, çerçeveli mağaza/site/Instagram görselleri: scripts/gorseller.mjs (KOMUTLAR 9 ikisini birlikte çalıştırır).
+// Başlıklı, çerçeveli mağaza/site/Instagram görselleri: scripts/gorseller.mjs (KOMUTLAR 7 ikisini birlikte çalıştırır).
 //
 // Kullanım (KOMUTLAR.bat 9):   npm run ekranlar            → 6 dil
 //                              npm run ekranlar -- de fr   → yalnız bu diller
@@ -54,4 +54,4 @@ for (const L of LANGS) {
 }
 await b.close(); sunucu.closeAllConnections(); sunucu.close();
 console.log(`\n✅ ${toplam} ekran görüntüsü: magaza/ham-ekranlar/`);
-console.log('   Görseller için: npm run gorseller (KOMUTLAR 9 ikisini birlikte yapar).\n');
+console.log('   Görseller için: npm run gorseller (KOMUTLAR 7 ikisini birlikte yapar).\n');

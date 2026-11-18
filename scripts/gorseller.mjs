@@ -1,4 +1,4 @@
-// Mağaza, site ve Instagram görsellerini ham ekran görüntülerinden üretir (Enes'in bilgisayarında, Edge ile; KOMUTLAR 9'un ikinci yarısı).
+// Mağaza, site ve Instagram görsellerini ham ekran görüntülerinden üretir (Enes'in bilgisayarında, Edge ile; KOMUTLAR 7'nin ikinci yarısı).
 //   girdi : magaza/ham-ekranlar/<dil>/ps_<dil>_NN_<ad>.jpg  (npm run ekranlar)
 //   çıktı : magaza/gorseller/<dil>/telefon-01…08.jpg (1440×2560) + one-cikan.jpg (1024×500, ES/PT/DE/FR o dilde)
 //           magaza/instagram/ig_en_01…10.jpg (1080×1350, yalnız İngilizce)
@@ -215,4 +215,4 @@ for (const L of DILLER) {
 }
 await b.close(); sunucu.closeAllConnections(); sunucu.close();
 console.log('\n✅ Hazır: magaza/gorseller/ · magaza/instagram/ · site/img/shots/');
-console.log('   GitHub Desktop → Commit → Push (site 1-2 dakikada güncellenir). Mağazaya yüklemek için KOMUTLAR 8.\n');
+console.log('   GitHub Desktop → Commit → Push (site 1-2 dakikada güncellenir). Mağazaya yüklemek için KOMUTLAR 6.\n');

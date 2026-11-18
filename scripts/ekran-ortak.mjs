@@ -9,8 +9,8 @@ import { createRequire } from 'node:module';
 export const KOK = process.cwd(), WWW = path.join(KOK, 'www'), CIKTI = path.join(KOK, 'magaza', 'ham-ekranlar');
 const require = createRequire(import.meta.url);
 export let chromium;
-try { ({ chromium } = require('playwright-core')); } catch (e) { try { ({ chromium } = require('playwright')); } catch (e2) { console.log('playwright-core yok: önce KOMUTLAR 6 (npm install).'); process.exit(1); } }
-if (!fs.existsSync(path.join(WWW, 'lib', 'leaflet'))) { console.log('www/lib yok: önce KOMUTLAR 6 (npm install).'); process.exit(1); }
+try { ({ chromium } = require('playwright-core')); } catch (e) { try { ({ chromium } = require('playwright')); } catch (e2) { console.log('playwright-core yok: önce KOMUTLAR 10 (npm install).'); process.exit(1); } }
+if (!fs.existsSync(path.join(WWW, 'lib', 'leaflet'))) { console.log('www/lib yok: önce KOMUTLAR 10 (npm install).'); process.exit(1); }
 
 export const TUM_DILLER = ['tr', 'en', 'es', 'pt', 'de', 'fr'];
 export const LOCALE = { tr: 'tr-TR', en: 'en-US', es: 'es-ES', pt: 'pt-BR', de: 'de-DE', fr: 'fr-FR' };

@@ -1,5 +1,5 @@
 // Tür adları: eBird ile Wikidata'yı karşılaştırır (deneme; uygulamaya dokunmaz).
-// eBird tarafı: bilgisayardaki www/data/ebird-taxonomy.json + ebird-names-<dil>.json (KOMUTLAR 7 ile indirilmiş olmalı).
+// eBird tarafı: bilgisayardaki www/data/ebird-taxonomy.json + ebird-names-<dil>.json (KOMUTLAR 12 ile indirilmiş olmalı).
 // Wikidata tarafı: query.wikidata.org (anahtar gerekmez, veri CC0). Eşleştirme eBird koduyla (Wikidata P3444).
 // Çıktı: rapor/ad-karsilastirma.md  → Commit + Push, Claude okusun.
 // Kullanım: npm run ad-karsilastir
@@ -8,7 +8,7 @@ import path from 'node:path';
 
 const KOK = process.cwd(), VERI = path.join(KOK, 'www', 'data');
 const TAX = path.join(VERI, 'ebird-taxonomy.json');
-if (!fs.existsSync(TAX)) { console.log('www/data/ebird-taxonomy.json yok: önce KOMUTLAR 7 (tür adları).'); process.exit(1); }
+if (!fs.existsSync(TAX)) { console.log('www/data/ebird-taxonomy.json yok: önce KOMUTLAR 12 (tür adları).'); process.exit(1); }
 
 // ---------- eBird ----------
 const { rows, downloaded } = JSON.parse(fs.readFileSync(TAX, 'utf8'));   // [bilimsel, tr, en, kod]

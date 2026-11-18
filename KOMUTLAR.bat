@@ -8,33 +8,42 @@ echo  ==============================================
 echo   KUS ATLASI - Komutlar
 echo  ==============================================
 echo.
+echo   GELISTIRME
 echo   1  Android Studio yu ac        (sync + Android Studio)
-echo   2  Telefonda dene linki        (en yeni imzali AAB - Play dahili paylasim)
-echo   3  Magaza METINLERI yukle      (6 dil + web sitesi/e-posta; Claude hazirlar)
-echo   4  Simgeler + sync             (logo degisince / yeni surumden once)
-echo   5  Sadece sync                 (dosyalari Android projesine aktar)
-echo   6  Paketleri kur / guncelle    (npm install)
-echo   7  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari ister)
-echo   8  Magaza GORSELLERI yukle     (ikon + ekran goruntuleri + one cikan gorsel)
-echo   9  Ekran goruntuleri + tum gorseller (magaza, one cikan, site, Instagram; sonra Commit + Push)
-echo  10  Tanitim videosu             (kayit + montaj + muzik; yatay ve dikey mp4)
-echo  11  Video yalniz montaj         (kayit yok; baslik/muzik degisince)
+echo   2  Sadece sync                 (dosyalari Android projesine aktar)
+echo   3  Telefonda dene linki        (en yeni imzali AAB - Play dahili paylasim; kullaniciya gitmez)
+echo.
+echo   YAYIN
+echo   4  Play e YAYINLA              (uretim: en yeni imzali AAB + 6 dilde surum notlari; Claude hazirlar)
+echo.
+echo   MAGAZA SAYFASI
+echo   5  Magaza METINLERI yukle      (6 dil + video linkleri + web sitesi/e-posta)
+echo   6  Magaza GORSELLERI yukle     (ikon + ekran goruntuleri + one cikan gorsel)
+echo   7  Ekran goruntuleri + tum gorseller uret (magaza, one cikan, site, Instagram; sonra Commit + Push)
+echo   8  Tanitim videosu             (kayit + montaj + muzik; yatay ve dikey mp4)
+echo   9  Video yalniz montaj         (kayit yok; baslik/muzik degisince)
+echo.
+echo   BAKIM
+echo  10  Paketleri kur / guncelle    (npm install)
+echo  11  Simgeler + sync             (logo degisince)
+echo  12  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari ister)
 echo.
 echo   0  Cikis
 echo.
 set "SEC="
 set /p SEC=  Numara yaz ve Enter a bas:
 if "%SEC%"=="1" goto studio
-if "%SEC%"=="2" goto paylas
-if "%SEC%"=="3" goto magaza
-if "%SEC%"=="4" goto ikon
-if "%SEC%"=="5" goto sync
-if "%SEC%"=="6" goto install
-if "%SEC%"=="7" goto taksonomi
-if "%SEC%"=="8" goto gorsel
-if "%SEC%"=="9" goto ekranlar
-if "%SEC%"=="10" goto video
-if "%SEC%"=="11" goto montaj
+if "%SEC%"=="2" goto sync
+if "%SEC%"=="3" goto paylas
+if "%SEC%"=="4" goto yayinla
+if "%SEC%"=="5" goto magaza
+if "%SEC%"=="6" goto gorsel
+if "%SEC%"=="7" goto ekranlar
+if "%SEC%"=="8" goto video
+if "%SEC%"=="9" goto montaj
+if "%SEC%"=="10" goto install
+if "%SEC%"=="11" goto ikon
+if "%SEC%"=="12" goto taksonomi
 if "%SEC%"=="0" exit /b 0
 goto menu
 
@@ -44,6 +53,14 @@ if errorlevel 1 goto hata
 call npm run open
 echo.
 echo  Android Studio aciliyor.
+goto bitti
+
+:yayinla
+echo.
+echo  (Once: Android Studio - Build - Generate Signed Bundle. Surum notlarini Claude hazirlar.)
+echo.
+call npm run yayinla
+if errorlevel 1 goto hata
 goto bitti
 
 :paylas
@@ -74,7 +91,7 @@ if errorlevel 1 goto hata
 call npm run gorseller
 if errorlevel 1 goto hata
 echo.
-echo  Tamam. GitHub Desktop: Commit + Push. Magazaya yuklemek icin 8.
+echo  Tamam. GitHub Desktop: Commit + Push. Magazaya yuklemek icin 6.
 goto bitti
 
 :montaj

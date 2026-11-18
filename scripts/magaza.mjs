@@ -1,6 +1,6 @@
 // Play mağaza sayfası metinlerini ve görsellerini Google Play'e yükler (Google Play Developer API).
 // Diller ve iletişim bilgileri: magaza/ayarlar.json (tr-TR ve en-US dahil; görseli yazılmayan dilin görsellerine dokunulmaz)
-// Kullanım (proje klasöründe; KOMUTLAR.bat 3 ve 8 bunları çalıştırır):
+// Kullanım (proje klasöründe; KOMUTLAR.bat 5 ve 6 bunları çalıştırır):
 //   npm run magaza -- --metin       → yalnız METİNLER (tüm diller, TR ve EN dahil) + iletişim (web sitesi, e-posta)
 //   npm run magaza -- --gorsel      → yalnız GÖRSELLER: uygulama ikonu (magaza/gorseller/ikon-512.png) + ekran görüntüleri + öne çıkan görsel
 //   npm run magaza                  → ikisi birden
