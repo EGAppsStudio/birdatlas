@@ -16,7 +16,8 @@ echo   5  Sadece sync                 (dosyalari Android projesine aktar)
 echo   6  Paketleri kur / guncelle    (npm install)
 echo   7  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari ister)
 echo   8  Magaza GORSELLERI yukle     (ikon + ekran goruntuleri + one cikan gorsel)
-echo   9  Magaza ekran goruntulerini cek (6 dil x 10 ekran; sonra Commit + Push)
+echo   9  Ekran goruntuleri + tum gorseller (magaza, one cikan, site, Instagram; sonra Commit + Push)
+echo  10  Tanitim videosu             (kayit + montaj + muzik; yatay ve dikey mp4)
 echo.
 echo   0  Cikis
 echo.
@@ -31,6 +32,7 @@ if "%SEC%"=="6" goto install
 if "%SEC%"=="7" goto taksonomi
 if "%SEC%"=="8" goto gorsel
 if "%SEC%"=="9" goto ekranlar
+if "%SEC%"=="10" goto video
 if "%SEC%"=="0" exit /b 0
 goto menu
 
@@ -66,6 +68,19 @@ echo.
 echo  Birkac dakika surer; bilgisayar bu sirada kullanilabilir.
 call npm run ekranlar
 if errorlevel 1 goto hata
+call npm run gorseller
+if errorlevel 1 goto hata
+echo.
+echo  Tamam. GitHub Desktop: Commit + Push. Magazaya yuklemek icin 8.
+goto bitti
+
+:video
+echo.
+echo  Muzik: magaza\video\muzik klasorundeki ilk ses dosyasi. 5-10 dakika surer.
+call npm run video
+if errorlevel 1 goto hata
+echo.
+echo  Tamam. Video: magaza\video klasorunde. GitHub Desktop: Commit + Push.
 goto bitti
 
 :ikon
