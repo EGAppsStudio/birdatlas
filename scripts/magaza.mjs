@@ -36,6 +36,9 @@ function hazirla(ayar) {
     if (title.length > 30) sorunlar.push(`${dil}: ad ${title.length}/30 karakter`);
     if (shortDescription.length > 80) sorunlar.push(`${dil}: kısa açıklama ${shortDescription.length}/80 karakter`);
     if (fullDescription.length > 4000) sorunlar.push(`${dil}: uzun açıklama ${fullDescription.length}/4000 karakter`);
+    // tanıtım videosu (isteğe bağlı): metinler/<dil>/video.txt içinde YouTube linki (liste dışı, reklamsız)
+    let video = ''; try { video = fs.readFileSync(path.join(mk, 'video.txt'), 'utf8').trim(); } catch (e) {}
+    if (video && !/^https:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}$/.test(video)) sorunlar.push(`${dil}: video.txt geçerli bir YouTube linki değil`);
     let telefon = [], oneCikan = null;
     const gk = a.gorsel ? path.join(MAGAZA, 'gorseller', a.gorsel) : null;
     const gorselli = GORSEL && !!gk && fs.existsSync(gk);
@@ -46,7 +49,7 @@ function hazirla(ayar) {
       if (telefon.length < 2 || telefon.length > 8) sorunlar.push(`${dil}: telefon ekran görüntüsü sayısı ${telefon.length} (2–8 olmalı)`);
       if (!oneCikan) sorunlar.push(`${dil}: öne çıkan görsel (one-cikan.jpg) yok`);
     }
-    isler.push({ dil, title, shortDescription, fullDescription, telefon, oneCikan, gorselli });
+    isler.push({ dil, title, shortDescription, fullDescription, video, telefon, oneCikan, gorselli });
   }
   if (GORSEL && !fs.existsSync(IKON)) sorunlar.push('magaza/gorseller/ikon-512.png yok');
   if (TEK_DIL && !isler.length) sorunlar.push(`"${TEK_DIL}" magaza/ayarlar.json içinde yok`);
@@ -80,8 +83,8 @@ try {
   for (const i of isler) {
     process.stdout.write(`• ${i.dil}:`);
     if (METIN) {
-      process.stdout.write(' metinler');
-      await istek('PUT', `${E}/listings/${i.dil}`, { language: i.dil, title: i.title, shortDescription: i.shortDescription, fullDescription: i.fullDescription });
+      process.stdout.write(i.video ? ' metinler + video' : ' metinler');
+      await istek('PUT', `${E}/listings/${i.dil}`, { language: i.dil, title: i.title, shortDescription: i.shortDescription, fullDescription: i.fullDescription, ...(i.video ? { video: i.video } : {}) });
     }
     if (GORSEL) {   // uygulama ikonu: beyaz zeminli, şeffaf değil (şeffaf olursa Play kenarı renkle doldurur)
       process.stdout.write(' ikon');
