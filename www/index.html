@@ -393,7 +393,7 @@
             /* Kendi simgelerimiz (emoji yerine): yazının boyunda, rengi yazının rengi, vurgu sarı */
         .icw { display: inline-block; width: 1.18em; height: 1.18em; vertical-align: -0.24em; line-height: 0; }
         .icw .ic { width: 100%; height: 100%; display: block; }
-        #main-menu .mf { font-size: 11px; color: #6b7a8c; text-align: center; padding: 8px 6px 4px; border-top: 1px solid #E3EAF3; margin-top: 4px; }
+        #main-menu .mf { font-size: 11px; line-height: 1.7; color: #6b7a8c; text-align: center; padding: 8px 6px 4px; border-top: 1px solid #E3EAF3; margin-top: 4px; }
         #main-menu .mf a { display: inline; padding: 0; font-size: inherit; color: #1662B6; font-weight: 600; text-decoration: none; }
         #main-menu .icw { width: 20px; height: 20px; color: #0A3E70; vertical-align: 0; flex: none; }
         #tabbar .tb b { display: flex; justify-content: center; }
@@ -5814,10 +5814,8 @@
                 it(IC('geri'), LT('Geri bildirim', 'Feedback'), "openTab('feedback')") +
                 it(IC('yildiz'), LT('Değerlendir', 'Rate the app'), 'rateApp()') +
                 it(IC('oner'), LT('Arkadaşına öner', 'Recommend to a friend'), 'tellFriends()') +
-                `<a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">${IC('instagram')} <span class="mt">Instagram</span><span class="mx">@birdatlas.app</span></a>` +
-                `<a href="https://birdatlas.app/${LANG}/" target="_blank" onclick="closeMainMenu()">${IC('site')} <span class="mt">${LT('Web sitesi', 'Website')}</span><span class="mx">birdatlas.app</span></a>` +
                 `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'tr' ? 'tr' : 'en'}" target="_blank" onclick="closeMainMenu()">${IC('kilit')} <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>` +
-                `<div class="mf">${LT('Kuş Atlası', 'Bird Atlas')} v${APP_VERSION} · <a href="https://play.google.com/store/apps/dev?id=6200277267214996612" target="_blank" onclick="closeMainMenu()">EG Apps Studio</a></div>`;
+                `<div class="mf">${LT('Kuş Atlası', 'Bird Atlas')} v${APP_VERSION} · <a href="https://play.google.com/store/apps/dev?id=6200277267214996612" target="_blank" onclick="closeMainMenu()">EG Apps Studio</a><br><a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">@birdatlas.app</a> · <a href="https://birdatlas.app/${LANG}/" target="_blank" onclick="closeMainMenu()">birdatlas.app</a></div>`;
             m.style.display = 'block';
             document.getElementById('menu-btn').classList.add('on');
             setTimeout(() => document.addEventListener('click', function close(ev) { if (!m.contains(ev.target) && !(document.getElementById('lang-menu') || {}).contains?.(ev.target)) { closeMainMenu(); document.removeEventListener('click', close); } }), 0);
