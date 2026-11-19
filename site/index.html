@@ -112,7 +112,7 @@ html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display
 .pair .phone:last-child { transform: rotate(4deg) translate(-14px, 40px); }
 
 /* ---------- tanıtım videosu (npm run web: magaza/video/birdatlas-<dil>-yatay.mp4 → /video/tanitim-<dil>.mp4) ---------- */
-.tanitim { padding: 72px 0 88px; text-align: center; }
+.tanitim { padding: 72px 0 8px; text-align: center; }
 .tanitim h2 { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -.8px; }
 .vid { max-width: 960px; margin: 28px auto 0; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: #E3ECF8; box-shadow: 0 30px 60px rgba(16,50,92,.22); }
 .vid video { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -299,6 +299,13 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
     </div>
   </section>
 
+  <section class="tanitim">
+    <div class="wrap">
+      <h2><span data-l="tr">Uygulamayı 40 saniyede gör</span><span data-l="en">See the app in 40 seconds</span></h2>
+      <div class="vid"><video data-vid controls preload="none" playsinline poster="/img/video/poster-tr.jpg" src="/video/tanitim-tr.mp4"></video></div>
+    </div>
+  </section>
+
   <section class="start">
     <div class="wrap">
       <h2><span data-l="tr">Üç adımda başla</span><span data-l="en">Get started in three steps</span></h2>
@@ -320,12 +327,6 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
         <div><h3><span data-l="tr">Paylaşmak senin elinde</span><span data-l="en">You decide what to share</span></h3><p><span data-l="tr">Kartlar cihazında üretilir; fotoğraflarındaki GPS bilgisi karta geçmez. Bağlantıyla paylaştığında veriler bağlantının içinde taşınır, sunucumuzda saklanmaz.</span><span data-l="en">Cards are made on your device, and your photos' GPS data is never copied to them. When you share a link, the data travels inside the link and is never stored on our server.</span></p></div>
       </div>
       <p style="margin-top:32px"><a href="/privacy/"><span data-l="tr">Gizlilik politikasının tamamı</span><span data-l="en">Read the full privacy policy</span></a></p>
-    </div>
-  </section>
-  <section class="tanitim">
-    <div class="wrap">
-      <h2><span data-l="tr">Uygulamayı 40 saniyede gör</span><span data-l="en">See the app in 40 seconds</span></h2>
-      <div class="vid"><video data-vid controls preload="none" playsinline poster="/img/video/poster-tr.jpg" src="/video/tanitim-tr.mp4"></video></div>
     </div>
   </section>
 </main>
