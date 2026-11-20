@@ -1,0 +1,94 @@
+{
+  "_not": "Geliştiricinin öyküsü (6 dil). Kaynak burası: uygulama (www/index.html → HIKAYE) ve site (site/index.html #hikaye + site-diller.json) bu dosyadan üretilir: node scripts/hikaye.mjs",
+  "title": {
+    "tr": "Kuş Atlası'nın öyküsü",
+    "en": "The story of Bird Atlas",
+    "es": "La historia de Bird Atlas",
+    "pt": "A história do Bird Atlas",
+    "de": "Die Geschichte von Bird Atlas",
+    "fr": "L'histoire de Bird Atlas"
+  },
+  "link": {
+    "tr": "Geliştiriciyi tanıyın",
+    "en": "Meet the developer",
+    "es": "Conoce al desarrollador",
+    "pt": "Conheça o desenvolvedor",
+    "de": "Lerne den Entwickler kennen",
+    "fr": "Découvrez le développeur"
+  },
+  "p": [
+    {
+      "tr": "Her şey Merlin'i kullanmayı öğrenmemle başladı. Şehirde her gün önünden geçtiğim ağaçlardan gelen sesleri merak edip telefonu kaldırdım. Ekranda isimler ve fotoğraflar belirdikçe şaşırdım: Bunca zamandır etrafımda bu kadar kuş mu vardı? Gerçekten bu kadar güzeller miydi? Sonra bir dürbün aldım; artık kulağım Merlin'de, gözüm dürbündeydi. Birçok kuşçunun hatırladığı o ilk \"farkına varma\" anıydı bu.",
+      "en": "It all started when I learned to use Merlin. Curious about the songs coming from the trees I walked past every day in the city, I held up my phone. As names and photos appeared on the screen, I was amazed: had there really been this many birds around me all along? Were they really this beautiful? Then I bought a pair of binoculars; from then on my ears were on Merlin and my eyes were in the binoculars. It was that first moment of \"noticing\" that so many birders remember.",
+      "es": "Todo empezó cuando aprendí a usar Merlin. Con curiosidad por los cantos que salían de los árboles junto a los que pasaba cada día en la ciudad, levanté el móvil. A medida que aparecían nombres y fotos en la pantalla, me quedé asombrado: ¿de verdad había tantas aves a mi alrededor desde siempre? ¿De verdad eran tan bonitas? Luego me compré unos prismáticos; desde entonces tenía el oído en Merlin y la vista en los prismáticos. Fue ese primer momento de \"darse cuenta\" que tantos pajareros recuerdan.",
+      "pt": "Tudo começou quando aprendi a usar o Merlin. Curioso com os cantos que vinham das árvores pelas quais eu passava todos os dias na cidade, levantei o celular. À medida que nomes e fotos apareciam na tela, fiquei maravilhado: havia mesmo tantas aves ao meu redor esse tempo todo? Elas eram mesmo tão bonitas? Depois comprei um binóculo; a partir daí, meus ouvidos estavam no Merlin e meus olhos no binóculo. Foi aquele primeiro momento de \"perceber\" que tantos observadores de aves lembram.",
+      "de": "Alles begann, als ich lernte, Merlin zu benutzen. Neugierig auf die Gesänge aus den Bäumen, an denen ich in der Stadt jeden Tag vorbeiging, hielt ich mein Handy hoch. Als Namen und Fotos auf dem Bildschirm erschienen, war ich verblüfft: Gab es um mich herum die ganze Zeit wirklich so viele Vögel? Waren sie wirklich so schön? Dann kaufte ich mir ein Fernglas; von da an waren meine Ohren bei Merlin und meine Augen im Fernglas. Es war dieser erste Moment des „Bemerkens“, an den sich so viele Vogelbeobachter erinnern.",
+      "fr": "Tout a commencé quand j'ai appris à utiliser Merlin. Curieux des chants qui venaient des arbres devant lesquels je passais chaque jour en ville, j'ai levé mon téléphone. À mesure que les noms et les photos apparaissaient à l'écran, j'étais émerveillé : y avait-il vraiment autant d'oiseaux autour de moi depuis toujours ? Étaient-ils vraiment aussi beaux ? Puis j'ai acheté des jumelles ; dès lors, mon oreille était sur Merlin et mon œil dans les jumelles. C'était ce premier moment où l'on « remarque » enfin, dont tant d'ornithologues se souviennent."
+    },
+    {
+      "tr": "Merlin'de sesini ilk gördüğüm kuşlardan biri mavi baştankaraydı. Dürbünle bulduğumda büyülendim: o parlak mavi tepelik, sarı göğüs, dalda bir an bile durmayan o cesur, telaşlı hâli. Maviş, işte o küçük kuştan doğdu.",
+      "en": "One of the first birds whose song I saw on Merlin was a Eurasian blue tit. When I found it in my binoculars, I was spellbound: that bright blue cap, the yellow breast, that bold, busy way of never staying still on a branch for a second. Maviş was born from that little bird.",
+      "es": "Una de las primeras aves cuyo canto vi en Merlin fue un herrerillo común. Cuando lo encontré con los prismáticos, me quedé hechizado: ese píleo azul brillante, el pecho amarillo, esa manera atrevida e inquieta de no quedarse quieto ni un segundo en la rama. Maviş nació de esa pequeña ave.",
+      "pt": "Uma das primeiras aves cujo canto vi no Merlin foi um chapim-azul. Quando o encontrei no binóculo, fiquei encantado: aquele boné azul brilhante, o peito amarelo, aquele jeito ousado e agitado de não ficar parado nem um segundo no galho. A Maviş nasceu daquele passarinho.",
+      "de": "Einer der ersten Vögel, deren Gesang ich in Merlin sah, war eine Blaumeise. Als ich sie im Fernglas fand, war ich verzaubert: diese leuchtend blaue Kappe, die gelbe Brust, diese mutige, quirlige Art, keine Sekunde still auf dem Ast zu sitzen. Aus diesem kleinen Vogel ist Maviş entstanden.",
+      "fr": "L'un des premiers oiseaux dont j'ai vu le chant sur Merlin était une mésange bleue. Quand je l'ai trouvée dans mes jumelles, j'ai été ensorcelé : cette calotte bleu vif, la poitrine jaune, cette façon hardie et affairée de ne jamais tenir en place une seconde sur la branche. Maviş est née de ce petit oiseau."
+    },
+    {
+      "tr": "Sonra göçü öğrendim. İstanbul Boğazı, her bahar ve sonbahar binlerce kuşun geçtiği bir darboğaz. Sarıyer'deki kuş gözlem kulesinden leylek ve yırtıcı sürülerinin süzülüşünü izledim. Minicik ötücülerin bile ağaçtan ağaca, azar azar ilerleyerek kıtalar aştığını öğrendim.",
+      "en": "Then I learned about migration. The Bosphorus in Istanbul is a bottleneck that thousands of birds pass through every spring and autumn. From the bird watching tower in Sarıyer I watched flocks of storks and raptors glide overhead. I learned that even tiny songbirds cross continents, moving from tree to tree, bit by bit.",
+      "es": "Luego descubrí la migración. El Bósforo, en Estambul, es un cuello de botella por el que pasan miles de aves cada primavera y cada otoño. Desde la torre de observación de aves de Sarıyer vi planear bandadas de cigüeñas y rapaces. Aprendí que incluso los pajarillos más pequeños cruzan continentes, de árbol en árbol, poco a poco.",
+      "pt": "Depois conheci a migração. O Bósforo, em Istambul, é um gargalo por onde passam milhares de aves a cada primavera e outono. Da torre de observação de aves de Sarıyer, vi bandos de cegonhas e aves de rapina planando no céu. Aprendi que até os menores pássaros canoros atravessam continentes, de árvore em árvore, aos pouquinhos.",
+      "de": "Dann lernte ich den Vogelzug kennen. Der Bosporus in Istanbul ist ein Nadelöhr, durch das jedes Frühjahr und jeden Herbst Tausende Vögel ziehen. Vom Vogelbeobachtungsturm in Sarıyer sah ich Schwärme von Störchen und Greifvögeln vorüberziehen. Ich lernte, dass selbst winzige Singvögel Kontinente überqueren, von Baum zu Baum, Stück für Stück.",
+      "fr": "Puis j'ai découvert la migration. Le Bosphore, à Istanbul, est un goulet par lequel passent des milliers d'oiseaux chaque printemps et chaque automne. Depuis la tour d'observation des oiseaux de Sarıyer, j'ai regardé planer des vols de cigognes et de rapaces. J'ai appris que même de minuscules passereaux traversent des continents, d'arbre en arbre, petit à petit."
+    },
+    {
+      "tr": "Her kuşun bende ayrı bir hatırası var. İstanbul'un yeşil papağanları, akşam gökyüzünde dans eden sığırcık kümeleri, dürbünle tüylerine tek tek baktığım kızılgerdan… Gökyüzünü dolduran leylek sürüleri, küçük orman kartalları, Gülhane'de yuva yapan gri balıkçıllar. Sesleriyle bana çocukluğumun yaz akşamlarını hatırlatan ak karınlı ebabiller. İlk kez bir antik Mısır kabartmasında gördüğüm ve aynı gün bahçemde karşıma çıkan ibibik. Boğaz'ı vapurla geçerken suyu sıyırarak uçan yelkovanlar. Ege'de bir adada, sarkık bacakları ve komik sesiyle beni heyecandan yerimde duramaz hâle getiren uzunbacak. Ve Antalya'da renkleriyle büyüleyen arı kuşu.",
+      "en": "Every bird holds its own memory for me. Istanbul's green parakeets, starling flocks dancing in the evening sky, a robin whose feathers I studied one by one through my binoculars… Storks filling the sky, booted eagles, grey herons nesting in Gülhane Park. Alpine swifts whose calls bring back the summer evenings of my childhood. The hoopoe I first saw in an ancient Egyptian relief, and that very same day in my garden. Yelkouan shearwaters skimming the water as I crossed the Bosphorus by ferry. On an Aegean island, a black-winged stilt with its trailing legs and funny call that had me too excited to stand still. And in Antalya, a bee-eater with its dazzling colours.",
+      "es": "Cada ave guarda para mí un recuerdo propio. Las cotorras verdes de Estambul, las nubes de estorninos bailando en el cielo del atardecer, un petirrojo cuyas plumas observé una a una con los prismáticos… Cigüeñas llenando el cielo, águilas calzadas, garzas reales anidando en el parque Gülhane. Vencejos reales cuyos gritos me devuelven a las tardes de verano de mi infancia. La abubilla que vi por primera vez en un relieve del antiguo Egipto y, ese mismo día, en mi jardín. Pardelas mediterráneas rozando el agua mientras cruzaba el Bósforo en ferry. En una isla del Egeo, una cigüeñuela con sus patas colgando y su canto gracioso, que me tuvo tan emocionado que no podía estarme quieto. Y en Antalya, un abejaruco de colores deslumbrantes.",
+      "pt": "Cada ave guarda uma lembrança só dela para mim. Os periquitos verdes de Istambul, as nuvens de estorninhos dançando no céu do fim de tarde, um pisco-de-peito-ruivo cujas penas observei uma a uma no binóculo… Cegonhas enchendo o céu, águias-calçadas, garças-reais fazendo ninho no parque Gülhane. Andorinhões-reais cujos gritos me levam de volta às tardes de verão da minha infância. A poupa que vi pela primeira vez num relevo do antigo Egito e, naquele mesmo dia, no meu jardim. Pardelas-do-mediterrâneo roçando a água enquanto eu atravessava o Bósforo de balsa. Numa ilha do Egeu, um pernilongo de pernas pendentes e canto engraçado, que me deixou tão empolgado que eu não conseguia ficar parado. E em Antália, um abelharuco de cores deslumbrantes.",
+      "de": "Jeder Vogel trägt für mich eine eigene Erinnerung. Istanbuls grüne Sittiche, Starenschwärme, die am Abendhimmel tanzen, ein Rotkehlchen, dessen Federn ich mir durchs Fernglas einzeln ansah … Störche, die den Himmel füllen, Zwergadler, Graureiher, die im Gülhane-Park brüten. Alpensegler, deren Rufe mich an die Sommerabende meiner Kindheit erinnern. Der Wiedehopf, den ich zum ersten Mal auf einem altägyptischen Relief sah – und am selben Tag in meinem Garten. Mittelmeer-Sturmtaucher, die übers Wasser streichen, während ich mit der Fähre über den Bosporus fuhr. Auf einer Insel in der Ägäis ein Stelzenläufer mit baumelnden Beinen und komischem Ruf, der mich so aufgeregt hat, dass ich nicht stillstehen konnte. Und in Antalya ein Bienenfresser mit seinen schillernden Farben.",
+      "fr": "Chaque oiseau garde pour moi un souvenir à part. Les perruches vertes d'Istanbul, les nuées d'étourneaux dansant dans le ciel du soir, un rouge-gorge dont j'ai observé les plumes une à une aux jumelles… Des cigognes emplissant le ciel, des aigles bottés, des hérons cendrés nichant dans le parc de Gülhane. Les martinets à ventre blanc, dont les cris me ramènent aux soirs d'été de mon enfance. La huppe que j'ai vue pour la première fois sur un bas-relief de l'Égypte ancienne, puis le jour même dans mon jardin. Des puffins yelkouans rasant l'eau pendant que je traversais le Bosphore en ferry. Sur une île de la mer Égée, une échasse blanche aux pattes pendantes et au cri amusant, qui m'a rendu si fébrile que je ne tenais plus en place. Et à Antalya, un guêpier aux couleurs éblouissantes."
+    },
+    {
+      "tr": "Gözlemlerimi eBird'e kaydetmeye başladım. Ama yolculuğuma dönüp bakmak istediğimde listeler yetmedi. Hangi kuşu nerede ve ne zaman gördüğümü tek bakışta görmek istiyordum. Excel tablolarıyla uğraşmak yerine kendime küçük bir HTML haritası yaptım.",
+      "en": "I started logging my sightings in eBird. But when I wanted to look back at my journey, lists weren't enough. I wanted to see at a glance which bird I had seen where and when. Instead of wrestling with Excel sheets, I built myself a small HTML map.",
+      "es": "Empecé a registrar mis observaciones en eBird. Pero cuando quería mirar atrás y ver mi recorrido, las listas no bastaban. Quería ver de un vistazo qué ave había visto, dónde y cuándo. En lugar de pelearme con hojas de Excel, me hice un pequeño mapa en HTML.",
+      "pt": "Comecei a registrar minhas observações no eBird. Mas, quando eu queria olhar para trás e ver a minha jornada, as listas não bastavam. Eu queria ver num relance qual ave tinha visto, onde e quando. Em vez de brigar com planilhas do Excel, fiz para mim um pequeno mapa em HTML.",
+      "de": "Ich begann, meine Beobachtungen in eBird einzutragen. Doch wenn ich auf meine Reise zurückblicken wollte, reichten Listen nicht aus. Ich wollte auf einen Blick sehen, welchen Vogel ich wo und wann gesehen hatte. Statt mich mit Excel-Tabellen herumzuschlagen, baute ich mir eine kleine HTML-Karte.",
+      "fr": "J'ai commencé à noter mes observations dans eBird. Mais quand je voulais revenir sur mon parcours, les listes ne suffisaient pas. Je voulais voir d'un coup d'œil quel oiseau j'avais vu, où et quand. Au lieu de me battre avec des tableaux Excel, je me suis fait une petite carte en HTML."
+    },
+    {
+      "tr": "Kuş Atlası böyle doğdu: önce kendim için, sonra gözlemlerine yeniden bakmaktan keyif alan herkes için. Umarım Maviş'le birlikte sen de kendi haritanda gezinir, her noktada bir kuşu, bir günü, bir hatırayı yeniden yaşarsın. İyi gözlemler!",
+      "en": "That's how Bird Atlas was born: first for me, then for everyone who enjoys looking back at their sightings. I hope that, together with Maviş, you'll wander through your own map and relive a bird, a day, a memory at every point. Happy birding!",
+      "es": "Así nació Bird Atlas: primero para mí y después para todos los que disfrutan volviendo a mirar sus observaciones. Ojalá que, junto con Maviş, recorras tu propio mapa y revivas en cada punto un ave, un día, un recuerdo. ¡Buenas observaciones!",
+      "pt": "Foi assim que nasceu o Bird Atlas: primeiro para mim, depois para todos que gostam de rever suas observações. Espero que, junto com a Maviş, você passeie pelo seu próprio mapa e reviva em cada ponto uma ave, um dia, uma lembrança. Boas observações!",
+      "de": "So ist Bird Atlas entstanden: zuerst für mich, dann für alle, die gern auf ihre Beobachtungen zurückblicken. Ich hoffe, dass du gemeinsam mit Maviş durch deine eigene Karte streifst und an jedem Punkt einen Vogel, einen Tag, eine Erinnerung neu erlebst. Gute Beobachtungen!",
+      "fr": "C'est ainsi qu'est né Bird Atlas : d'abord pour moi, puis pour tous ceux qui aiment revenir sur leurs observations. J'espère qu'avec Maviş, tu parcourras ta propre carte et revivras à chaque point un oiseau, une journée, un souvenir. Bonnes observations !"
+    }
+  ],
+  "imza": "— Enes · EG Apps Studio",
+  "yaz": {
+    "tr": "Bir fikrim var",
+    "en": "I have an idea",
+    "es": "Tengo una idea",
+    "pt": "Tenho uma ideia",
+    "de": "Ich habe eine Idee",
+    "fr": "J'ai une idée"
+  },
+  "kapat": {
+    "tr": "Kapat",
+    "en": "Close",
+    "es": "Cerrar",
+    "pt": "Fechar",
+    "de": "Schließen",
+    "fr": "Fermer"
+  },
+  "menu": {
+    "tr": "Geliştiriciyi tanı",
+    "en": "Meet the developer",
+    "es": "Conoce al desarrollador",
+    "pt": "Conheça o desenvolvedor",
+    "de": "Lerne den Entwickler kennen",
+    "fr": "Découvrez le développeur"
+  }
+}
