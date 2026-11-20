@@ -4,9 +4,8 @@ def im(k): x,y,w,h=P[k]; return f'<image href="{I[k]}" x="{x}" y="{y}" width="{w
 svg=f'''<svg class="mavis" id="mv" viewBox="40 -60 1180 1290" xmlns="http://www.w3.org/2000/svg">
 <g class="mv-all">
  <ellipse class="mv-golge" cx="627" cy="1196" rx="300" ry="20" fill="#0A3E70" opacity="0.1"/>
- <g class="mv-tail">{im('kuyruk')}</g>
- <g class="mv-flyL">{im('acikL')}</g><g class="mv-flyR">{im('acikR')}</g>
  {im('govde')}
+ <g class="mv-flyL">{im('acikL')}</g><g class="mv-flyR">{im('acikR')}</g>
  <g class="mv-crest">{im('tepe')}</g>
  <path class="mv-strap" d="M432,688 C455,720 485,752 512,780 M822,688 C799,720 769,752 742,780" stroke="#7A4A22" stroke-width="12" fill="none" stroke-linecap="round"/>
  <g class="mv-wing-l">{im('kanatL')}</g><g class="mv-wing-r">{im('kanatR')}</g>

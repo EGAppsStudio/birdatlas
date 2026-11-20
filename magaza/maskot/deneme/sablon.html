@@ -49,8 +49,8 @@ button.yeni{border-color:#E08A00;color:#B86E00}button.on{background:#1662B6;colo
 .a-sleep .mv-z{opacity:1}.a-sleep .mv-z text{animation:mv-zz 3s ease-out infinite}.a-sleep .z2{animation-delay:1s!important}.a-sleep .z3{animation-delay:2s!important}
 /* YENİ: uçma */
 .a-fly .mv-wing-l,.a-fly .mv-wing-r{opacity:0}
-.a-fly .mv-flyL{opacity:1;transform-origin:90% 85%;animation:mv-flyL .32s ease-in-out infinite}
-.a-fly .mv-flyR{opacity:1;transform-origin:10% 85%;animation:mv-flyR .32s ease-in-out infinite}
+.a-fly .mv-flyL{opacity:1;transform-origin:92% 88%;animation:mv-flyL .32s ease-in-out infinite}
+.a-fly .mv-flyR{opacity:1;transform-origin:8% 88%;animation:mv-flyR .32s ease-in-out infinite}
 .a-fly .mv-all{animation:mv-hover 1.6s ease-in-out infinite}
 .a-fly .mv-golge{animation:mv-shadow 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
 /* YENİ: kuyruk sallama */
@@ -87,7 +87,7 @@ button.yeni{border-color:#E08A00;color:#B86E00}button.on{background:#1662B6;colo
 @keyframes mv-zz{0%{opacity:0;transform:translate(0,0)}25%{opacity:1}100%{opacity:0;transform:translate(50px,-110px)}}
 @keyframes mv-flyL{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-22deg)}}
 @keyframes mv-flyR{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(22deg)}}
-@keyframes mv-hover{0%,100%{transform:translateY(-120px)}50%{transform:translateY(-170px)}}
+@keyframes mv-hover{0%,100%{transform:translateY(-40px)}50%{transform:translateY(-85px)}}
 @keyframes mv-shadow{0%,100%{transform:scale(.7);opacity:.06}50%{transform:scale(.6);opacity:.04}}
 @keyframes mv-wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
 @keyframes mv-heart{0%,100%{transform:scale(.85)}50%{transform:scale(1.1) translateY(-20px)}}
@@ -106,7 +106,7 @@ button.yeni{border-color:#E08A00;color:#B86E00}button.on{background:#1662B6;colo
 <button class="hepsi" id="hepsi">▶ Hepsini sırayla oynat</button>
 <script>
 const A=[['idle','Bekleme',0],['wave','El sallama',0],['hop','Zıplama',0],['peek','Dürbünle bakma',0],['look','Etrafa bakma',0],
-['talk','Konuşma',1],['sing','Ötme',1],['happy','Sevinç',1],['wow','Şaşırma',1],['sleep','Uyuklama',1],['fly','Uçma',1],['wag','Kuyruk sallama',1],['love','Sevgi',1]];
+['talk','Konuşma',1],['sing','Ötme',1],['happy','Sevinç',1],['wow','Şaşırma',1],['sleep','Uyuklama',1],['fly','Uçma',1],['love','Sevgi',1]];
 const mv=document.getElementById('mv');let t;
 function oyna(k,ad){mv.setAttribute('class','mavis');void mv.getBoundingClientRect();if(k!=='idle')mv.classList.add('a-'+k);document.getElementById('ad').textContent=ad;
 document.querySelectorAll('button[data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k===k));}

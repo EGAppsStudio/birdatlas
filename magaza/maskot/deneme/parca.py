@@ -1,7 +1,7 @@
 # Yeni Maviş parçalarını 1254 tuvalinde konumlandırır, webp + yerleşim üretir (deneme)
 import os, json, io, base64
 from PIL import Image, ImageOps, ImageFilter
-T='/home/claude/birdatlas/magaza/maskot/temiz/'
+T=__import__('os').path.join(__import__('os').path.dirname(__import__('os').path.abspath(__file__)),'..','temiz')+'/'
 OLCEK=560/1254
 P={}; IMG={}
 def ac(ad): return Image.open(T+ad+'.png')
@@ -34,7 +34,7 @@ m=ac('goz-mutlu'); m=cerceve(m,10)
 koy('mutluL',yari(m,1),465,452,150); koy('mutluR',yari(m,0),785,452,150)
 s=ac('goz-saskin'); koy('saskinL',yari(s,1),465,446,178); koy('saskinR',yari(s,0),785,446,178)
 u=ac('goz-uykulu'); koy('uykuL',yari(u,1),465,438,168); koy('uykuR',yari(u,0),785,438,168)
-koy('acikL',ac('kanat-acik'),215,0,330,ust=500); koy('acikR',ac('kanat-acik'),1039,0,330,True,ust=500)
+koy('acikL',ac('kanat-acik'),250,0,320,ust=490); koy('acikR',ac('kanat-acik'),1004,0,320,True,ust=490)
 koy('tepe',ac('tepe'),624,0,690,ust=10)
 koy('kuyruk',ac('kuyruk'),627,0,250,ust=1010)
 json.dump({k:v for k,v in IMG.items() if not k.endswith('_pil')},open('img.json','w'))
