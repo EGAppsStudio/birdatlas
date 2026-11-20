@@ -111,14 +111,6 @@ html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display
 .pair .phone:first-child { transform: rotate(-4deg) translateX(14px); z-index: 1; }
 .pair .phone:last-child { transform: rotate(4deg) translate(-14px, 40px); }
 
-/* ---------- hikâye (geliştirici) ---------- */
-.hikaye { padding: 80px 0; }
-.hikaye .wrap { max-width: 760px; }
-.hk-bas { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
-.mv-hk { flex: 0 0 96px; height: 96px; }
-.hikaye h2 { font-size: clamp(26px, 3vw, 36px); }
-.hikaye p { margin: 0 0 14px; font-size: 17px; line-height: 1.65; }
-.hikaye .hk-imza { font-weight: 700; color: var(--navy); }
 
 /* ---------- tanıtım videosu (npm run web: magaza/video/birdatlas-<dil>-yatay.mp4 → /video/tanitim-<dil>.mp4) ---------- */
 .tanitim { padding: 72px 0 8px; text-align: center; }
@@ -179,16 +171,12 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
   .pair { padding-bottom: 40px; }
 }
 @media (max-width: 420px) { .brand span { display: none; } }
-.top-link { margin-left: auto; margin-right: 12px; font-size: 14px; font-weight: 600; color: var(--navy); text-decoration: none; white-space: nowrap; }
-.top-link:hover { text-decoration: underline; }
-html { scroll-behavior: smooth; } .hikaye { scroll-margin-top: 20px; }
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <a class="brand" href="/"><img src="/img/logo.svg" alt=""><span><span data-l="tr">Kuş Atlası</span><span data-l="en">Bird Atlas</span></span></a>
-    <a class="top-link" href="#hikaye"><span data-l="tr">Geliştiriciyi tanıyın</span><span data-l="en">Meet the developer</span></a>
     <details class="langs">
       <summary aria-label="Language / Dil"><span class="cur">TR</span></summary>
       <nav aria-label="Language / Dil">
@@ -331,20 +319,6 @@ html { scroll-behavior: smooth; } .hikaye { scroll-margin-top: 20px; }
     </div>
   </section>
 
-  <section class="hikaye" id="hikaye">
-    <div class="wrap">
-      <div class="hk-bas"><div class="mv-hk" data-mavis="wave" role="img" aria-label="Maviş"></div>
-      <h2><span data-l="tr">Kuş Atlası'nın öyküsü</span><span data-l="en">The story of Bird Atlas</span></h2></div>
-      <p><span data-l="tr">Her şey Merlin'i kullanmayı öğrenmemle başladı. Şehirde her gün önünden geçtiğim ağaçlardan gelen sesleri merak edip telefonu kaldırdım. Ekranda isimler ve fotoğraflar belirdikçe şaşırdım: Bunca zamandır etrafımda bu kadar kuş mu vardı? Gerçekten bu kadar güzeller miydi? Sonra bir dürbün aldım; artık kulağım Merlin'de, gözüm dürbündeydi. Birçok kuşçunun hatırladığı o ilk "farkına varma" anıydı bu.</span><span data-l="en">It all started when I learned to use Merlin. Curious about the songs coming from the trees I walked past every day in the city, I held up my phone. As names and photos appeared on the screen, I was amazed: had there really been this many birds around me all along? Were they really this beautiful? Then I bought a pair of binoculars; from then on my ears were on Merlin and my eyes were in the binoculars. It was that first moment of "noticing" that so many birders remember.</span></p>
-      <p><span data-l="tr">Merlin'de sesini ilk gördüğüm kuşlardan biri mavi baştankaraydı. Dürbünle bulduğumda büyülendim: o parlak mavi tepelik, sarı göğüs, dalda bir an bile durmayan o cesur, telaşlı hâli. Maviş, işte o küçük kuştan doğdu.</span><span data-l="en">One of the first birds whose song I saw on Merlin was a Eurasian blue tit. When I found it in my binoculars, I was spellbound: that bright blue cap, the yellow breast, that bold, busy way of never staying still on a branch for a second. Maviş was born from that little bird.</span></p>
-      <p><span data-l="tr">Sonra göçü öğrendim. İstanbul Boğazı, her bahar ve sonbahar binlerce kuşun geçtiği bir darboğaz. Sarıyer'deki kuş gözlem kulesinden leylek ve yırtıcı sürülerinin süzülüşünü izledim. Minicik ötücülerin bile ağaçtan ağaca, azar azar ilerleyerek kıtalar aştığını öğrendim.</span><span data-l="en">Then I learned about migration. The Bosphorus in Istanbul is a bottleneck that thousands of birds pass through every spring and autumn. From the bird watching tower in Sarıyer I watched flocks of storks and raptors glide overhead. I learned that even tiny songbirds cross continents, moving from tree to tree, bit by bit.</span></p>
-      <p><span data-l="tr">Her kuşun bende ayrı bir hatırası var. İstanbul'un yeşil papağanları, akşam gökyüzünde dans eden sığırcık kümeleri, dürbünle tüylerine tek tek baktığım kızılgerdan… Gökyüzünü dolduran leylek sürüleri, küçük orman kartalları, Gülhane'de yuva yapan gri balıkçıllar. Sesleriyle bana çocukluğumun yaz akşamlarını hatırlatan ak karınlı ebabiller. İlk kez bir antik Mısır kabartmasında gördüğüm ve aynı gün bahçemde karşıma çıkan ibibik. Boğaz'ı vapurla geçerken suyu sıyırarak uçan yelkovanlar. Ege'de bir adada, sarkık bacakları ve komik sesiyle beni heyecandan yerimde duramaz hâle getiren uzunbacak. Ve Antalya'da renkleriyle büyüleyen arı kuşu.</span><span data-l="en">Every bird holds its own memory for me. Istanbul's green parakeets, starling flocks dancing in the evening sky, a robin whose feathers I studied one by one through my binoculars… Storks filling the sky, booted eagles, grey herons nesting in Gülhane Park. Alpine swifts whose calls bring back the summer evenings of my childhood. The hoopoe I first saw in an ancient Egyptian relief, and that very same day in my garden. Yelkouan shearwaters skimming the water as I crossed the Bosphorus by ferry. On an Aegean island, a black-winged stilt with its trailing legs and funny call that had me too excited to stand still. And in Antalya, a bee-eater with its dazzling colours.</span></p>
-      <p><span data-l="tr">Gözlemlerimi eBird'e kaydetmeye başladım. Ama yolculuğuma dönüp bakmak istediğimde listeler yetmedi. Hangi kuşu nerede ve ne zaman gördüğümü tek bakışta görmek istiyordum. Excel tablolarıyla uğraşmak yerine kendime küçük bir HTML haritası yaptım.</span><span data-l="en">I started logging my sightings in eBird. But when I wanted to look back at my journey, lists weren't enough. I wanted to see at a glance which bird I had seen where and when. Instead of wrestling with Excel sheets, I built myself a small HTML map.</span></p>
-      <p><span data-l="tr">Kuş Atlası böyle doğdu: önce kendim için, sonra gözlemlerine yeniden bakmaktan keyif alan herkes için. Umarım Maviş'le birlikte sen de kendi haritanda gezinir, her noktada bir kuşu, bir günü, bir hatırayı yeniden yaşarsın. İyi gözlemler!</span><span data-l="en">That's how Bird Atlas was born: first for me, then for everyone who enjoys looking back at their sightings. I hope that, together with Maviş, you'll wander through your own map and relive a bird, a day, a memory at every point. Happy birding!</span></p>
-      <p class="hk-imza">— Enes · EG Apps Studio</p>
-    </div>
-  </section>
-
   <section class="privacy">
     <div class="wrap">
       <h2><span data-l="tr">Gözlemlerin sende kalır</span><span data-l="en">Your sightings stay with you</span></h2>
@@ -365,7 +339,7 @@ html { scroll-behavior: smooth; } .hikaye { scroll-margin-top: 20px; }
       <a href="/app/"><span data-l="tr">Uygulamayı aç</span><span data-l="en">Open the app</span></a>
       <a href="https://www.instagram.com/birdatlas.app" rel="noopener">Instagram</a>
       <a href="mailto:egapps.support@gmail.com"><span data-l="tr">İletişim</span><span data-l="en">Contact</span></a>
-      <a href="#hikaye"><span data-l="tr">Geliştiriciyi tanıyın</span><span data-l="en">Meet the developer</span></a>
+      <a href="/hikaye/"><span data-l="tr">Geliştiriciyi tanıyın</span><span data-l="en">Meet the developer</span></a>
       <a href="/privacy/"><span data-l="tr">Gizlilik</span><span data-l="en">Privacy</span></a>
       <a href="https://play.google.com/store/apps/dev?id=6200277267214996612" rel="noopener"><span data-l="tr">Diğer uygulamalarımız</span><span data-l="en">Our other apps</span></a>
     </nav>

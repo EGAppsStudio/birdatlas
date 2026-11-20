@@ -1,5 +1,5 @@
 {
-  "_not": "Geliştiricinin öyküsü (6 dil). Kaynak burası: uygulama (www/index.html → HIKAYE) ve site (site/index.html #hikaye + site-diller.json) bu dosyadan üretilir: node scripts/hikaye.mjs",
+  "_not": "Geliştiricinin öyküsü (6 dil). Kaynak burası: site sayfası site/hikaye/index.html (birdatlas.app/hikaye/) ve uygulamanın ☰ menü yazısı bu dosyadan üretilir: node scripts/hikaye.mjs",
   "title": {
     "tr": "Kuş Atlası'nın öyküsü",
     "en": "The story of Bird Atlas",
@@ -67,22 +67,6 @@
     }
   ],
   "imza": "— Enes · EG Apps Studio",
-  "yaz": {
-    "tr": "Bir fikrim var",
-    "en": "I have an idea",
-    "es": "Tengo una idea",
-    "pt": "Tenho uma ideia",
-    "de": "Ich habe eine Idee",
-    "fr": "J'ai une idée"
-  },
-  "kapat": {
-    "tr": "Kapat",
-    "en": "Close",
-    "es": "Cerrar",
-    "pt": "Fechar",
-    "de": "Schließen",
-    "fr": "Fermer"
-  },
   "menu": {
     "tr": "Geliştiriciyi tanı",
     "en": "Meet the developer",
@@ -90,5 +74,21 @@
     "pt": "Conheça o desenvolvedor",
     "de": "Lerne den Entwickler kennen",
     "fr": "Découvrez le développeur"
+  },
+  "geri": {
+    "tr": "Ana sayfa",
+    "en": "Home",
+    "es": "Inicio",
+    "pt": "Início",
+    "de": "Startseite",
+    "fr": "Accueil"
+  },
+  "ac": {
+    "tr": "Uygulamayı aç",
+    "en": "Open the app",
+    "es": "Abrir la app",
+    "pt": "Abrir o app",
+    "de": "App öffnen",
+    "fr": "Ouvrir l'app"
   }
 }

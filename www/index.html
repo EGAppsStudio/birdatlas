@@ -3789,7 +3789,7 @@
                 document.body.appendChild(d);
             } catch (e) {}
         }
-        // ☰ → Geliştiriciyi tanı: sitedeki öykü (birdatlas.app/<dil>/#hikaye). Metin scripts/hikaye.json, yazan: node scripts/hikaye.mjs
+        // ☰ → Geliştiriciyi tanı: sitedeki öykü sayfası (birdatlas.app/hikaye/?lang=<dil>). Metin scripts/hikaye.json, yazan: node scripts/hikaye.mjs
         const HIKAYE = {"menu":{"tr":"Geliştiriciyi tanı","en":"Meet the developer","es":"Conoce al desarrollador","pt":"Conheça o desenvolvedor","de":"Lerne den Entwickler kennen","fr":"Découvrez le développeur"}};
         // Kuşçu arkadaşlarına öner: telefonun paylaş ekranı (WhatsApp vb.); birdatlas.app hem Play'e hem web/iPhone sürümüne götürür
         window.tellFriends = async function() {
@@ -5888,7 +5888,7 @@
                 it(IC('geri'), LT('Geri bildirim', 'Feedback'), "openTab('feedback')") +
                 it(IC('yildiz'), LT('Değerlendir', 'Rate the app'), 'rateApp()') +
                 it(IC('oner'), LT('Arkadaşına öner', 'Recommend to a friend'), 'tellFriends()') +
-                `<a href="https://birdatlas.app/${LANG}/#hikaye" target="_blank" onclick="closeMainMenu()">${IC('kalp')} <span class="mt">${(HIKAYE.menu[LANG] || HIKAYE.menu.en)}</span></a>` +
+                `<a href="https://birdatlas.app/hikaye/?lang=${LANG}" target="_blank" onclick="closeMainMenu()">${IC('kalp')} <span class="mt">${(HIKAYE.menu[LANG] || HIKAYE.menu.en)}</span></a>` +
                 `<a href="https://birdatlas.app/privacy/?lang=${LANG === 'tr' ? 'tr' : 'en'}" target="_blank" onclick="closeMainMenu()">${IC('kilit')} <span class="mt">${LT('Gizlilik', 'Privacy')}</span></a>` +
                 `<div class="mf">${LT('Kuş Atlası', 'Bird Atlas')} v${APP_VERSION} · <a href="https://play.google.com/store/apps/dev?id=6200277267214996612" target="_blank" onclick="closeMainMenu()">EG Apps Studio</a><br><a href="https://www.instagram.com/birdatlas.app" target="_blank" onclick="closeMainMenu()">@birdatlas.app</a> · <a href="https://birdatlas.app/${LANG}/" target="_blank" onclick="closeMainMenu()">birdatlas.app</a></div>`;
             m.style.display = 'block';
