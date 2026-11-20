@@ -9,7 +9,7 @@ from scipy.ndimage import gaussian_filter, zoom
 from skimage import measure
 
 KOK = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TOHUM = int(sys.argv[1]) if len(sys.argv) > 1 else 7
+TOHUM = int(sys.argv[1]) if len(sys.argv) > 1 else 11
 
 DENIZ, KARA, PARK = '#C3C8CC', '#E8EAE5', '#DCE3D3'
 KENAR, YOL, RAY = '#D6D8D2', '#FFFFFF', '#B9BDB6'
@@ -90,7 +90,7 @@ def uret(W, H, u, rng, prng):
     gol_alani = gurultu(rng, gh, gw, [(int(40 * u / S), 1.0), (int(14 * u / S), .35)])
     uzaklik = yuk  # kıyıdan içeri ne kadar "yüksek"
     gol = np.where(uzaklik > .55, gol_alani, -9)
-    gol_sekil = sorted(sekiller(gaussian_filter(gol, .8), 1.95, 60 * u * u), key=len, reverse=True)[:7]
+    gol_sekil = sorted(sekiller(gaussian_filter(gol, .8), 1.95, 60 * u * u), key=len, reverse=True)[:4]
 
     def karada(x, y, pay=0.05):
         i, j = int(round(y / S)), int(round(x / S))
@@ -100,7 +100,7 @@ def uret(W, H, u, rng, prng):
     # ---------- parklar ----------
     park_alani = gurultu(rng, gh, gw, [(int(30 * u / S), 1.0), (int(10 * u / S), .3)])
     park = np.where(uzaklik > .25, park_alani, -9)
-    park_sekil = sekiller(gaussian_filter(park, .8), 1.75, 120 * u * u)
+    park_sekil = sorted(sekiller(gaussian_filter(park, .8), 1.9, 200 * u * u), key=len, reverse=True)[:5]
 
     # ---------- nehirler: iç kısımdan denize, yükseklik eğimini izler ----------
     yg = gaussian_filter(yuk, 6)
@@ -109,7 +109,7 @@ def uret(W, H, u, rng, prng):
     adaylar = [(i, j) for i in range(0, gh, 6) for j in range(0, gw, 6) if yg[i, j] > .9]
     prng.shuffle(adaylar)
     for (i, j) in adaylar[:40]:
-        if len(nehirler) >= 2: break
+        if len(nehirler) >= 1: break
         x, y = j * S + .0, i * S + .0
         yol = [(x, y)]
         for _ in range(2000):
@@ -130,9 +130,9 @@ def uret(W, H, u, rng, prng):
     for _ in range(4000):
         x, y = prng.uniform(-.05, 1.05) * W, prng.uniform(-.05, 1.05) * H
         if not karada(x, y, .25): continue
-        if any(math.dist((x, y), k) < 115 * u for k in kasabalar): continue
+        if any(math.dist((x, y), k) < 160 * u for k in kasabalar): continue
         kasabalar.append((x, y))
-        if len(kasabalar) >= 12: break
+        if len(kasabalar) >= 7: break
 
     def kivrimli(a, b, sapma, adim):
         """a→b arası doğal kıvrımlı yol: düşük frekanslı yanal sapma."""
@@ -172,12 +172,12 @@ def uret(W, H, u, rng, prng):
         ai = math.atan2(pts[2][1] - pts[0][1], pts[2][0] - pts[0][0]); aj = math.atan2(pts[-3][1] - pts[-1][1], pts[-3][0] - pts[-1][0])
         if bul(i) != bul(j):
             kume[bul(i)] = bul(j); ekle(i, j, pts)
-        elif ekstra < 2 and L < 380 * u and len(acilar[i]) < 3 and len(acilar[j]) < 3 and aci_bos(i, ai) and aci_bos(j, aj) and prng.random() < .6:
+        elif ekstra < 1 and L < 380 * u and len(acilar[i]) < 3 and len(acilar[j]) < 3 and aci_bos(i, ai) and aci_bos(j, aj) and prng.random() < .6:
             ekstra += 1; ekle(i, j, pts)
 
     # çerçeve dışına çıkan yollar (harita kesilmiş gibi dursun)
     for ki, k in enumerate(kasabalar):
-        if prng.random() < .5 and len(acilar[ki]) < 3:
+        if prng.random() < .35 and len(acilar[ki]) < 3:
             for _ in range(20):
                 a = prng.uniform(0, 6.28)
                 if aci_bos(ki, a): break
@@ -203,7 +203,7 @@ def uret(W, H, u, rng, prng):
 
     ara = []
     for yol in ana:
-        for _ in range(prng.randint(1, 3)):
+        for _ in range(prng.randint(0, 1)):
             i = prng.randint(2, max(3, len(yol) - 3))
             if i >= len(yol) - 1: continue
             (x0, y0), (x1, y1) = yol[i - 1], yol[i + 1]
@@ -218,7 +218,7 @@ def uret(W, H, u, rng, prng):
         ara_ = prng.uniform(13, 17) * u
         for yon in (don, don + math.pi / 2 + prng.uniform(-.25, .25)):
             ux, uy = math.cos(yon), math.sin(yon); vx, vy = -uy, ux
-            for m in range(-1, 2) if prng.random() < .5 else range(-2, 3):
+            for m in range(-1, 2):
                 uz = r * math.sqrt(max(.15, 1 - (m * ara_ / r) ** 2)) * prng.uniform(.75, 1.0)
                 bukum = prng.uniform(-.12, .12)
                 pts = []
