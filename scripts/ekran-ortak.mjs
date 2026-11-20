@@ -22,13 +22,13 @@ const SAZ_FOTO = path.join(KOK, 'magaza', 'ekran-foto', 'saz-delicesi.jpg');
 // ---------- Anahtar YOK: Maviş'in Gemini cevabı ve Keşfet listesi sabit örnek (her dilde aynı, her çekimde aynı) ----------
 // Uygulama Gemini'ye / eBird'e gerçekten istek atar ama bu istekler bilgisayardan dışarı çıkmadan aşağıdaki örneklerle cevaplanır.
 const GEMINI = 'ekran', EBIRD = 'ekran';
-const MAVIS_CEVAP = {
-  tr: "Selam! Dürbünüm hazır, 2026 kayıtlarına baktım. En çeşitli günün **15 Ağustos 2026**'da **Eymir Gölü**'ndeydi: 15 farklı tür kaydetmişsin; aralarında yeşilbaş, sakarmeke, bahri ve boz kuyrukkakan var. Ne güzel bir gözlem günü! Bu arada ardıçkuşları ve ben, göçmen tüylerin hesabını bu kadar titiz tutanlara hep hayranızdır!",
-  en: "Hi! Binoculars ready, I've looked through your 2026 records. Your most diverse day was **15 August 2026** at **Eymir Gölü**, where you logged 15 different species, including Mallard, Eurasian Coot, Great Crested Grebe and Isabelline Wheatear. What a day in the field! By the way, the thrushes and I always admire anyone who keeps such an exact count of their feathered travellers!",
-  es: "¡Hola! Con mis prismáticos listos, he revisado tus registros de 2026. Tu día con mayor diversidad de avistamientos fue el **15 de agosto de 2026** en **Eymir Gölü**, donde registraste 15 especies diferentes, incluyendo el ánade real, la focha común, el somormujo lavanco y la collalba isabel. ¡Qué gran jornada de observación! Por cierto, ¡los tordos y yo siempre admiramos a quienes llevan la cuenta exacta de sus plumas viajeras!",
-  pt: "Olá! Com meus binóculos prontos, revisei seus registros de 2026. Seu dia com mais espécies foi **15 de agosto de 2026** no **Eymir Gölü**, onde você registrou 15 espécies diferentes, incluindo o pato-real, o galeirão-comum, o mergulhão-de-crista e a chasco-isabel. Que dia de campo incrível! Aliás, os sabiás e eu sempre admiramos quem leva a conta exata das suas penas viajantes!",
-  de: "Hallo! Fernglas bereit, ich habe mir deine Beobachtungen von 2026 angesehen. Dein artenreichster Tag war der **15. August 2026** am **Eymir Gölü**: 15 verschiedene Arten, darunter Stockente, Blässhuhn, Haubentaucher und Isabellsteinschmätzer. Was für ein Tag draußen! Übrigens bewundern die Drosseln und ich jeden, der so genau über seine gefiederten Reisenden Buch führt!",
-  fr: "Salut ! Jumelles prêtes, j'ai parcouru vos observations de 2026. Votre journée la plus riche a été le **15 août 2026** à **Eymir Gölü** : 15 espèces différentes, dont le canard colvert, la foulque macroule, le grèbe huppé et le traquet isabelle. Quelle belle journée de terrain ! D'ailleurs, les grives et moi admirons toujours ceux qui tiennent le compte exact de leurs voyageurs à plumes !",
+const MAVIS_CEVAP = {   // örnek veride 2026'nın en zengin günü: 11 Nisan 2026, Doñana (23 tür) – scripts/ornek-veri.py
+  tr: "Selam! Dürbünüm hazır, 2026 kayıtlarına baktım. En çeşitli günün **11 Nisan 2026**'da **Doñana National Park**'taydı: 23 farklı tür kaydetmişsin; aralarında iberya şah kartalı, yaz ördeği, mor sazhorozu ve çeltikçi var. Ne güzel bir gözlem günü! Bu arada ardıçkuşları ve ben, göçmen tüylerin hesabını bu kadar titiz tutanlara hep hayranızdır!",
+  en: "Hi! Binoculars ready, I've looked through your 2026 records. Your most diverse day was **11 April 2026** at **Doñana National Park**, where you logged 23 different species, including Spanish Imperial Eagle, Marbled Duck, Western Swamphen and Glossy Ibis. What a day in the field! By the way, the thrushes and I always admire anyone who keeps such an exact count of their feathered travellers!",
+  es: "¡Hola! Con mis prismáticos listos, he revisado tus registros de 2026. Tu día con mayor diversidad de avistamientos fue el **11 de abril de 2026** en **Doñana National Park**, donde registraste 23 especies diferentes, incluyendo el águila imperial ibérica, la cerceta pardilla, el calamón común y el morito común. ¡Qué gran jornada de observación! Por cierto, ¡los tordos y yo siempre admiramos a quienes llevan la cuenta exacta de sus plumas viajeras!",
+  pt: "Olá! Com meus binóculos prontos, revisei seus registros de 2026. Seu dia com mais espécies foi **11 de abril de 2026** no **Doñana National Park**, onde você registrou 23 espécies diferentes, incluindo a águia-imperial-ibérica, a pardilheira, o camão e a íbis-preta. Que dia de campo incrível! Aliás, os sabiás e eu sempre admiramos quem leva a conta exata das suas penas viajantes!",
+  de: "Hallo! Fernglas bereit, ich habe mir deine Beobachtungen von 2026 angesehen. Dein artenreichster Tag war der **11. April 2026** im **Doñana National Park**: 23 verschiedene Arten, darunter Iberienadler, Marmelente, Purpurhuhn und Sichler. Was für ein Tag draußen! Übrigens bewundern die Drosseln und ich jeden, der so genau über seine gefiederten Reisenden Buch führt!",
+  fr: "Salut ! Jumelles prêtes, j'ai parcouru vos observations de 2026. Votre journée la plus riche a été le **11 avril 2026** au **Doñana National Park** : 23 espèces différentes, dont l'aigle ibérique, la marmaronette marbrée, la talève sultane et l'ibis falcinelle. Quelle belle journée de terrain ! D'ailleurs, les grives et moi admirons toujours ceux qui tiennent le compte exact de leurs voyageurs à plumes !",
 };
 // Keşfet: Köstence yakınlarında 30 km, son 30 gün (bilimsel ad, eBird kodu, sayı); adlar uygulamanın tür adı dosyalarından o dilde
 const KESFET_LISTE = [   // ilk 7: Enes'in gerçek Köstence sonucuyla aynı sıra ve sayılar
@@ -139,12 +139,12 @@ export const KAYDIR = (el, oran) => {
 // ---------- Çekilecek ekranlar ----------
 export const EKRANLAR = [
   ['harita', async (pg) => {
-    await pg.evaluate(() => { closeTabs(); mapObj.zoomIn(1, { animate: false }); mapObj.panBy([-70, 0], { animate: false }); });   // biraz sağa: Endülüs de girsin
+    await pg.evaluate(() => { closeTabs(); mapObj.setView([38, 14], 3, { animate: false }); });   // Avrupa, Akdeniz, Kafkasya, Kuzey Afrika (örnek veri dünyaya yayıldı)
   }],
   ['takvim', async (pg) => {
     await pg.evaluate(() => {
-      openTab('obs'); setObsSub('calendar');
-      currentCalDate = new Date(2025, 7, 1); selectedDates.clear(); selectedDates.add('2025-08-12'); lastClickedDay = '2025-08-12'; renderAll();
+      openTab('obs'); setObsSub('calendar');   // Ağustos 2024: Kenya gezisi (örnek veride bir haftalık gözlem günleri)
+      currentCalDate = new Date(2024, 7, 1); selectedDates.clear(); selectedDates.add('2024-08-04'); lastClickedDay = '2024-08-04'; renderAll();
     });
   }],
   ['grafik', async (pg) => {
@@ -162,7 +162,7 @@ export const EKRANLAR = [
     await pg.evaluate(() => { openTab('obs'); setObsSub('locations'); });
     await bekle(700);
     await pg.evaluate(() => {
-      let s = [...document.querySelectorAll('#location-list span[onclick*="showLocDays"]')].find(x => x.getAttribute('onclick').includes('Central Park'));
+      let s = [...document.querySelectorAll('#location-list span[onclick*="showLocDays"]')][2];   // listede 3. yer (örnek veri değişse de ekranda görünür)
       if (s) s.click();
     });
   }],

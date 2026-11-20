@@ -46,12 +46,12 @@ const ozel = (pg, css) => pg.evaluate(c => { document.getElementById('ekran-ozel
 const SAHNELER = [
   ['harita', async (pg, L, k) => {
     const bas = () => pg.evaluate(() => { closeTabs(); mapObj.setView([30, 22], 2, { animate: false }); });
-    await pg.evaluate(() => mapObj.setView([39.3, 33.2], 6, { animate: false })); await hazir(pg);   // hedefin parçaları önceden insin
+    await pg.evaluate(() => mapObj.setView([44, 12], 4, { animate: false })); await hazir(pg);   // hedefin parçaları önceden insin
     await bas(); await hazir(pg, 800);
     k.basla(); await bekle(900);
     // parmakla yaklaştırır gibi: küçük adımlarla, hiç uzaklaşmadan (flyTo önce uzaklaşıp tüm noktaları tek noktada topluyordu)
     await pg.evaluate(async () => {
-      const z0 = mapObj.getZoom(), c0 = mapObj.getCenter(), z1 = 6, c1 = L.latLng(39.3, 33.2), snap = mapObj.options.zoomSnap, N = 56;
+      const z0 = mapObj.getZoom(), c0 = mapObj.getCenter(), z1 = 4, c1 = L.latLng(44, 12), snap = mapObj.options.zoomSnap, N = 56;
       mapObj.options.zoomSnap = 0;
       for (let i = 1; i <= N; i++) {
         const t = i / N, e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
@@ -63,10 +63,10 @@ const SAHNELER = [
     await bekle(300); await hazir(pg, 900); k.dur();
   }],
   ['takvim', async (pg, L, k) => {
-    await pg.evaluate(() => { openTab('obs'); setObsSub('calendar'); currentCalDate = new Date(2025, 7, 1); selectedDates.clear(); renderAll(); });
+    await pg.evaluate(() => { openTab('obs'); setObsSub('calendar'); currentCalDate = new Date(2024, 7, 1); selectedDates.clear(); renderAll(); });   // Kenya gezisi
     await hazir(pg, 600);
     k.basla(); await bekle(1000);
-    await pg.evaluate(() => { selectedDates.add('2025-08-12'); lastClickedDay = '2025-08-12'; renderAll(); });
+    await pg.evaluate(() => { selectedDates.add('2024-08-04'); lastClickedDay = '2024-08-04'; renderAll(); });
     await bekle(2400); k.dur();
   }],
   ['kertik', async (pg, L, k) => {

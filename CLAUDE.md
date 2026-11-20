@@ -12,7 +12,7 @@ Geliştirici: EG Apps Studio · destek: egapps.support@gmail.com · Instagram: @
 
 ```
 www/index.html     uygulamanın tamamı (tek dosya, ~4000 satır) – Android'de Capacitor, web'de /app/
-www/data/          ornek-veri.csv (kurgusal örnek veri) · ebird-taxonomy.json + ebird-names-<dil>.json (KOMUTLAR 12 ile üretilir, depoda)
+www/data/          ornek-veri.csv (kurgusal örnek veri; `python3 scripts/ornek-veri.py` üretir: 51 yer, 33 ülke, İngilizce yer adları; değişince index.html SAMPLE_VER artır, ekran/video betiklerindeki tarih ve yerler dosyanın başında) · ebird-taxonomy.json + ebird-names-<dil>.json (KOMUTLAR 12 ile üretilir, depoda)
 www/img/           logo, PWA ikonları
 www/manifest.webmanifest, www/sw.js   yalnızca web (PWA); Android'i etkilemez
 www/lib/           npm install sonrası copy-libs ile dolar (depoda YOK)

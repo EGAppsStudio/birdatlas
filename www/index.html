@@ -1349,7 +1349,7 @@
                 <g class="mv-e-uyku">${im('uykuL')}${im('uykuR')}</g>
                 <g class="mv-binoc">${im('durbun')}</g>
               </g>
-              <g class="mv-deco">
+              <g class="mv-deco" aria-hidden="true">
                 <g class="mv-notes" fill="#1662B6"><text class="n1" x="1000" y="380" font-size="120">♪</text><text class="n2" x="1080" y="300" font-size="100">♫</text><text class="n3" x="960" y="240" font-size="90">♪</text></g>
                 <g class="mv-z" fill="#6b7a8c" font-weight="bold" font-family="sans-serif"><text class="z1" x="930" y="330" font-size="80">z</text><text class="z2" x="1010" y="240" font-size="105">z</text><text class="z3" x="1100" y="140" font-size="130">Z</text></g>
                 <text class="mv-unlem" x="1000" y="250" font-size="220" font-weight="900" fill="#F5A623" font-family="sans-serif">!</text>
@@ -2066,7 +2066,7 @@
 
         const savedDataRaw = localStorage.getItem('ebird_saved_csv_data');
         // Örnek veri güncellendiyse eski kopya yerine yenisini yükle (kendi verisi olanlara dokunmaz)
-        const SAMPLE_VER = '2026-11-12b';
+        const SAMPLE_VER = '2026-11-21';   // örnek veri değişince artır (scripts/ornek-veri.py): eski örneği yüklemiş olanlarda yenisi açılır
         let staleSample = false; try { staleSample = !!savedDataRaw && localStorage.getItem('is_sample') === '1' && localStorage.getItem('sample_ver') !== SAMPLE_VER; } catch (e) {}
         if (staleSample) { setTimeout(() => window.loadSampleData(), 50); }
         else if (savedDataRaw) {
@@ -3364,6 +3364,7 @@
         };
 
         function fetchExploreData(lat, lng) {
+            if (window.tourExploreDemo && tourExploreDemo(lat, lng)) return;   // turda: örnek (eBird'e bağlanmaz)
             if (!EBIRD_API) {
                 appAlert(LT("Keşfet, çevredeki son eBird kayıtlarını getirmek için ücretsiz bir eBird API anahtarı istiyor. Ayarlar'da nasıl alınacağı adım adım yazıyor; bir kez girmen yeterli.", "Explore needs a free eBird API key to fetch recent eBird sightings nearby. Settings shows how to get one step by step; you only enter it once."),
                     { btn: '⚙️ ' + LT("Ayarlar'a git", 'Go to Settings'), action: () => { openSettings(); setTimeout(() => { let i = document.getElementById('input-ebird-api'); if (i) { i.scrollIntoView({ block: 'center', behavior: 'smooth' }); i.focus(); } }, 150); } });
@@ -3556,7 +3557,12 @@
             'KE-31': ['Nakuru', 'Nakuru'], 'KE-33': ['Narok', 'Narok'],
             'US-FL': ['Florida', 'Florida'], 'US-TX': ['Teksas', 'Texas'], 'US-NY': ['New York', 'New York'], 'US-CA': ['Kaliforniya', 'California'],
             'BR-MT': ['Mato Grosso', 'Mato Grosso'], 'CR-P': ['Puntarenas', 'Puntarenas'], 'EC-P': ['Pichincha', 'Pichincha'], 'EC-W': ['Galápagos', 'Galápagos'],
-            'ID-SA': ['Kuzey Sulawesi', 'North Sulawesi'], 'ID-PB': ['Batı Papua', 'West Papua'], 'IN-RJ': ['Racastan', 'Rajasthan'], 'AU-QLD': ['Queensland', 'Queensland'], 'ZA-MP': ['Mpumalanga', 'Mpumalanga']
+            'ID-SA': ['Kuzey Sulawesi', 'North Sulawesi'], 'ID-PB': ['Batı Papua', 'West Papua'], 'IN-RJ': ['Racastan', 'Rajasthan'], 'AU-QLD': ['Queensland', 'Queensland'], 'ZA-MP': ['Mpumalanga', 'Mpumalanga'],
+            'TZ-13': ['Mara', 'Mara'], 'FR-PAC': ["Provence-Alpes-Côte d'Azur", "Provence-Alpes-Côte d'Azur"], 'PT-11': ['Lizbon', 'Lisbon'], 'PL-20': ['Podlaskie', 'Podlaskie'],
+            'SE-M': ['Skåne', 'Skåne'], 'NO-56': ['Finnmark', 'Finnmark'], 'IS-6': ['Kuzeydoğu', 'Northeast'], 'HU-HB': ['Hajdú-Bihar', 'Hajdú-Bihar'],
+            'IL-Z': ['Kuzey', 'Northern District'], 'IL-D': ['Güney', 'Southern District'], 'MG-A': ['Toamasina', 'Toamasina'], 'LK-3': ['Güney Eyaleti', 'Southern Province'],
+            'TH-50': ['Chiang Mai', 'Chiang Mai'], 'JP-01': ['Hokkaido', 'Hokkaido'], 'AU-NT': ['Kuzey Toprakları', 'Northern Territory'], 'NZ-AUK': ['Auckland', 'Auckland'],
+            'US-AZ': ['Arizona', 'Arizona'], 'CA-ON': ['Ontario', 'Ontario'], 'PE-MDD': ['Madre de Dios', 'Madre de Dios'], 'AR-N': ['Misiones', 'Misiones'], 'CL-MA': ['Magallanes', 'Magallanes']
         };
         const REGION_CACHE_KEY = 'region_names_v1';
         let regionCache = (() => { try { return JSON.parse(localStorage.getItem(REGION_CACHE_KEY)) || {}; } catch (e) { return {}; } })();
@@ -6120,6 +6126,38 @@
                 buttons: [[LT('Bitir', 'Finish'), 'endTour(true)', true]] });
             return s;
         }
+        // Tur adımında dokunulabilen yerler
+        function tourAllowed(t) {
+            if (!t || !t.closest) return false;
+            if (t.closest('#tour .tour-tip, .leaflet-control-zoom')) return true;
+            let st = tourSteps[tourIdx]; if (!st || st.pre) return false;
+            if (t.closest('#upload-overlay, #settings-overlay, #menu-btn, #main-menu, #chat-btn, .chat-close, .fchip.sample')) return false;
+            if (t.closest('#tabbar')) return st.id === 'tabs';
+            if (t.closest('#map, #mini-popup, #photo-viewer, #filter-bar, #explore-dock')) return true;
+            if (t.closest('#chat-window')) return st.id === 'mavis';
+            if (t.closest('#share-overlay')) return st.id === 'share';
+            let list = st.targets ? st.targets() : (st.target ? [st.target()] : []);
+            return list.some(el => el && el.contains && el.contains(t));
+        }
+        // Adımlar arasında kullanıcının denediklerini temizle (bir sonraki adımın odağı bozulmasın)
+        function tourResetState() {
+            try { let m = $t('mini-popup'); if (m) m.style.display = 'none'; } catch (e) {}
+            try { mapObj.closePopup(); } catch (e) {}
+            try { let v = $t('photo-viewer'); if (v && v.style.display !== 'none') closePhotoViewer(); } catch (e) {}
+            try { let o = $t('share-overlay'); if (o && o.style.display !== 'none') closeShare(); } catch (e) {}
+            try { if ($t('chat-window').style.display === 'flex') toggleChat(); } catch (e) {}
+            try { let q = $t('species-search'); if (q && q.value) { q.value = ''; q.dispatchEvent(new Event('input')); } } catch (e) {}
+            try { setExplore(false); } catch (e) {}
+            try { clearFilter('all'); } catch (e) {}
+        }
+        // Keşfet adımında haritaya dokunmak / çapı değiştirmek: eBird'e bağlanmadan sarı daire oraya taşınır (örnek liste aynı kalır)
+        window.tourExploreDemo = function(lat, lng) {
+            let st = tourSteps[tourIdx]; if (tourIdx < 0 || !st || st.id !== 'explore') return false;
+            lastExploreLat = lat; lastExploreLng = lng;
+            if (exploreCircle) mapObj.removeLayer(exploreCircle);
+            exploreCircle = L.circle([lat, lng], { radius: currentRadius * 1000, color: '#FED008', fillColor: '#FED008', fillOpacity: 0.25 }).addTo(mapObj);
+            return true;
+        };
         function ensureTourDom() {
             let r = $t('tour'); if (r) return r;
             r = document.createElement('div'); r.id = 'tour'; r.setAttribute('data-no-i18n', '');
@@ -6141,18 +6179,17 @@
                 const up = () => { tip.classList.remove('drag'); tip.removeEventListener('pointermove', mv); tip.removeEventListener('pointerup', up); tip.removeEventListener('pointercancel', up); };
                 tip.addEventListener('pointermove', mv); tip.addEventListener('pointerup', up); tip.addEventListener('pointercancel', up);
             });
-            // Tur sırasında arka planda yalnız bakmak serbest: kaydırma, harita sürükleme / yakınlaştırma.
-            // Dokunup başka ekrana geçmek, düğmeler, seçimler kapalı (turun kendi düğmeleri hariç).
+            // Tur sırasında kullanıcı vurgulanan alanı ve haritayı serbestçe dener (filtreler, paylaşım seçenekleri, Maviş'e soru,
+            // Keşfet çapı / noktası). Başka ekrana götüren yerler (sekme çubuğu, ☰, yükleme, ayarlar) kapalı; her adım kendi görünümünü yeniden kurar.
             const guard = e => {
                 if (tourIdx < 0 || !e.isTrusted) return;
-                let t = e.target;
-                if (t.closest && (t.closest('#tour .tour-tip') || t.closest('.leaflet-control-zoom'))) return;
+                if (tourAllowed(e.target)) return;
                 e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
             };
             ['click', 'change', 'submit', 'contextmenu'].forEach(ev => document.addEventListener(ev, guard, true));
             document.addEventListener('pointerdown', e => {   // yazı kutusu / seçim listesi açılmasın
                 if (tourIdx < 0 || !e.isTrusted || !e.target.closest) return;
-                if (e.target.closest('#tour .tour-tip')) return;
+                if (e.target.closest('#tour .tour-tip') || tourAllowed(e.target)) return;
                 if (e.target.closest('input, select, textarea, label')) { e.preventDefault(); e.stopPropagation(); }
             }, true);
             window.addEventListener('resize', () => { if (tourIdx >= 0) placeTour(); });
@@ -6215,6 +6252,7 @@
         async function goTour(i) {
             let cur = tourSteps[tourIdx];
             if (cur && cur.leave) { try { cur.leave(); } catch (e) {} }
+            if (cur && !cur.pre) tourResetState();
             tourIdx = i;
             let st = tourSteps[i]; if (!st) return endTour(true);
             if (st.enter) { try { await st.enter(); } catch (e) {} }
@@ -6227,6 +6265,7 @@
             let cur = tourSteps[tourIdx];
             if (cur && cur.leave) { try { cur.leave(); } catch (e) {} }
             let wasMain = tourIdx >= 0 && cur && !cur.pre;
+            if (wasMain) tourResetState();
             tourIdx = -1; tourWaiting = false; clearInterval(tourWaitTimer); let r = $t('tour'); if (r) r.style.display = 'none';
             if (done) { setTourFlag('tour_done', '1'); setTourFlag('tour_resume', null); }
             if (wasMain) restoreTourView();
