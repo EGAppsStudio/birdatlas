@@ -1,6 +1,6 @@
 // Geliştiricinin öyküsünü (scripts/hikaye.json, 6 dil) uygulamaya ve siteye yazar:
-//   www/index.html  → const HIKAYE = {menu};  (☰ → "Geliştiriciyi tanı" → birdatlas.app/hikaye/?lang=<dil>)
-//   site/hikaye/index.html → ayrı sayfa birdatlas.app/hikaye/?lang=xx (6 dil)
+//   www/index.html  → const HIKAYE = {menu};  (☰ → "Kuş Atlası'nın öyküsü" → birdatlas.app/story/?lang=<dil>)
+//   site/story/index.html → ayrı sayfa birdatlas.app/story/?lang=xx (6 dil)
 //   scripts/site-diller.json → ana sayfanın altındaki "Geliştiriciyi tanıyın" bağlantısının ES/PT/DE/FR karşılığı
 // Kullanım: node scripts/hikaye.mjs   (metni değiştirince yeniden çalıştır)
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -19,7 +19,7 @@ const yeni = s.replace(/const HIKAYE = \{.*\};/, () => 'const HIKAYE = ' + JSON.
 if (yeni === s && !s.includes('const HIKAYE = ' + JSON.stringify(veri))) throw new Error('www/index.html içinde "const HIKAYE = {...};" bulunamadı');
 writeFileSync(app, yeni);
 
-// ---------- site: ayrı sayfa /hikaye/ (6 dil tek sayfada; dil ?lang= → gelinen sayfa → app_lang → tarayıcı) ----------
+// ---------- site: ayrı sayfa /story/ (6 dil tek sayfada; dil ?lang= → gelinen sayfa → app_lang → tarayıcı) ----------
 const DIL = { tr: 'TR', en: 'EN', es: 'ES', pt: 'PT', de: 'DE', fr: 'FR' };
 const art = L => `<article data-l="${L}" lang="${L}">
 <div class="bas"><div class="mv" data-mavis="wave" role="img" aria-label="Maviş"></div><h1>${esc(H.title[L])}</h1></div>
@@ -36,7 +36,7 @@ const sayfa = `<!doctype html>
 <meta name="theme-color" content="#10325C">
 <link rel="icon" type="image/svg+xml" href="/img/logo.svg">
 <link rel="icon" type="image/png" href="/img/favicon-64.png">
-<link rel="canonical" href="https://birdatlas.app/hikaye/">
+<link rel="canonical" href="https://birdatlas.app/story/">
 <!-- Bu dosyayı elle düzenleme: metin scripts/hikaye.json, üreten node scripts/hikaye.mjs -->
 <style>
 @font-face { font-family: "Poppins"; font-weight: 400; src: url("/app/lib/fonts/poppins-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-0130, U+0132-024F; }
@@ -87,12 +87,12 @@ ${Object.keys(DIL).map(art).join('\n')}
 </body>
 </html>
 `;
-mkdirSync(join(KOK, 'site', 'hikaye'), { recursive: true });
-writeFileSync(join(KOK, 'site', 'hikaye', 'index.html'), sayfa);
+mkdirSync(join(KOK, 'site', 'story'), { recursive: true });
+writeFileSync(join(KOK, 'site', 'story', 'index.html'), sayfa);
 
 // ---------- ana sayfadaki alt bağlantı (ES/PT/DE/FR karşılıkları) ----------
 const dp = join(KOK, 'scripts', 'site-diller.json');
 const D = JSON.parse(readFileSync(dp, 'utf8'));
 for (const L of ['es', 'pt', 'de', 'fr']) if (D[L]) { D[L][H.link.en] = H.link[L]; D[L][H.title.en] = H.title[L]; }   // alt bağlantı + video altındaki düğme
 writeFileSync(dp, JSON.stringify(D, null, 2) + '\n');
-console.log('Öykü yazıldı: uygulama menüsü + site/hikaye/ (6 dil).');
+console.log('Öykü yazıldı: uygulama menüsü + site/story/ (6 dil).');
