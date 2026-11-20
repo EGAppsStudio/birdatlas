@@ -24,7 +24,7 @@ const DIL = { tr: 'TR', en: 'EN', es: 'ES', pt: 'PT', de: 'DE', fr: 'FR' };
 const art = L => `<article data-l="${L}" lang="${L}">
 <div class="bas"><div class="mv" data-mavis="wave" role="img" aria-label="Maviş"></div><h1>${esc(H.title[L])}</h1></div>
 ${H.p.map(p => `<p>${esc(p[L])}</p>`).join('\n')}
-<p class="imza">${esc(H.imza)}</p>
+<p class="imza">${esc(H.imza)}<span class="yer">${esc(H.yer[L])}</span></p>
 <p class="geri"><a href="/${L}/">← ${esc(H.geri[L])}</a> · <a href="/app/?lang=${L}">${esc(H.ac[L])}</a></p>
 </article>`;
 const sayfa = `<!doctype html>
@@ -55,7 +55,8 @@ header img { width: 36px; height: 36px; border-radius: 50%; background: #fff; }
 .mv { flex: 0 0 92px; height: 92px; }
 h1 { color: #10325C; font-size: clamp(26px, 5vw, 38px); line-height: 1.2; margin: 0; }
 p { margin: 0 0 16px; }
-.imza { font-weight: 700; color: #10325C; margin-top: 24px; }
+.imza { font-weight: 700; color: #10325C; margin-top: 28px; line-height: 1.5; }
+.imza .yer { display: block; font-weight: 400; color: #42536A; font-size: 15px; }
 .geri { margin-top: 36px; font-size: 15px; }
 a { color: #1F5FB0; }
 article { display: none; }

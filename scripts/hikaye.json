@@ -66,7 +66,7 @@
       "fr": "C'est ainsi qu'est né Bird Atlas : d'abord pour moi, puis pour tous ceux qui aiment revenir sur leurs observations. J'espère qu'avec Maviş, tu parcourras ta propre carte et revivras à chaque point un oiseau, une journée, un souvenir. Bonnes observations !"
     }
   ],
-  "imza": "— Enes · EG Apps Studio",
+  "imza": "Enes · EG Apps Studio",
   "menu": {
     "tr": "Kuş Atlası'nın öyküsü",
     "en": "The story of Bird Atlas",
@@ -90,5 +90,13 @@
     "pt": "Abrir o app",
     "de": "App öffnen",
     "fr": "Ouvrir l'app"
+  },
+  "yer": {
+    "tr": "İstanbul, 2026",
+    "en": "Istanbul, 2026",
+    "es": "Estambul, 2026",
+    "pt": "Istambul, 2026",
+    "de": "Istanbul, 2026",
+    "fr": "Istanbul, 2026"
   }
 }
