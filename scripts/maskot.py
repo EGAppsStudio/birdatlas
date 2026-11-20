@@ -16,12 +16,13 @@ def temizle(ad, kaynak):
     bg = np.median(kenar, axis=0)
     d = np.sqrt(((a - bg) ** 2).sum(-1))
     al = np.clip((d - 60) / 80, 0, 1)                      # zemine yakın → şeffaf (zemin gürültüsü < 55)
+    al[:6] = al[-6:] = 0; al[:, :6] = al[:, -6:] = 0       # kenardaki sıkıştırma çerçevesi (jpg) parça sayılmasın
     # yarı saydam kenarlarda magenta sızıntısını çıkar
     m = al[..., None]
     rgb = np.where(m > 0.02, (a - (1 - m) * bg) / np.maximum(m, 0.02), 0)
     rgb = np.clip(rgb, 0, 255)
     img = Image.fromarray(np.dstack([rgb, al * 255]).astype(np.uint8), 'RGBA')
-    img = img.crop(img.getbbox())
+    img = img.crop(Image.fromarray(((al > .25) * 255).astype(np.uint8)).getbbox())
     img.save(os.path.join(OUT, ad + '.png'))
     print(ad, img.size, 'zemin', bg.astype(int))
 

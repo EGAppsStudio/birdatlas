@@ -1,0 +1,116 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maviş animasyonları</title>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#EAF1FA;color:#0A3E70;display:flex;flex-direction:column;align-items:center;padding:16px;box-sizing:border-box;min-height:100vh}
+h1{font-size:18px;margin:4px 0 2px}.alt{font-size:12.5px;color:#4A5B70;margin-bottom:8px;text-align:center}
+.sahne{width:min(80vw,340px);aspect-ratio:1180/1290;background:#fff;border-radius:22px;box-shadow:0 8px 24px rgba(10,62,112,.12);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sahne svg{width:88%;height:auto;overflow:visible}
+.ad{font-weight:700;margin:12px 0 6px;min-height:22px}
+.grup{font-size:12px;color:#4A5B70;margin:10px 0 4px;text-transform:uppercase;letter-spacing:.06em}
+.btns{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:440px}
+button{border:1.5px solid #1662B6;background:#fff;color:#1662B6;border-radius:20px;padding:8px 13px;font:inherit;font-weight:600;font-size:14px;cursor:pointer}
+button.yeni{border-color:#E08A00;color:#B86E00}button.on{background:#1662B6;color:#fff}button.yeni.on{background:#E08A00;color:#fff}
+.hepsi{margin-top:12px;background:#0A3E70;color:#fff;border-color:#0A3E70}
+/* --- Maviş --- */
+.mavis g{transform-box:fill-box}
+.mv-all{transform-origin:50% 100%;animation:mv-bob 3s ease-in-out infinite}
+.mv-eyes{animation:mv-blink-o 4s infinite}.mv-eyes-c{opacity:0;animation:mv-blink-c 4s infinite}
+.mv-beak,.mv-e-mutlu,.mv-e-saskin,.mv-e-uyku,.mv-flyL,.mv-flyR,.mv-crest,.mv-deco>*,.mv-notes text,.mv-z text{opacity:0}
+.mv-tail{transform-origin:50% 0%}
+/* mevcut */
+.a-wave .mv-wing-r{transform-origin:25% 10%;animation:mv-wave 1.1s ease-in-out 3}
+.a-wave .mv-all{animation:mv-hop .6s ease-out 1,mv-bob 3s ease-in-out .6s infinite}
+.a-hop .mv-all{animation:mv-hop .6s ease-out 2}
+.a-peek .mv-binoc{transform-origin:50% 50%;animation:mv-peek 2.4s ease-in-out infinite}
+.a-peek .mv-wing-l{transform-origin:75% 10%;animation:mv-hold-l 2.4s ease-in-out infinite}
+.a-peek .mv-wing-r{transform-origin:25% 10%;animation:mv-hold-r 2.4s ease-in-out infinite}
+.a-peek .mv-strap{animation:mv-strap 2.4s ease-in-out infinite}
+.a-look .mv-pupil{animation:mv-pupil 3.6s ease-in-out infinite}
+/* YENİ: konuşma */
+.a-talk .mv-beak{animation:mv-talk .5s steps(1) infinite}
+/* YENİ: ötme */
+.a-sing .mv-beak{opacity:1}.a-sing .mv-eyes,.a-sing .mv-eyes-c{opacity:0;animation:none}.a-sing .mv-e-mutlu{opacity:1}
+.a-sing .mv-all{transform-origin:50% 100%;animation:mv-sway 1.2s ease-in-out infinite}
+.a-sing .mv-notes{opacity:1}.a-sing .mv-notes text{animation:mv-note 1.8s ease-out infinite}.a-sing .n2{animation-delay:.6s!important}.a-sing .n3{animation-delay:1.2s!important}
+/* YENİ: mutlu */
+.a-happy .mv-eyes,.a-happy .mv-eyes-c{opacity:0;animation:none}.a-happy .mv-e-mutlu{opacity:1}
+.a-happy .mv-all{animation:mv-hop .55s ease-out infinite}
+.a-happy .mv-tail{animation:mv-wag .28s ease-in-out infinite}
+.a-happy .mv-crest{opacity:1;transform-origin:50% 100%;animation:mv-crest .55s ease-out infinite}
+.a-happy .mv-wing-l{transform-origin:75% 10%;animation:mv-flapL .55s ease-in-out infinite}.a-happy .mv-wing-r{transform-origin:25% 10%;animation:mv-flapR .55s ease-in-out infinite}
+/* YENİ: şaşkın */
+.a-wow .mv-eyes,.a-wow .mv-eyes-c{opacity:0;animation:none}.a-wow .mv-e-saskin{opacity:1;transform-origin:50% 50%;animation:mv-pop .35s ease-out 1}
+.a-wow .mv-beak{opacity:1}.a-wow .mv-crest{opacity:1;transform-origin:50% 100%;animation:mv-crestup .3s ease-out forwards}
+.a-wow .mv-all{animation:mv-jolt .4s ease-out 1}
+.a-wow .mv-unlem{opacity:1;transform-box:fill-box;transform-origin:50% 100%;animation:mv-pop .35s ease-out 1}
+/* YENİ: uykulu */
+.a-sleep .mv-eyes{opacity:0;animation:none}.a-sleep .mv-e-uyku{animation:mv-uyku 4s ease-in-out infinite}.a-sleep .mv-eyes-c{animation:mv-uykuc 4s ease-in-out infinite}
+.a-sleep .mv-all{transform-origin:50% 100%;animation:mv-breath 4s ease-in-out infinite}
+.a-sleep .mv-z{opacity:1}.a-sleep .mv-z text{animation:mv-zz 3s ease-out infinite}.a-sleep .z2{animation-delay:1s!important}.a-sleep .z3{animation-delay:2s!important}
+/* YENİ: uçma */
+.a-fly .mv-wing-l,.a-fly .mv-wing-r{opacity:0}
+.a-fly .mv-flyL{opacity:1;transform-origin:90% 85%;animation:mv-flyL .32s ease-in-out infinite}
+.a-fly .mv-flyR{opacity:1;transform-origin:10% 85%;animation:mv-flyR .32s ease-in-out infinite}
+.a-fly .mv-all{animation:mv-hover 1.6s ease-in-out infinite}
+.a-fly .mv-golge{animation:mv-shadow 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+/* YENİ: kuyruk sallama */
+.a-wag .mv-tail{animation:mv-wag .3s ease-in-out infinite}.a-wag .mv-all{animation:mv-wiggle .6s ease-in-out infinite}
+/* YENİ: sevgi */
+.a-love .mv-eyes,.a-love .mv-eyes-c{opacity:0;animation:none}.a-love .mv-e-mutlu{opacity:1}
+.a-love .mv-kalp{opacity:1;transform-box:fill-box;transform-origin:50% 50%;animation:mv-heart 1.4s ease-in-out infinite}
+.a-love .mv-wing-l{transform-origin:75% 10%;animation:mv-hug-l 1.4s ease-in-out infinite}.a-love .mv-wing-r{transform-origin:25% 10%;animation:mv-hug-r 1.4s ease-in-out infinite}
+.a-love .mv-tail{animation:mv-wag .4s ease-in-out infinite}
+/* kareler */
+@keyframes mv-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@keyframes mv-hop{0%{transform:translateY(0) scale(1,1)}30%{transform:translateY(0) scale(1.06,.92)}60%{transform:translateY(-80px) scale(.96,1.05)}100%{transform:translateY(0) scale(1,1)}}
+@keyframes mv-blink-o{0%,92%,98%,100%{opacity:1}93%,97%{opacity:0}}
+@keyframes mv-blink-c{0%,92%,98%,100%{opacity:0}93%,97%{opacity:1}}
+@keyframes mv-wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-115deg)}}
+@keyframes mv-peek{0%,100%{transform:translate(0,0) scale(1)}30%,75%{transform:translate(0,-430px) scale(1.65)}}
+@keyframes mv-hold-l{0%,100%{transform:rotate(0)}30%,75%{transform:translate(110px,-250px) rotate(-25deg)}}
+@keyframes mv-hold-r{0%,100%{transform:rotate(0)}30%,75%{transform:translate(-110px,-250px) rotate(25deg)}}
+@keyframes mv-strap{0%,100%{opacity:1}20%,85%{opacity:0}}
+@keyframes mv-pupil{0%,100%{transform:translateX(0)}15%,40%{transform:translateX(-28px)}60%,85%{transform:translateX(28px)}}
+@keyframes mv-talk{0%{opacity:1}50%{opacity:0}}
+@keyframes mv-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes mv-note{0%{opacity:0;transform:translate(0,0)}20%{opacity:1}100%{opacity:0;transform:translate(60px,-160px)}}
+@keyframes mv-wag{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+@keyframes mv-crest{0%,100%{transform:scaleY(1)}60%{transform:translateY(-14px) scaleY(1.06)}}
+@keyframes mv-crestup{to{transform:translateY(-26px) scaleY(1.08)}}
+@keyframes mv-flapL{0%,100%{transform:rotate(0)}50%{transform:rotate(28deg)}}
+@keyframes mv-flapR{0%,100%{transform:rotate(0)}50%{transform:rotate(-28deg)}}
+@keyframes mv-pop{0%{transform:scale(.4)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes mv-jolt{0%{transform:translateY(0)}35%{transform:translateY(-40px)}100%{transform:translateY(0)}}
+@keyframes mv-uyku{0%,55%,100%{opacity:1}65%,90%{opacity:0}}
+@keyframes mv-uykuc{0%,55%,100%{opacity:0}65%,90%{opacity:1}}
+@keyframes mv-breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
+@keyframes mv-zz{0%{opacity:0;transform:translate(0,0)}25%{opacity:1}100%{opacity:0;transform:translate(50px,-110px)}}
+@keyframes mv-flyL{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-22deg)}}
+@keyframes mv-flyR{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(22deg)}}
+@keyframes mv-hover{0%,100%{transform:translateY(-120px)}50%{transform:translateY(-170px)}}
+@keyframes mv-shadow{0%,100%{transform:scale(.7);opacity:.06}50%{transform:scale(.6);opacity:.04}}
+@keyframes mv-wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes mv-heart{0%,100%{transform:scale(.85)}50%{transform:scale(1.1) translateY(-20px)}}
+@keyframes mv-hug-l{0%,100%{transform:rotate(0)}50%{transform:rotate(-30deg) translateX(30px)}}
+@keyframes mv-hug-r{0%,100%{transform:rotate(0)}50%{transform:rotate(30deg) translateX(-30px)}}
+@media (prefers-reduced-motion:reduce){.mavis *{animation:none!important}}
+</style></head><body>
+<h1>Maviş · animasyon denemesi</h1>
+<div class="alt">Mavi düğmeler bugünküler, <b style="color:#B86E00">turuncular yeni parçalarla</b></div>
+<div class="sahne">%SVG%</div>
+<div class="ad" id="ad">Bekleme</div>
+<div class="grup">Şu an uygulamada</div>
+<div class="btns" id="b1"></div>
+<div class="grup">Yeni</div>
+<div class="btns" id="b2"></div>
+<button class="hepsi" id="hepsi">▶ Hepsini sırayla oynat</button>
+<script>
+const A=[['idle','Bekleme',0],['wave','El sallama',0],['hop','Zıplama',0],['peek','Dürbünle bakma',0],['look','Etrafa bakma',0],
+['talk','Konuşma',1],['sing','Ötme',1],['happy','Sevinç',1],['wow','Şaşırma',1],['sleep','Uyuklama',1],['fly','Uçma',1],['wag','Kuyruk sallama',1],['love','Sevgi',1]];
+const mv=document.getElementById('mv');let t;
+function oyna(k,ad){mv.setAttribute('class','mavis');void mv.getBoundingClientRect();if(k!=='idle')mv.classList.add('a-'+k);document.getElementById('ad').textContent=ad;
+document.querySelectorAll('button[data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k===k));}
+A.forEach(([k,ad,y])=>{const b=document.createElement('button');b.textContent=ad;b.dataset.k=k;if(y)b.className='yeni';b.onclick=()=>{clearTimeout(t);oyna(k,ad)};document.getElementById(y?'b2':'b1').appendChild(b);});
+document.getElementById('hepsi').onclick=()=>{let i=0;clearTimeout(t);(function s(){const [k,ad]=A[i%A.length];oyna(k,ad);i++;if(i<=A.length)t=setTimeout(s,i===1?1500:3600);else oyna('idle','Bekleme');})();};
+oyna('idle','Bekleme');
+</script></body></html>
