@@ -47,7 +47,7 @@ writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
   const h = readFileSync(join(www, 'index.html'), 'utf8');
   const css = h.slice(h.indexOf('/* ===== Maviş animasyonları ===== */'), h.indexOf('.mavis-intro {'));
   const js = h.slice(h.indexOf('        const MAVIS_P ='), h.indexOf('        // ===== /Maviş =====')).replace(/#chat-window svg\.mavis/g, '#mv-site svg.mavis');
-  writeFileSync(join(dist, 'mavis.js'), `(function(){\nconst st=document.createElement('style');st.textContent=${JSON.stringify(css)};document.head.appendChild(st);\n${js}\nconst el=document.getElementById('mv-site');if(el)el.innerHTML=mavisSVG(104,'look',k=>'/app/img/mavis/'+k+'.webp');\n})();\n`);
+  writeFileSync(join(dist, 'mavis.js'), `(function(){\nconst st=document.createElement('style');st.textContent=${JSON.stringify(css)};document.head.appendChild(st);\n${js}\nconst src=k=>'/app/img/mavis/'+k+'.webp',el=document.getElementById('mv-site');if(el)el.innerHTML=mavisSVG(104,'look',src);document.querySelectorAll('[data-mavis]').forEach(m=>{m.innerHTML=mavisSVG(96,m.dataset.mavis,src);});\n})();\n`);
 }
 
 // ---------- Tanıtım sayfasının dil sayfaları: /tr/ /en/ /es/ /pt/ /de/ /fr/ ----------

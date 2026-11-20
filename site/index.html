@@ -111,6 +111,15 @@ html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display
 .pair .phone:first-child { transform: rotate(-4deg) translateX(14px); z-index: 1; }
 .pair .phone:last-child { transform: rotate(4deg) translate(-14px, 40px); }
 
+/* ---------- hikâye (geliştirici) ---------- */
+.hikaye { padding: 80px 0; }
+.hikaye .wrap { max-width: 760px; }
+.hk-bas { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.mv-hk { flex: 0 0 96px; height: 96px; }
+.hikaye h2 { font-size: clamp(26px, 3vw, 36px); }
+.hikaye p { margin: 0 0 14px; font-size: 17px; line-height: 1.65; }
+.hikaye .hk-imza { font-weight: 700; color: var(--navy); }
+
 /* ---------- tanıtım videosu (npm run web: magaza/video/birdatlas-<dil>-yatay.mp4 → /video/tanitim-<dil>.mp4) ---------- */
 .tanitim { padding: 72px 0 8px; text-align: center; }
 .tanitim h2 { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -.8px; }
@@ -315,6 +324,20 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
         <li><h3><span data-l="tr">Kuş Atlası'nda seç</span><span data-l="en">Choose it in Bird Atlas</span></h3><p><span data-l="tr">Uygulamada "eBird ZIP veya CSV Dosyasını Seç"e bas. Haritan hazır.</span><span data-l="en">Tap "Choose eBird ZIP or CSV File" in the app. Your map is ready.</span></p></li>
       </ol>
       <p class="alt"><span data-l="tr">Web sürümünü iPhone'da ya da bilgisayarda da kullanabilirsin. Telefonda tarayıcının menüsünden "Ana ekrana ekle" dersen uygulama gibi açılır.</span><span data-l="en">The web version works on iPhone and computers too. On a phone, choose "Add to Home Screen" in your browser menu and it opens like an app.</span></p>
+    </div>
+  </section>
+
+  <section class="hikaye">
+    <div class="wrap">
+      <div class="hk-bas"><div class="mv-hk" data-mavis="wave" role="img" aria-label="Maviş"></div>
+      <h2><span data-l="tr">Bu uygulamanın hikâyesi</span><span data-l="en">The story behind Bird Atlas</span></h2></div>
+      <p><span data-l="tr">Merhaba, ben Enes. Otuzlarında birden kuşlara merak saran o insanlardan biriyim.</span><span data-l="en">Hi, I'm Enes, one of those people who suddenly fell for birds in their thirties.</span></p>
+      <p><span data-l="tr">Her şey Merlin'le başladı. Şehirde, her gün önünden geçtiğim ağaçlardan gelen seslerin ne olduğunu merak edip telefonu tuttum. Ekranda isimler belirdikçe şaşırdım: Bunca zamandır etrafımda bu kadar kuş mu vardı? Gerçekten böyle mi görünüyorlar, bu kadar güzeller mi? Sonra bir dürbün aldım; artık kulağım Merlin'de, gözüm dürbündeydi. Birçok kuşçunun hatırladığı o ilk "farkına varma" anı.</span><span data-l="en">It all started with Merlin. I held up my phone to the songs coming from the trees I walked past every day in the city, and as the names appeared on the screen, I was stunned. Had all these birds been around me all along? Do they really look like that, this beautiful? Then I bought binoculars: Merlin for my ears, binoculars for my eyes. That first moment of noticing, the one so many birders remember.</span></p>
+      <p><span data-l="tr">Beni en çok etkileyen, rengiyle ve tavrıyla küçük bir mavi baştankara oldu. Maviş de oradan geliyor.</span><span data-l="en">The one that won me over was a little Eurasian blue tit, with its colours and its attitude. That's where Maviş comes from.</span></p>
+      <p><span data-l="tr">Sonra göçü öğrendim. İstanbul Boğazı her bahar ve sonbahar binlerce kuşun geçtiği bir darboğaz. Sarıyer'deki kuş gözlem kulesinden leyleklerin, yırtıcıların sürü sürü süzüldüğünü izledim; minicik ötücülerin bile ağaçtan ağaca, küçük küçük yer değiştirerek kıtalar aştığını öğrendim.</span><span data-l="en">Then I learned about migration. The Bosphorus in Istanbul is a bottleneck that thousands of birds pass through every spring and autumn. From the bird watching tower in Sarıyer I watched storks and raptors glide over in flocks, and learned that even tiny songbirds cross continents, hopping from tree to tree.</span></p>
+      <p><span data-l="tr">Gözlemlerimi eBird'e kaydetmeye başladım. Ama kendi yolculuğuma dönüp bakmak istediğimde haritalar ve listeler bana yetmedi. Hangi kuşu nerede, ne zaman gördüğümü bir bakışta görmek istiyordum. Excel tablolarıyla uğraşmak yerine kendime bir harita yaptım.</span><span data-l="en">I started logging my sightings in eBird. But when I wanted to look back at my own journey, the maps and lists weren't enough. I wanted to see at a glance which bird I saw where and when. Instead of wrestling with spreadsheets, I built myself a map.</span></p>
+      <p><span data-l="tr">Kuş Atlası böyle doğdu: önce kendim için, sonra benim gibi gözlemlerine yeniden bakmaktan keyif alan herkes için. Verilerin yalnız senin telefonunda kalır. Bir fikrin ya da önerin olursa her zaman yazabilirsin.</span><span data-l="en">That's how Bird Atlas began: first for me, then for everyone who loves looking back at their sightings. Your data stays on your phone. If you have an idea or suggestion, I'd love to hear it.</span></p>
+      <p class="hk-imza">— Enes · EG Apps Studio</p>
     </div>
   </section>
 
