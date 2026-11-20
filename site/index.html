@@ -114,6 +114,14 @@ html[data-lang="tr"] [data-l="en"], html[data-lang="en"] [data-l="tr"] { display
 
 /* ---------- tanıtım videosu (npm run web: magaza/video/birdatlas-<dil>-yatay.mp4 → /video/tanitim-<dil>.mp4) ---------- */
 .tanitim { padding: 72px 0 8px; text-align: center; }
+.gelistirici { display: inline-flex; align-items: center; gap: 14px; margin: 34px auto 0; padding: 12px 22px 12px 12px; border-radius: 20px; background: #FED008; color: var(--navy); text-decoration: none; text-align: left; box-shadow: 0 10px 26px rgba(254,208,8,.45), 0 2px 6px rgba(10,62,112,.12); transition: transform .2s, box-shadow .2s; }
+.gelistirici:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(254,208,8,.55), 0 4px 10px rgba(10,62,112,.15); }
+.gl-mv { flex: 0 0 64px; width: 64px; height: 64px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.gl-mv svg { width: 54px; height: 54px; }
+.gl-yazi { display: flex; flex-direction: column; line-height: 1.25; }
+.gl-yazi b { font-size: 18px; } .gl-yazi small { font-size: 14px; opacity: .8; font-weight: 600; }
+.gl-ok { font-size: 24px; font-weight: 700; margin-left: 6px; transition: transform .2s; }
+.gelistirici:hover .gl-ok { transform: translateX(4px); }
 .tanitim h2 { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -.8px; }
 .vid { max-width: 960px; margin: 28px auto 0; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: #E3ECF8; box-shadow: 0 30px 60px rgba(16,50,92,.22); }
 .vid video { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -304,6 +312,11 @@ footer .fine { flex-basis: 100%; color: #6A7A90; font-size: 13px; }
     <div class="wrap">
       <h2><span data-l="tr">Uygulamayı 40 saniyede gör</span><span data-l="en">See the app in 40 seconds</span></h2>
       <div class="vid"><video data-vid controls preload="none" playsinline poster="/img/video/poster-tr.jpg" src="/video/tanitim-tr.mp4"></video></div>
+      <a class="gelistirici" href="/hikaye/">
+        <span class="gl-mv" data-mavis="wave" aria-hidden="true"></span>
+        <span class="gl-yazi"><b><span data-l="tr">Geliştiriciyi tanıyın</span><span data-l="en">Meet the developer</span></b><small><span data-l="tr">Kuş Atlası'nın öyküsü</span><span data-l="en">The story of Bird Atlas</span></small></span>
+        <span class="gl-ok" aria-hidden="true">→</span>
+      </a>
     </div>
   </section>
 

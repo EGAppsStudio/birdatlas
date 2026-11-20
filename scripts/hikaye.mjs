@@ -93,6 +93,6 @@ writeFileSync(join(KOK, 'site', 'hikaye', 'index.html'), sayfa);
 // ---------- ana sayfadaki alt bağlantı (ES/PT/DE/FR karşılıkları) ----------
 const dp = join(KOK, 'scripts', 'site-diller.json');
 const D = JSON.parse(readFileSync(dp, 'utf8'));
-for (const L of ['es', 'pt', 'de', 'fr']) if (D[L]) D[L][H.link.en] = H.link[L];
+for (const L of ['es', 'pt', 'de', 'fr']) if (D[L]) { D[L][H.link.en] = H.link[L]; D[L][H.title.en] = H.title[L]; }   // alt bağlantı + video altındaki düğme
 writeFileSync(dp, JSON.stringify(D, null, 2) + '\n');
 console.log('Öykü yazıldı: uygulama menüsü + site/hikaye/ (6 dil).');
