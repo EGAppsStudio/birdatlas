@@ -2,7 +2,7 @@
 // Harita, Wikipedia, eBird ve Gemini istekleri (başka adresler) burada saklanmaz.
 const CACHE = 'kus-atlasi-__VERSION__';
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', 'index.html', 'manifest.webmanifest', 'img/logo.png', ...['govde', 'kanatL', 'kanatR', 'gozL', 'gozR', 'kapaliL', 'kapaliR', 'durbun'].map(k => 'img/mavis/' + k + '.webp')])).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', 'index.html', 'manifest.webmanifest', 'img/logo.png', ...['govde', 'kanatL', 'kanatR', 'gozL', 'gozR', 'kapaliL', 'kapaliR', 'durbun', 'gaga', 'mutluL', 'mutluR', 'saskinL', 'saskinR', 'uykuL', 'uykuR', 'acikL', 'acikR', 'tepe'].map(k => 'img/mavis/' + k + '.webp')])).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));

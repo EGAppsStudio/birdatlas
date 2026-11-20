@@ -60,7 +60,7 @@
         .guide-body li { margin-bottom: 4px; }
         /* ===== Maviş animasyonları ===== */
         .mavis { display: inline-block; vertical-align: middle; overflow: visible; }
-        .mavis .mv-all, .mavis .mv-wing-l, .mavis .mv-wing-r, .mavis .mv-binoc, .mavis .mv-pupil { transform-box: fill-box; }
+        .mavis g, .mavis .mv-deco > * { transform-box: fill-box; }
         .mavis .mv-all { transform-origin: 50% 100%; animation: mv-bob 3s ease-in-out infinite; }
         .mavis .mv-eyes { animation: mv-blink-o 4s infinite; }
         .mavis .mv-eyes-c { opacity: 0; animation: mv-blink-c 4s infinite; }
@@ -92,6 +92,61 @@
         .mavis.mv-r-wave .mv-wing-r { transform-origin: 25% 10%; animation: mv-wave 0.55s ease-in-out 2; }
         @keyframes mv-qblink-o { 0%,100% { opacity: 1; } 25%,75% { opacity: 0; } }
         @keyframes mv-qblink-c { 0%,100% { opacity: 0; } 25%,75% { opacity: 1; } }
+        /* 20 Kasım: yeni hareketler (konuşma, ötme, sevinç, şaşırma, uyuklama, uçma, sevgi) – modlar .mavis-<ad>, dokunma tepkileri .mv-r-<ad> */
+        .mavis .mv-beak, .mavis .mv-e-mutlu, .mavis .mv-e-saskin, .mavis .mv-e-uyku, .mavis .mv-flyL, .mavis .mv-flyR, .mavis .mv-crest, .mavis .mv-deco > *, .mavis .mv-notes text, .mavis .mv-z text { opacity: 0; }
+        .mavis-talk .mv-beak { animation: mv-talk .5s steps(1) infinite; }
+        .mavis-sing .mv-beak, .mv-r-sing .mv-beak { opacity: 1; }
+        .mavis-sing .mv-eyes, .mavis-sing .mv-eyes-c, .mv-r-sing .mv-eyes, .mv-r-sing .mv-eyes-c,
+        .mavis-happy .mv-eyes, .mavis-happy .mv-eyes-c, .mv-r-happy .mv-eyes, .mv-r-happy .mv-eyes-c,
+        .mavis-love .mv-eyes, .mavis-love .mv-eyes-c, .mv-r-love .mv-eyes, .mv-r-love .mv-eyes-c,
+        .mavis-wow .mv-eyes, .mavis-wow .mv-eyes-c, .mv-r-wow .mv-eyes, .mv-r-wow .mv-eyes-c { opacity: 0; animation: none; }
+        .mavis-sing .mv-e-mutlu, .mv-r-sing .mv-e-mutlu, .mavis-happy .mv-e-mutlu, .mv-r-happy .mv-e-mutlu, .mavis-love .mv-e-mutlu, .mv-r-love .mv-e-mutlu { opacity: 1; }
+        .mavis-sing .mv-all, .mv-r-sing .mv-all { animation: mv-sway 1.2s ease-in-out infinite; }
+        .mavis-sing .mv-notes, .mv-r-sing .mv-notes { opacity: 1; }
+        .mavis-sing .mv-notes text, .mv-r-sing .mv-notes text { animation: mv-note 1.8s ease-out infinite; }
+        .mavis .mv-notes .n2 { animation-delay: .6s; } .mavis .mv-notes .n3 { animation-delay: 1.2s; }
+        .mavis-happy .mv-all { animation: mv-hop .55s ease-out 3, mv-bob 3s ease-in-out 1.65s infinite; }
+        .mv-r-happy .mv-all { animation: mv-hop .55s ease-out 3; }
+        .mavis-happy .mv-crest, .mv-r-happy .mv-crest { opacity: 1; transform-origin: 50% 100%; animation: mv-crest .55s ease-out 3; }
+        .mavis-happy .mv-wing-l, .mv-r-happy .mv-wing-l { transform-origin: 75% 10%; animation: mv-flapL .55s ease-in-out 3; }
+        .mavis-happy .mv-wing-r, .mv-r-happy .mv-wing-r { transform-origin: 25% 10%; animation: mv-flapR .55s ease-in-out 3; }
+        .mavis-wow .mv-e-saskin, .mv-r-wow .mv-e-saskin { opacity: 1; transform-origin: 50% 50%; animation: mv-pop .35s ease-out 1; }
+        .mavis-wow .mv-crest, .mv-r-wow .mv-crest { opacity: 1; transform-origin: 50% 100%; animation: mv-crestup .3s ease-out forwards; }
+        .mv-r-wow .mv-beak { opacity: 1; }
+        .mavis-wow .mv-all, .mv-r-wow .mv-all { animation: mv-jolt .4s ease-out 1, mv-bob 3s ease-in-out .4s infinite; }
+        .mavis-wow .mv-unlem, .mv-r-wow .mv-unlem { transform-origin: 50% 100%; animation: mv-unlem 1.8s ease-out 1; }
+        .mavis-sleep .mv-eyes { opacity: 0; animation: none; }
+        .mavis-sleep .mv-e-uyku { animation: mv-uyku 4s ease-in-out infinite; } .mavis-sleep .mv-eyes-c { animation: mv-uykuc 4s ease-in-out infinite; }
+        .mavis-sleep .mv-all { animation: mv-breath 4s ease-in-out infinite; }
+        .mavis-sleep .mv-z { opacity: 1; } .mavis-sleep .mv-z text { animation: mv-zz 3s ease-out infinite; }
+        .mavis .mv-z .z2 { animation-delay: 1s; } .mavis .mv-z .z3 { animation-delay: 2s; }
+        .mavis-fly .mv-wing-l, .mavis-fly .mv-wing-r, .mv-r-fly .mv-wing-l, .mv-r-fly .mv-wing-r { opacity: 0; }
+        .mavis-fly .mv-flyL, .mv-r-fly .mv-flyL { opacity: 1; transform-origin: 92% 88%; animation: mv-flyL .32s ease-in-out infinite; }
+        .mavis-fly .mv-flyR, .mv-r-fly .mv-flyR { opacity: 1; transform-origin: 8% 88%; animation: mv-flyR .32s ease-in-out infinite; }
+        .mavis-fly .mv-all, .mv-r-fly .mv-all { animation: mv-hover 1.6s ease-in-out infinite; }
+        .mavis-love .mv-kalp, .mv-r-love .mv-kalp { opacity: 1; transform-origin: 50% 50%; animation: mv-heart 1.4s ease-in-out infinite; }
+        .mavis-love .mv-wing-l, .mv-r-love .mv-wing-l { transform-origin: 75% 10%; animation: mv-hug-l 1.4s ease-in-out 2; }
+        .mavis-love .mv-wing-r, .mv-r-love .mv-wing-r { transform-origin: 25% 10%; animation: mv-hug-r 1.4s ease-in-out 2; }
+        @keyframes mv-talk { 0% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes mv-sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+        @keyframes mv-note { 0% { opacity: 0; transform: translate(0,0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(60px,-160px); } }
+        @keyframes mv-crest { 0%,100% { transform: scaleY(1); } 60% { transform: translateY(-14px) scaleY(1.06); } }
+        @keyframes mv-crestup { to { transform: translateY(-26px) scaleY(1.08); } }
+        @keyframes mv-flapL { 0%,100% { transform: rotate(0); } 50% { transform: rotate(28deg); } }
+        @keyframes mv-flapR { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-28deg); } }
+        @keyframes mv-pop { 0% { transform: scale(.4); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes mv-jolt { 0% { transform: translateY(0); } 35% { transform: translateY(-40px); } 100% { transform: translateY(0); } }
+        @keyframes mv-unlem { 0% { opacity: 0; transform: scale(.4); } 15% { opacity: 1; transform: scale(1.15); } 25%,75% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+        @keyframes mv-uyku { 0%,55%,100% { opacity: 1; } 65%,90% { opacity: 0; } }
+        @keyframes mv-uykuc { 0%,55%,100% { opacity: 0; } 65%,90% { opacity: 1; } }
+        @keyframes mv-breath { 0%,100% { transform: scale(1,1); } 50% { transform: scale(1.03,.97); } }
+        @keyframes mv-zz { 0% { opacity: 0; transform: translate(0,0); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(50px,-110px); } }
+        @keyframes mv-flyL { 0%,100% { transform: rotate(18deg); } 50% { transform: rotate(-22deg); } }
+        @keyframes mv-flyR { 0%,100% { transform: rotate(-18deg); } 50% { transform: rotate(22deg); } }
+        @keyframes mv-hover { 0%,100% { transform: translateY(-40px); } 50% { transform: translateY(-85px); } }
+        @keyframes mv-heart { 0%,100% { transform: scale(.85); } 50% { transform: scale(1.1) translateY(-20px); } }
+        @keyframes mv-hug-l { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-30deg) translateX(30px); } }
+        @keyframes mv-hug-r { 0%,100% { transform: rotate(0); } 50% { transform: rotate(30deg) translateX(-30px); } }
         .mv-gem { color: #1662B6; font-weight: 600; text-decoration: underline; cursor: pointer; }
         #ai-settings.vurgu { animation: ai-vurgu 1.6s ease-out 1; border-radius: 8px; }
         @keyframes ai-vurgu { 0%,40% { box-shadow: 0 0 0 3px #F5C518; } 100% { box-shadow: 0 0 0 3px rgba(245,197,24,0); } }
@@ -1273,7 +1328,7 @@
         // Çizim: Copilot parçaları (magaza/maskot → scripts/maskot.py + maskot-birlestir.py → img/mavis/*.webp).
         // Parçalar ayrı (animasyon için): mv-all, mv-wing-l, mv-wing-r, mv-eyes (açık), mv-eyes-c (kapalı), mv-pupil, mv-binoc, mv-strap
         // mode: 'idle' (göz kırpar), 'wave' (el sallar), 'think' (dürbünü gözüne kaldırır), 'look' (sağa sola bakar)
-        const MAVIS_P = {"govde":[253,37,745,1163],"kanatL":[168,713,215,345],"kanatR":[868,713,215,345],"gozL":[390,371,150,154],"gozR":[710,371,150,155],"kapaliL":[382,416,165,77],"kapaliR":[702,417,165,77],"durbun":[432,759,390,242]};
+        const MAVIS_P = {"govde":[253,38,745,1162],"kanatL":[168,713,215,344],"kanatR":[868,713,215,344],"gozL":[390,371,150,154],"gozR":[710,371,150,155],"kapaliL":[382,416,165,77],"kapaliR":[702,416,165,77],"durbun":[432,759,390,241],"gaga":[566,447,112,109],"mutluL":[390,410,150,84],"mutluR":[710,410,150,84],"saskinL":[376,357,178,177],"saskinR":[696,357,178,177],"uykuL":[381,364,168,148],"uykuR":[701,364,168,147],"acikL":[90,490,320,382],"acikR":[844,490,320,382],"tepe":[279,10,690,345]};
         function mavisSVG(size, mode, src) {
             mode = mode || 'idle';
             const im = k => { const [x, y, w, h] = MAVIS_P[k]; return `<image href="${src ? src(k) : 'img/mavis/' + k + '.webp'}" x="${x}" y="${y}" width="${w}" height="${h}"/>`; };
@@ -1281,17 +1336,29 @@
               <g class="mv-all">
                 <ellipse cx="627" cy="1196" rx="300" ry="20" fill="#0A3E70" opacity="0.1"/>
                 ${im('govde')}
+                <g class="mv-crest">${im('tepe')}</g>
                 <path class="mv-strap" d="M432,688 C455,720 485,752 512,780 M822,688 C799,720 769,752 742,780" stroke="#7A4A22" stroke-width="12" fill="none" stroke-linecap="round"/>
                 <g class="mv-wing-l">${im('kanatL')}</g>
                 <g class="mv-wing-r">${im('kanatR')}</g>
+                <g class="mv-flyL">${im('acikL')}</g><g class="mv-flyR">${im('acikR')}</g>
+                <g class="mv-beak">${im('gaga')}</g>
                 <g class="mv-eyes"><g class="mv-pupil">${im('gozL')}${im('gozR')}</g></g>
                 <g class="mv-eyes-c">${im('kapaliL')}${im('kapaliR')}</g>
+                <g class="mv-e-mutlu">${im('mutluL')}${im('mutluR')}</g>
+                <g class="mv-e-saskin">${im('saskinL')}${im('saskinR')}</g>
+                <g class="mv-e-uyku">${im('uykuL')}${im('uykuR')}</g>
                 <g class="mv-binoc">${im('durbun')}</g>
+              </g>
+              <g class="mv-deco">
+                <g class="mv-notes" fill="#1662B6"><text class="n1" x="1000" y="380" font-size="120">♪</text><text class="n2" x="1080" y="300" font-size="100">♫</text><text class="n3" x="960" y="240" font-size="90">♪</text></g>
+                <g class="mv-z" fill="#6b7a8c" font-weight="bold" font-family="sans-serif"><text class="z1" x="930" y="330" font-size="80">z</text><text class="z2" x="1010" y="240" font-size="105">z</text><text class="z3" x="1100" y="140" font-size="130">Z</text></g>
+                <text class="mv-unlem" x="1000" y="250" font-size="220" font-weight="900" fill="#F5A623" font-family="sans-serif">!</text>
+                <path class="mv-kalp" d="M1010,330 c-40,-60 -130,-20 -95,45 c20,35 95,80 95,80 c0,0 75,-45 95,-80 c35,-65 -55,-105 -95,-45z" fill="#F06A8A"/>
               </g>
             </svg>`;
         }
-        // Sohbette Maviş'e dokununca sırayla tepki: zıplar → göz kırpar → dürbünle bakar → kanadıyla selam verir
-        const MAVIS_TEPKI = [['mv-r-hop', 700], ['mv-r-blink', 600], ['mv-r-peek', 2500], ['mv-r-wave', 1200]];
+        // Sohbette Maviş'e dokununca sırayla tepki: zıplar → öter → göz kırpar → sevinir → dürbünle bakar → şaşırır → selam verir → sevgi → uçar
+        const MAVIS_TEPKI = [['mv-r-hop', 700], ['mv-r-sing', 2600], ['mv-r-blink', 600], ['mv-r-happy', 1700], ['mv-r-peek', 2500], ['mv-r-wow', 1900], ['mv-r-wave', 1200], ['mv-r-love', 2800], ['mv-r-fly', 2400]];
         let mavisTepkiNo = 0;
         function mavisTepki(svg) {
             const [cls, ms] = MAVIS_TEPKI[mavisTepkiNo++ % MAVIS_TEPKI.length];
@@ -3709,7 +3776,7 @@
                 sessionStorage.setItem('upd_reminded', '1');
                 let d = document.createElement('div'); d.id = 'updask'; d.setAttribute('data-no-i18n', '');
                 d.innerHTML = `<div class="fa-card" role="dialog" aria-modal="true">
-                    <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${LT('Yeni gözlemlerin var mı?', 'Any new sightings?')}</b><div class="fa-sub">${LT(`Verini en son ${days} gün önce yükledin.`, `You last updated your data ${days} days ago.`)} ${LT("Yeni gözlemlerin varsa eBird'den güncel dosyanı indirip yükle; haritan, kertiklerin ve grafiklerin güncellensin.", 'If you have new sightings, download your latest file from eBird and upload it to update your map, lifers and charts.')}</div></div></div>
+                    <div class="fa-top">${mavisSVG(64, 'talk')}<div><b>${LT('Yeni gözlemlerin var mı?', 'Any new sightings?')}</b><div class="fa-sub">${LT(`Verini en son ${days} gün önce yükledin.`, `You last updated your data ${days} days ago.`)} ${LT("Yeni gözlemlerin varsa eBird'den güncel dosyanı indirip yükle; haritan, kertiklerin ve grafiklerin güncellensin.", 'If you have new sightings, download your latest file from eBird and upload it to update your map, lifers and charts.')}</div></div></div>
                     <button class="fa-btn fa-rate" data-a="go">${IC('yenile')} ${LT('Verilerimi güncelle', 'Update my data')}</button>
                     <div class="fa-foot"><button class="fa-link" data-a="later">${LT('Sonra', 'Later')}</button><button class="fa-link" data-a="never">${LT('Bir daha hatırlatma', "Don't remind me again")}</button></div>
                 </div>`;
@@ -3747,7 +3814,7 @@
             };
             let d = document.createElement('div'); d.id = 'fbask'; d.setAttribute('data-no-i18n', '');
             d.innerHTML = `<div class="fa-card" role="dialog" aria-modal="true">
-                <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${first ? LT('İlk izlenimin nasıl?', 'First impressions?') : LT('Kuş Atlası nasıl gidiyor?', 'How is Bird Atlas going?')}</b><div class="fa-sub">${first ? LT('Bir şey takıldıysa ya da aklına bir fikir geldiyse şimdi yazman bize çok yardımcı olur 💙', 'If something got stuck or you have an idea, telling us now helps a lot 💙') : LT('Uygulamayı birlikte geliştiriyoruz. Bir dakikanı ayırırsan çok seviniriz 💙', 'We build this app together. A minute of your time means a lot 💙')}</div></div></div>
+                <div class="fa-top">${mavisSVG(64, 'love')}<div><b>${first ? LT('İlk izlenimin nasıl?', 'First impressions?') : LT('Kuş Atlası nasıl gidiyor?', 'How is Bird Atlas going?')}</b><div class="fa-sub">${first ? LT('Bir şey takıldıysa ya da aklına bir fikir geldiyse şimdi yazman bize çok yardımcı olur 💙', 'If something got stuck or you have an idea, telling us now helps a lot 💙') : LT('Uygulamayı birlikte geliştiriyoruz. Bir dakikanı ayırırsan çok seviniriz 💙', 'We build this app together. A minute of your time means a lot 💙')}</div></div></div>
                 ${rate ? `<button class="fa-btn fa-rate" data-a="rate">⭐ ${LT("Google Play'de değerlendir", 'Rate on Google Play')}</button>` : ''}
                 ${first ? '' : `<button class="fa-btn" data-a="tell">📣 ${LT('Kuşçu arkadaşlarına öner', 'Recommend to birding friends')}</button>`}
                 <button class="fa-btn" data-a="bug">🐞 ${LT('Bir hata gördüm', 'I found a bug')}</button>
@@ -3840,7 +3907,7 @@
             let old = document.getElementById('appmsg'); if (old) old.remove();
             let d = document.createElement('div'); d.id = 'appmsg'; d.setAttribute('data-no-i18n', '');
             d.innerHTML = `<div class="fa-card">
-                <div class="fa-top">${mavisSVG(60, 'wave')}<div><b>${LT('Yeni kayıtların eklendi 🎉', 'Your new records are in 🎉')}</b>
+                <div class="fa-top">${mavisSVG(60, 'happy')}<div><b>${LT('Yeni kayıtların eklendi 🎉', 'Your new records are in 🎉')}</b>
                     <div class="fa-sub">${LT(`${fresh.length} yeni gözlem · ${dates.length} gün · ${spNew.size} tür`, `${fresh.length} new sightings · ${dates.length} days · ${spNew.size} species`)}</div></div></div>
                 <div class="fa-sub" style="margin:-4px 0 10px;">📅 ${escHtml(dTxt)}</div>
                 ${newLifers.length ? `<div class="wn-lifer"><b>🏆 ${newLifers.length === 1 ? LT('Yeni kertik! Tebrikler 🎉', 'New lifer! Congrats 🎉') : LT(`${newLifers.length} yeni kertik! Tebrikler 🎉`, `${newLifers.length} new lifers! Congrats 🎉`)}</b>
@@ -4099,7 +4166,7 @@
         function loadImgMemo(src, cors) { if (!src) return Promise.resolve(null); if (!_imgMemo[src]) _imgMemo[src] = loadImg(src, cors); return _imgMemo[src]; }
         // Paylaşım kartı için Maviş: parçalar bir canvas'a birleştirilir (SVG içindeki dış resimler <img> ile çizilemez)
         function mavisImg(mode) {
-            if (!_imgMemo.__mavis) _imgMemo.__mavis = Promise.all(Object.keys(MAVIS_P).map(k => loadImg('img/mavis/' + k + '.webp', false).then(im => [k, im]))).then(list => {
+            if (!_imgMemo.__mavis) _imgMemo.__mavis = Promise.all(['govde', 'kanatL', 'kanatR', 'gozL', 'gozR', 'durbun'].map(k => loadImg('img/mavis/' + k + '.webp', false).then(im => [k, im]))).then(list => {
                 const m = Object.fromEntries(list), c = document.createElement('canvas'); c.width = c.height = 560;
                 const g = c.getContext('2d'); g.scale(560 / 1180, 560 / 1180); g.translate(-40, -30);
                 const d = k => { if (m[k]) { const [x, y, w, h] = MAVIS_P[k]; g.drawImage(m[k], x, y, w, h); } };
@@ -5676,7 +5743,7 @@
             if (busy) return setTimeout(maybeAskMl, 4000);
             let d = document.createElement('div'); d.id = 'mlask'; d.setAttribute('data-no-i18n', '');
             d.innerHTML = `<div class="fa-card">
-                <div class="fa-top">${mavisSVG(64, 'wave')}<div><b>${LT('eBird fotoğrafların bulundu 📷', 'Found your eBird photos 📷')}</b>
+                <div class="fa-top">${mavisSVG(64, 'wow')}<div><b>${LT('eBird fotoğrafların bulundu 📷', 'Found your eBird photos 📷')}</b>
                 <div class="fa-sub">${LT(`eBird'e ${n} türün fotoğrafını yüklemişsin. Bu türlerde Wikipedia fotoğrafı yerine kendi fotoğrafını (en yeni gözleminden) göstereyim mi?`, `You've uploaded photos of ${n} species to eBird. Shall I show your own photo (from your latest sighting) instead of the Wikipedia photo for these species?`)}</div></div></div>
                 <button class="fa-btn fa-rate" data-k="yes">${LT('Evet, fotoğraflarımı kullan', 'Yes, use my photos')}</button>
                 <button class="fa-btn" data-k="no">${LT('Hayır, Wikipedia kalsın', 'No, keep Wikipedia')}</button>

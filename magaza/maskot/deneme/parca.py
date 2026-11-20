@@ -36,7 +36,6 @@ s=ac('goz-saskin'); koy('saskinL',yari(s,1),465,446,178); koy('saskinR',yari(s,0
 u=ac('goz-uykulu'); koy('uykuL',yari(u,1),465,438,168); koy('uykuR',yari(u,0),785,438,168)
 koy('acikL',ac('kanat-acik'),250,0,320,ust=490); koy('acikR',ac('kanat-acik'),1004,0,320,True,ust=490)
 koy('tepe',ac('tepe'),624,0,690,ust=10)
-koy('kuyruk',ac('kuyruk'),627,0,250,ust=1010)
 json.dump({k:v for k,v in IMG.items() if not k.endswith('_pil')},open('img.json','w'))
 json.dump(P,open('p.json','w'))
 # önizleme kompozitleri
@@ -45,10 +44,10 @@ def sahne(katmanlar):
     for k in katmanlar:
         im,(x,y,w,h)=IMG[k+'_pil']; c.alpha_composite(im.resize((w,h)),(max(0,x),max(0,y)) if x>=0 and y>=0 else (0,0))
     return c.convert('RGB').resize((400,400))
-pozlar=[['kuyruk','govde','kanatL','kanatR','gozL','gozR','durbun'],
- ['kuyruk','govde','kanatL','kanatR','gaga','mutluL','mutluR','durbun'],
- ['kuyruk','govde','tepe','kanatL','kanatR','gaga','saskinL','saskinR','durbun'],
- ['kuyruk','acikL','acikR','govde','uykuL','uykuR','durbun']]
+pozlar=[['govde','kanatL','kanatR','gozL','gozR','durbun'],
+ ['govde','kanatL','kanatR','gaga','mutluL','mutluR','durbun'],
+ ['govde','tepe','kanatL','kanatR','gaga','saskinL','saskinR','durbun'],
+ ['acikL','acikR','govde','uykuL','uykuR','durbun']]
 o=Image.new('RGB',(1600,400),'white')
 for i,pz in enumerate(pozlar): o.paste(sahne(pz),(i*400,0))
 o.save('onizleme.png'); print(P)
