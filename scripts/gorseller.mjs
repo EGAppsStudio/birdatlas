@@ -1,7 +1,7 @@
 // Mağaza, site ve Instagram görsellerini ham ekran görüntülerinden üretir (Enes'in bilgisayarında, Edge ile; KOMUTLAR 7'nin ikinci yarısı).
 //   girdi : magaza/ham-ekranlar/<dil>/ps_<dil>_NN_<ad>.jpg  (npm run ekranlar)
 //   çıktı : magaza/gorseller/<dil>/telefon-01…08.jpg (1440×2560) + one-cikan.jpg (1024×500, ES/PT/DE/FR o dilde)
-//           magaza/instagram/ig_en_01…10.jpg (1080×1350, yalnız İngilizce)
+//           magaza/instagram/ig_en_01…10.jpg (1080×1350, yalnız İngilizce); gönderi/Reels/hikâye/biyografi metinleri elle: magaza/instagram/aciklama.txt
 //           site/img/shots/<ekran>-<dil>.webp (600×1167; birdatlas.app tanıtım sayfası)
 // Başlıklar aşağıda (6 dil); değiştirmek için yalnız bu dosya. Tasarım tarifi: proje dokümanı magaza-instagram-gorsel-tarifi.md
 // Kullanım: npm run gorseller            → 6 dil
