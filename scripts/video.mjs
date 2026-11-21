@@ -9,9 +9,8 @@
 //           npm run video -- en --sahne=paylas,mavis → yalnız bu sahneleri yeniden kaydet, sonra montaj
 // Her sahne önce KAYITSIZ hazırlanır (harita parçaları, fotoğraflar, kart yüklenene kadar); kayıt ekran hazır olunca başlar,
 // beklemelerde durur (k.basla / k.dur). Sahneler ve başlıklar aşağıda. Ara dosyalar magaza/video/ham ve kare (depoya girmez).
-// SONRAKİ KAYITTA (Enes, 19 Kasım 2026): harita sahnesindeki yaklaşma biraz yavaş/kasık görünüyor (adım sayısı ve
-// bekleme ayarlanmalı, belki daha az nokta yeniden çizimi); takvim, konumlar gibi ekranlarda menüde biraz gezinmek
-// (sekme/alt sekme değiştirmek, listeyi kaydırmak) videoyu canlandırır.
+// 21 Kasım 2026: harita yaklaşması kasmıyor (noktalar her adımda yeniden çizilmiyor, kare kare akıcı); takvim sahnesinde
+// gün seçildikten sonra Türler alt sekmesine geçilip liste kaydırılıyor, sonra Konumlar (menüde gezinme).
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -40,26 +39,44 @@ const HAMD = (L) => path.join(VD, 'ham', L);
 const hazirla = Object.fromEntries(EKRANLAR);
 const resimler = (pg) => pg.waitForFunction(() => [...document.images].filter(i => i.offsetParent && i.src).every(i => i.complete), null, { timeout: 20000, polling: 300 }).catch(() => {});
 const hazir = async (pg, ms = 400) => { await oturt(pg, 300); await resimler(pg); await bekle(ms); };   // harita parçaları + görünen resimler yüklendi
+// alt sekmeye dokunur gibi: düğme kısa bir an basılı görünür, sonra tıklanır
+const dokun = async (pg, sec) => {
+  await pg.evaluate(s => { let b = document.querySelector(s); if (b) { b.style.transition = 'transform .12s, filter .12s'; b.style.transform = 'scale(.92)'; b.style.filter = 'brightness(.9)'; } }, sec);
+  await bekle(160);
+  await pg.evaluate(s => { let b = document.querySelector(s); if (b) { b.style.transform = ''; b.style.filter = ''; b.click(); } }, sec);
+};
+// listeyi parmakla kaydırır gibi yumuşakça aşağı indirir (kaydırılabilir kutusunu kendi bulur)
+const kaydir = (pg, sec, sure, oran = 0.55) => pg.evaluate(([s, sure, oran]) => new Promise(ok => {
+  let p = document.querySelector(s);
+  while (p && !(p.scrollHeight > p.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(p).overflowY))) p = p.parentElement;
+  if (!p) return ok();
+  const y0 = p.scrollTop, dy = Math.min(p.scrollHeight - p.clientHeight - y0, p.clientHeight * oran), t0 = performance.now();
+  const kare = () => { const t = Math.min(1, (performance.now() - t0) / sure); p.scrollTop = y0 + dy * (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2); t < 1 ? requestAnimationFrame(kare) : ok(); };
+  requestAnimationFrame(kare);
+}), [sec, sure, oran]);
 const ozel = (pg, css) => pg.evaluate(c => { document.getElementById('ekran-ozel').textContent = c; }, css);
 
 // ---------- sahneler: [ad, eylem(pg, L, k)] — k.basla() kaydı başlatır, k.dur() durdurur (arada hazırlık kayda girmez) ----------
 const SAHNELER = [
   ['harita', async (pg, L, k) => {
     const bas = () => pg.evaluate(() => { closeTabs(); mapObj.setView([30, 22], 2, { animate: false }); });
-    await pg.evaluate(() => mapObj.setView([44, 12], 4, { animate: false })); await hazir(pg);   // hedefin parçaları önceden insin
+    for (const [c, z] of [[[44, 12], 4], [[37, 17], 3]]) { await pg.evaluate(([c, z]) => mapObj.setView(c, z, { animate: false }), [c, z]); await hazir(pg); }   // hedefin ve aradaki seviyenin parçaları önceden insin
     await bas(); await hazir(pg, 800);
     k.basla(); await bekle(900);
-    // parmakla yaklaştırır gibi: küçük adımlarla, hiç uzaklaşmadan (flyTo önce uzaklaşıp tüm noktaları tek noktada topluyordu)
-    await pg.evaluate(async () => {
-      const z0 = mapObj.getZoom(), c0 = mapObj.getCenter(), z1 = 4, c1 = L.latLng(44, 12), snap = mapObj.options.zoomSnap, N = 56;
-      mapObj.options.zoomSnap = 0;
-      for (let i = 1; i <= N; i++) {
-        const t = i / N, e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        mapObj.setView([c0.lat + (c1.lat - c0.lat) * e, c0.lng + (c1.lng - c0.lng) * e], z0 + (z1 - z0) * e, { animate: false });
-        await new Promise(r => setTimeout(r, 45));
-      }
-      mapObj.options.zoomSnap = snap; mapObj.setView(c1, z1, { animate: false });
-    });
+    // parmakla yaklaştırır gibi, tek akışta: Leaflet'in flyTo'da kullandığı iç adım (_move) ekranın her karesinde çağrılır.
+    // setView her adımda 'zoomend' atıyordu → il baloncukları (zoom < 8) her adımda baştan çiziliyordu = kasma. Burada
+    // zoomend yalnız sonda bir kez gelir. Süre saatle ölçülür (adım sayısıyla değil), bilgisayar yavaşsa da hız aynı kalır.
+    await pg.evaluate(() => new Promise(ok => {
+      const z0 = mapObj.getZoom(), z1 = 4, p0 = mapObj.project(mapObj.getCenter(), z0), p1 = mapObj.project(L.latLng(44, 12), z0), SURE = 2300, t0 = performance.now();
+      const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      mapObj.stop(); mapObj._moveStart(true, false);
+      const kare = () => {
+        const t = Math.min(1, (performance.now() - t0) / SURE), e = ease(t);
+        if (t < 1) { mapObj._move(mapObj.unproject(p0.add(p1.subtract(p0).multiplyBy(e)), z0), z0 + (z1 - z0) * e, { flyTo: true }); requestAnimationFrame(kare); }
+        else { mapObj._move(L.latLng(44, 12), z1)._moveEnd(true); ok(); }
+      };
+      requestAnimationFrame(kare);
+    }));
     await bekle(300); await hazir(pg, 900); k.dur();
   }],
   ['takvim', async (pg, L, k) => {
@@ -67,7 +84,12 @@ const SAHNELER = [
     await hazir(pg, 600);
     k.basla(); await bekle(1000);
     await pg.evaluate(() => { selectedDates.add('2024-08-04'); lastClickedDay = '2024-08-04'; renderAll(); });
-    await bekle(2400); k.dur();
+    await bekle(2000);
+    // menüde gezinme: o günün türlerine geç (alt sekmeye "dokun"), listeyi yavaşça kaydır, sonra Konumlar
+    await dokun(pg, '#obs-seg button[onclick*="species"]'); await bekle(1100);
+    await kaydir(pg, '#species-list', 1600); await bekle(700);
+    await dokun(pg, '#obs-seg button[onclick*="locations"]'); await bekle(1600);
+    k.dur();
   }],
   ['kertik', async (pg, L, k) => {
     await hazirla.kertik(pg, L); await hazir(pg, 400);              // kertik haritası + açık kutu, önce sessizce
