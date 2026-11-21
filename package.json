@@ -17,7 +17,8 @@
     "ekranlar": "node scripts/ekranlar.mjs",
     "gorseller": "node scripts/gorseller.mjs",
     "video": "node scripts/video.mjs",
-    "ad-karsilastir": "node scripts/ad-karsilastir.mjs"
+    "ad-karsilastir": "node scripts/ad-karsilastir.mjs",
+    "foto-odak": "node scripts/foto-odak.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",

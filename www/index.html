@@ -270,6 +270,7 @@
         @media (max-width: 699px) {
             body:has(#tabbar .tb.on[data-tab="explore"]) #filter-panels { max-height: 46vh !important; }
             body.tour-compact #filter-panels { max-height: 36vh !important; }
+            body.tour-circle .my-popup-content { max-height: min(200px, 30vh) !important; }
         }
         /* Sekme penceresi telefona tam sığsın (iç satırlar genişliği zorlamasın) */
         #filter-panels { overflow-x: hidden !important; }
@@ -360,6 +361,12 @@
         #mini-popup { max-width: min(calc(100vw - 16px), 380px); box-sizing: border-box; overflow-x: hidden; overflow-wrap: anywhere; }
         #mini-popup .mini-popup-item div { white-space: normal; }
         #photo-viewer { position: fixed; inset: 0; z-index: 1000001; background: rgba(8,22,44,0.9); display: none; align-items: center; justify-content: center; padding: calc(16px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)); box-sizing: border-box; }
+        .sp-fam-h { display: flex; align-items: baseline; gap: 6px; margin: 10px 2px 6px; padding-bottom: 4px; border-bottom: 2px solid #1662B6; color: #0A3E70; cursor: pointer; user-select: none; font-size: 13px; }
+        .sp-fam-h i { font-size: 11px; color: #5B6B7E; font-weight: normal; }
+        .sp-fam-h .n { margin-left: auto; font-size: 11px; color: #1662B6; font-weight: bold; white-space: nowrap; }
+        .sp-fam-h .ar { display: inline-block; transition: transform .15s; color: #1662B6; }
+        .sp-fam.closed:not(.searching) .sp-fam-b { display: none; }
+        .sp-fam.closed:not(.searching) .sp-fam-h .ar { transform: rotate(-90deg); }
         #photo-viewer .pv-card { position: relative; background: #fff; border-radius: 16px; padding: 14px; width: min(100%, 520px); max-height: 100%; overflow-y: auto; box-sizing: border-box; color: #0A3E70; text-align: center; }
         #photo-viewer .pv-frame { width: min(100%, 52vh, 420px); aspect-ratio: 1; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 3px solid var(--pc); box-sizing: border-box; background: #eef2f6; }
         #photo-viewer #pv-canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
@@ -750,6 +757,7 @@
         if (NativePlugins.App) {
             NativePlugins.App.addListener('backButton', function() {
                 let byId = id => document.getElementById(id);
+                let pv = byId('photo-viewer'); if (pv && pv.style.display && pv.style.display !== 'none') return closePhotoViewer();
                 if (typeof tourIdx !== 'undefined' && tourIdx >= 0) return endTour(false);
                 if (byId('guide-overlay').style.display === 'flex') return closeGuide();
                 if (byId('settings-overlay').style.display === 'flex') return closeSettings();
@@ -765,7 +773,10 @@
                 if (byId('main-menu').style.display === 'block') return closeMainMenu();
                 if (byId('filter-panels').style.display === 'grid') return closeTabs();
                 if (byId('upload-overlay').style.display !== 'none' && byId('skip-upload-btn').innerText.startsWith('İptal')) return skipUpload();
-                NativePlugins.App.exitApp();
+                // hiçbir şey açık değil: yanlışlıkla çıkılmasın, 2 sn içinde ikinci basışta çık
+                if (Date.now() - (window._backAt || 0) < 2000) return NativePlugins.App.exitApp();
+                window._backAt = Date.now();
+                if (typeof showToast === 'function') showToast(LT('Çıkmak için tekrar bas', 'Press back again to exit'), [], 2000); else NativePlugins.App.exitApp();
             });
         }
         // ===== /Mobil entegrasyon =====
@@ -2267,7 +2278,9 @@
             let a = window.popupData.allSpecies && window.popupData.allSpecies[sci];
             if (!a) return '';
             let k = escAttr(sci);
-            return `<span class="mini-link" style="color:${color||'inherit'}" onclick="showMiniPopup(event,'allSpecies','${k}','locs')">📍 ${a.locs.size} konum</span> · <span class="mini-link" style="color:${color||'inherit'}" onclick="showMiniPopup(event,'allSpecies','${k}','dates')">📅 ${a.dates.size} farklı gün</span> · <span>${a.count} gözlem</span>`;
+            // Tek liste (yer → gün, "Tarihe göre" ile gün → yer): diğer listelerdeki "📍 konum · 📅 gün ▾" ile aynı pencere (eskiden yerler ve günler ayrı iki pencereydi)
+            let nl = a.locs.size, nd = a.dates.size;
+            return `<span class="mini-link" data-no-i18n style="color:${color||'inherit'}" onclick="showObsList(event,'${k}',null,'loc')">📍 ${nl} ${LT('konum', nl === 1 ? 'location' : 'locations')} · 📅 ${nd} ${LT('gün', nd === 1 ? 'day' : 'days')} ▾</span> · <span data-no-i18n>${a.count} ${LT('gözlem', 'obs.')}</span>`;
         }
 
         function calculateLifers() {
@@ -2312,13 +2325,31 @@
 
         // Tür adları: önce uygulamanın içine gömülü eBird taksonomisi (www/data/ebird-taxonomy.json),
         // yoksa eBird API anahtarıyla internetten, o da yoksa küçük yedek liste.
+        // Familyalar (KOMUTLAR 12 indirir: data/ebird-families.json + tür satırındaki familya kodu). Dosya yoksa "Familyaya göre grupla" görünmez.
+        const TAX_IDX = {}, FAM_OF = {}; let FAMILIES = null;
+        async function loadFamilies() {
+            try { let r = await fetch('data/ebird-families.json'); if (r.ok) { FAMILIES = (await r.json()).families || null; if (typeof renderSpecies === 'function' && obsData.length) renderSpecies(); } } catch (e) {}
+        }
+        function famName(code) { let f = FAMILIES && FAMILIES[code]; return f ? (f[LANG] || f.en || f.sci || code) : LT('Diğer', 'Other'); }
+        // Türün familyası: taksonomide birebir yoksa (alt tür, "sp.", melez) cins adıyla aynı cinsten bir türün familyası
+        function famOfSci(sci) {
+            if (!sci) return '';
+            if (FAM_OF[sci]) return FAM_OF[sci];
+            let g = sci.split(/[\s/]/)[0]; if (!famOfSci._g) { famOfSci._g = {}; for (let k in FAM_OF) { let gg = k.split(' ')[0]; if (!famOfSci._g[gg]) famOfSci._g[gg] = FAM_OF[k]; } }
+            return famOfSci._g[g] || '';
+        }
+        function groupFamilyOn() { try { return localStorage.getItem('group_family') !== '0'; } catch (e) { return true; } }
+        let FAM_CLOSED = (() => { try { return new Set(JSON.parse(localStorage.getItem('fam_closed') || '[]')); } catch (e) { return new Set(); } })();
+        window.toggleFam = function(code) { FAM_CLOSED.has(code) ? FAM_CLOSED.delete(code) : FAM_CLOSED.add(code); try { localStorage.setItem('fam_closed', JSON.stringify([...FAM_CLOSED])); } catch (e) {} let g = document.querySelector(`.sp-fam[data-fam="${code}"]`); if (g) g.classList.toggle('closed', FAM_CLOSED.has(code)); };
+        window.setGroupFamily = function(on) { try { localStorage.setItem('group_family', on ? '1' : '0'); } catch (e) {} renderSpecies(); };
         async function loadTaxonomy(statusEl) {
             if (Object.keys(trNameMap).length > 0) return;
             try {
                 let res = await fetch('data/ebird-taxonomy.json');
                 if (res.ok) {
                     let tax = await res.json();
-                    tax.rows.forEach(([sci, tr, en, code]) => { trNameMap[sci] = tr; enNameMap[sci] = en; speciesCodeMap[sci] = code; sciToTrMap[tr] = sci; });
+                    tax.rows.forEach(([sci, tr, en, code, fam], i) => { trNameMap[sci] = tr; enNameMap[sci] = en; speciesCodeMap[sci] = code; sciToTrMap[tr] = sci; TAX_IDX[sci] = i; if (fam) FAM_OF[sci] = fam; });
+                    if (Object.keys(FAM_OF).length) loadFamilies();
                     populateDatalist(tax.rows.map(r => ({ sciName: r[0], comName: r[1] })));
                     return;
                 }
@@ -2716,6 +2747,22 @@
         }
 
         let currentCalDate = new Date(); currentCalDate.setDate(1);
+        // Takvimde "Tüm ayı seç": ayın gözlem günlerinin hepsi seçilir (harita, listeler o aya süzülür); haritada "📅 Ağustos 2024" etiketi
+        let selMonth = null;
+        function monthDays(ym) {
+            return [...new Set(obsData.filter(d => d.date && d.date.startsWith(ym + '-') && (!selectedLocation || d.loc === selectedLocation) && (!selectedProvince || d.province === selectedProvince) && (!selectedSpecies || d.tr_name === selectedSpecies)).map(d => d.date))];
+        }
+        function selMonthActive() {
+            if (!selMonth || !selectedDates.size) return null;
+            if ([...selectedDates].some(d => !d.startsWith(selMonth + '-'))) return null;
+            let all = monthDays(selMonth); return all.length === selectedDates.size && all.every(d => selectedDates.has(d)) ? selMonth : null;
+        }
+        window.selectCalMonth = function(ym) {
+            if (selMonthActive() === ym) { selectedDates.clear(); selMonth = null; }
+            else { selectedDates.clear(); monthDays(ym).forEach(d => selectedDates.add(d)); selMonth = ym; }
+            lastClickedDay = null; renderAll();
+        };
+        function monthLabel(ym) { let d = new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1); let t = new Intl.DateTimeFormat(loc(), { month: 'long', year: 'numeric' }).format(d).replace(/ de /g, ' '); return t.charAt(0).toLocaleUpperCase(loc()) + t.slice(1); }
         function renderCalendar() {
             let validDates = obsData.map(d=>d.date).filter(d=>d && d!=='Bilinmiyor');
             if(validDates.length>0 && isNaN(currentCalDate.getTime())) { validDates.sort(); currentCalDate = new Date(validDates[validDates.length-1]); currentCalDate.setDate(1); }
@@ -2774,7 +2821,8 @@
             }
             calHtml += `</div>`;
 
-            calHtml += `<div data-no-i18n style="text-align:right; margin-top:6px;"><span class="mini-link" style="font-size:11px; color:#1662B6; font-weight:bold;" onclick="openShare({type:'month', month:'${y}-${String(m + 1).padStart(2, '0')}'})">📤 ${LT('Bu ayı paylaş', 'Share this month')}</span></div>`;
+            let ymCal = `${y}-${String(m + 1).padStart(2, '0')}`, monthOn = selMonthActive() === ymCal;
+            calHtml += `<div data-no-i18n style="display:flex; justify-content:space-between; gap:8px; margin-top:6px;">${Object.keys(dayCounts).length ? `<span class="mini-link" style="font-size:11px; color:#1662B6; font-weight:bold;${monthOn ? ' background:#FED008; color:#0A3E70; border-radius:6px; padding:1px 6px;' : ''}" onclick="selectCalMonth('${ymCal}')">${monthOn ? '✓ ' + LT('Ay seçili', 'Month selected') : '📅 ' + LT('Tüm ayı seç', 'Select whole month')}</span>` : '<span></span>'}<span class="mini-link" style="font-size:11px; color:#1662B6; font-weight:bold;" onclick="openShare({type:'month', month:'${ymCal}'})">📤 ${LT('Bu ayı paylaş', 'Share this month')}</span></div>`;
 
             // Tıklanan günün özeti: konum → türler. Birden çok gün seçiliyse varsayılan: hepsinin toplamı; istenirse gün gün
             const locListHtml = (lsMap, locs) => [...locs.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => { let sm = lsMap.get(n) || new Map(); return `<div style="padding:4px 0; border-top:1px solid #e2e8f0;"><div onclick="window.focusLocation('${escAttr(n)}')" style="cursor:pointer; display:flex; justify-content:space-between; gap:6px;"><b>📍 ${escHtml(n)}</b><span style="white-space:nowrap;">${sm.size} ${LT('tür', 'sp.')}</span></div><div style="color:#555; margin-top:2px;">${[...sm.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([t, k]) => escHtml(trSpecies(t)) + (k > 1 ? ` (${k})` : '')).join(', ')}</div></div>`; }).join('');
@@ -2944,6 +2992,7 @@
                 el.classList.toggle('ls-hide', !ok);
                 if (ok) shown++;
             });
+            if (kind === 'species') list.querySelectorAll('.sp-fam').forEach(g => { g.classList.toggle('ls-hide', !g.querySelector('.species-item:not(.ls-hide)')); g.classList.toggle('searching', !!q); });
             if (kind !== 'species') list.querySelectorAll('.loc-country').forEach(g => g.classList.toggle('ls-hide', !g.querySelector('.loc-item:not(.ls-hide)')));
             if (empty) empty.style.display = (q && items.length && !shown) ? 'block' : 'none';
             let cnt = document.getElementById(kind === 'species' ? 'species-count' : 'loc-count');
@@ -3007,12 +3056,22 @@
             };
 
             let anyFilter = selectedLocation || selectedProvince || selectedDates.size > 0;
-            arr.forEach(s => {
+            let famOn = !!FAMILIES && groupFamilyOn();
+            html += FAMILIES ? `<label data-no-i18n style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:bold; color:#0A3E70; margin:0 0 8px;"><input type="checkbox" ${famOn ? 'checked' : ''} onchange="setGroupFamily(this.checked)"> 🧬 ${LT('Familyaya göre grupla', 'Group by family')}</label>` : '';
+            let groups = null;
+            if (famOn) {
+                // familyalar sistematik sırada (eBird taksonomisi); içinde seçili sıralama geçerli
+                let m = new Map(); arr.forEach(s => { let f = famOfSci(s.sci_name); if (!m.has(f)) m.set(f, []); m.get(f).push(s); });
+                const ord = f => f ? Math.min(...m.get(f).map(s => TAX_IDX[s.sci_name] ?? 1e9)) : 2e9;
+                groups = [...m.entries()].sort((a, b) => ord(a[0]) - ord(b[0]));
+            }
+            const itemHtml = s => {
+                let h = '';
                 let isSel = selectedSpecies === s.name;
                 let eBirdLink = s.ebird_code ? `https://ebird.org/species/${s.ebird_code}` : (s.sci_name ? `https://en.wikipedia.org/wiki/${encodeURIComponent(s.sci_name)}` : '');
                 let safeName = s.name.replace(/'/g, "\\'");
                 
-                html += `<div class="species-item" data-name="${s.name}" data-sci="${s.sci_name || ''}" style="padding:8px; margin-bottom:6px; background:${isSel ? '#1662B6' : '#f0f4f8'}; color:${isSel ? '#fff' : '#0A3E70'}; border-radius:4px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:${isSel ? 'bold' : 'normal'}; border: 1px solid ${isSel ? '#0A3E70' : '#e2e8f0'};">
+                h += `<div class="species-item" data-name="${s.name}" data-sci="${s.sci_name || ''}" style="padding:8px; margin-bottom:6px; background:${isSel ? '#1662B6' : '#f0f4f8'}; color:${isSel ? '#fff' : '#0A3E70'}; border-radius:4px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:${isSel ? 'bold' : 'normal'}; border: 1px solid ${isSel ? '#0A3E70' : '#e2e8f0'};">
                     <div style="flex:1; min-width:0;">
                         <span style="font-size:13px; font-weight:bold;">${s.name}</span>
                         ${showNames ? otherNames(s) : ''}
@@ -3028,7 +3087,13 @@
                         ${(showPhotos && s.img) ? `<img class="sp-photo" onclick="openPhotoViewer('${escAttr(s.sci_name || '')}', event)" src="${s.img}" style="width:52px; height:52px; object-fit:cover; border-radius:5px; margin-left:6px; flex-shrink:0;">` : ''}
                     </div>
                 </div>`;
+                return h;
+            };
+            if (groups) groups.forEach(([f, list]) => {
+                let fs = FAMILIES && FAMILIES[f];
+                html += `<div class="sp-fam${FAM_CLOSED.has(f) ? ' closed' : ''}" data-fam="${escAttr(f)}"><div class="sp-fam-h" data-no-i18n onclick="toggleFam('${escAttr(f)}')"><span class="ar">▾</span><b>${escHtml(famName(f))}</b>${fs && fs.sci && famName(f) !== fs.sci ? ` <i>${escHtml(fs.sci)}</i>` : ''}<span class="n">${list.length} ${LT('tür', 'species')}</span></div><div class="sp-fam-b">${list.map(itemHtml).join('')}</div></div>`;
             });
+            else arr.forEach(s => { html += itemHtml(s); });
             document.getElementById("species-list").innerHTML = html;
             applyListSearch('species');
             if(document.getElementById("clear-species")) document.getElementById("clear-species").onclick = () => { selectedSpecies=null; renderAll(); };
@@ -4537,20 +4602,27 @@
                 }
             }
             else if (st.type === 'milestone') {
+                // Kuşun fotoğrafı kartın ortasında büyük (eskiden alttaki kutuda küçük bir daireydi); Maviş fotoğrafın köşesinde
                 let l = D.l; if (!l) return;
-                confetti(ctx, W, H, story ? [[40, 200], [1180, 1270], [1590, 1760]] : [[20, 90], [930, 990]]);
-                text(ctx, MILESTONES.includes(+D.n) ? LT('KERTİK DÖNÜM NOKTASI', 'LIFER MILESTONE') : LT('YENİ KERTİK', 'NEW LIFER'), W / 2, story ? 250 : 130, { w: 700, px: story ? 44 : 36, color: C.blue, align: 'center', spacing: 6 });
-                text(ctx, ordN(D.n), W / 2, story ? 570 : 340, { w: 700, px: story ? 330 : 220, align: 'center' });
-                text(ctx, LT('türün kutlu olsun! 🎉', 'species — congrats! 🎉'), W / 2, story ? 690 : 425, { w: 700, px: story ? 64 : 48, align: 'center', maxW: W - 120 });
-                await drawMavis(ctx, 'wave', W / 2 - (story ? 210 : 120), story ? 790 : 455, story ? 420 : 240);
-                let cy = story ? 1300 : 715, ch = story ? 250 : 210;
+                confetti(ctx, W, H, story ? [[40, 190], [1735, 1800]] : [[0, 36]]);
+                text(ctx, MILESTONES.includes(+D.n) ? LT('KERTİK DÖNÜM NOKTASI', 'LIFER MILESTONE') : LT('YENİ KERTİK', 'NEW LIFER'), W / 2, story ? 230 : 92, { w: 700, px: story ? 44 : 32, color: C.blue, align: 'center', spacing: 6 });
+                text(ctx, ordN(D.n), W / 2, story ? 460 : 248, { w: 700, px: story ? 250 : 150, align: 'center' });
+                text(ctx, LT('türün kutlu olsun! 🎉', 'species — congrats! 🎉'), W / 2, story ? 560 : 314, { w: 700, px: story ? 58 : 38, align: 'center', maxW: W - 120 });
+                let px = story ? 120 : 170, py = story ? 620 : 352, pw = W - 2 * px, ph = story ? 820 : 420, rad = story ? 48 : 36;
+                let img = await cardImg(l.img), fr = frameOf(l.sci_name);
+                ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.25)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 14; rr(ctx, px - 12, py - 12, pw + 24, ph + 24, rad + 10); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
+                ctx.save(); rr(ctx, px, py, pw, ph, rad); ctx.clip();
+                if (img) drawCover(ctx, img, px, py, pw, ph, fr.x, fr.y, fr.z);
+                else { let g = ctx.createLinearGradient(px, py, px + pw, py + ph); g.addColorStop(0, '#cfe0f3'); g.addColorStop(1, '#9dbbe0'); ctx.fillStyle = g; ctx.fillRect(px, py, pw, ph); }
+                ctx.restore();
+                if (img && /wiki/i.test(l.img || '')) text(ctx, LT('Fotoğraf: Wikipedia', 'Photo: Wikipedia'), px + pw - 24, py + ph - 22, { w: 400, px: 20, color: 'rgba(255,255,255,0.85)', align: 'right' });
+                await drawMavis(ctx, 'wave', px - (story ? 40 : 60), py + ph - (story ? 200 : 150), story ? 250 : 180);
+                let cy = story ? 1490 : 800, ch = story ? 230 : 176, tx = story ? 160 : 200;
                 ctx.save(); ctx.shadowColor = 'rgba(28,58,107,0.12)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 10; rr(ctx, 110, cy, W - 220, ch, 40); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
-                await photoCircle(ctx, l.img, 110 + 40 + (story ? 75 : 62), cy + ch / 2, story ? 75 : 62);
-                let tx = 110 + 40 + (story ? 170 : 145);
-                text(ctx, `${ordN(D.n)} ${LT('tür', 'species')}`, tx, cy + (story ? 70 : 58), { w: 400, px: 28, color: C.sky });
-                text(ctx, spName(l), tx, cy + (story ? 132 : 112), { w: 700, px: story ? 54 : 44, maxW: W - tx - 140, minPx: 28 });
+                text(ctx, `${ordN(D.n)} ${LT('tür', 'species')}`, tx, cy + (story ? 62 : 50), { w: 400, px: story ? 28 : 24, color: C.sky });
+                text(ctx, spName(l), tx, cy + (story ? 130 : 106), { w: 700, px: story ? 56 : 44, maxW: W - tx - 140, minPx: 28 });
                 let pl = placeText(l.loc, l.province);
-                text(ctx, `${pl ? '📍 ' + pl + ' · ' : ''}${formatDisplayDate(l.date)}`, tx, cy + (story ? 190 : 160), { w: 400, px: 30, color: C.blue, maxW: W - tx - 140, minPx: 20 });
+                text(ctx, `${pl ? '📍 ' + pl + ' · ' : ''}${formatDisplayDate(l.date)}`, tx, cy + (story ? 188 : 150), { w: 400, px: story ? 30 : 26, color: C.blue, maxW: W - tx - 140, minPx: 20 });
             }
             await footer(ctx, W, H, false);
         }
@@ -4650,7 +4722,7 @@
             h += `<div class="sh-row"><label>${LT('Biçim', 'Format')}</label>${seg('format', [['story', LT('📱 Hikâye', '📱 Story')], ['square', LT('⬛ Kare', '⬛ Square')], ['pdf', '📄 PDF']], st.format)}</div>`;
             if (!['chart', 'month'].includes(st.type) && !(st.type === 'species' && st.spView && st.spView !== 'map')) h += `<div class="sh-row"><label>${LT('Konum bilgisi', 'Location detail')}</label>${seg('privacy', [['exact', LT('Tam konum', 'Exact')], ['province', LT('Sadece il', 'Province only')], ['hidden', LT('Gizli', 'Hidden')]], st.privacy)}</div>`;
             h += `<div class="sh-row"><label>${LT('İmza (isteğe bağlı)', 'Signature (optional)')}</label><input type="text" maxlength="28" value="${escHtml(st.sign)}" placeholder="${LT('ör. adın ya da kullanıcı adın', 'e.g. your name or handle')}" oninput="setShare('sign', this.value, true)"></div>`;
-            h += `<div class="sh-row"><label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" ${st.ig !== false ? 'checked' : ''} onchange="setShare('ig', this.checked)"> <span style="color:#C13584;">${IG_SVG}</span> @birdatlas.app</label></div>`;
+            h += `<div class="sh-row"><label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" ${st.ig !== false ? 'checked' : ''} onchange="setShare('ig', this.checked)"> <span style="color:#C13584;">${IG_SVG}</span> @birdatlas.app</label><div style="font-size:11px; color:#5B6B7E; margin-top:2px;">${LT('Instagram\'da paylaşırken <b>#BirdAtlasApp</b> etiketini kullanırsan kartını görürüz 💙', 'Sharing on Instagram? Add <b>#BirdAtlasApp</b> so we can see your card 💙')}</div></div>`;
             h += `<div id="share-preview-wrap"><canvas id="share-preview"></canvas><div class="sh-busy" id="share-busy">${mavisSVG(40, 'think')} &nbsp;${LT('Hazırlanıyor...', 'Preparing...')}</div></div>`;
             h += `<div style="display:flex; flex-wrap:wrap;"><button class="sh-btn primary" onclick="exportShare('share')">📤 ${LT('Paylaş', 'Share')}</button>${NativeCap ? '' : `<button class="sh-btn" onclick="exportShare('save')">💾 ${LT('İndir', 'Download')}</button>`}<button class="sh-btn" onclick="shareLink()">🔗 ${LT('Bağlantı', 'Link')}</button></div>
                 <div style="font-size:11px; color:#5B6B7E; margin-top:4px;">🔗 ${LT('Bağlantıyı açan kişi bu görünümü uygulama kurmadan tarayıcıda görür. Veriler bağlantının içinde taşınır, sunucumuzda saklanmaz.', 'Anyone with the link sees this view in a browser, no app needed. The data travels inside the link and is not stored on our server.')}</div>`;
@@ -4756,6 +4828,12 @@
             let out = new Uint8Array(len), p = 0; parts.forEach(b => { out.set(b, p); p += b.length; });
             return out;
         }
+        // Paylaşırken: "@birdatlas.app #BirdAtlasApp" panoya kopyalanır, Instagram'da açıklamaya yapıştırılsın diye kısa rica
+        const SHARE_TAG = '@birdatlas.app #BirdAtlasApp';
+        async function copyShareTag() {
+            let ok = false; try { await navigator.clipboard.writeText(SHARE_TAG); ok = true; } catch (e) {}
+            setTimeout(() => showToast((ok ? LT('📋 Panoya kopyalandı: ', '📋 Copied: ') : '') + `<b>${SHARE_TAG}</b><br>` + LT('Instagram\'da paylaşırken açıklamaya yapıştır; kartını görmeyi çok isteriz 💙', 'Paste it in your Instagram caption — we\'d love to see your card 💙'), [{ label: 'OK', ghost: true }], 7000), 400);
+        }
         window.exportShare = async function(mode) {
             let busy = $id('share-busy'); if (busy) busy.style.display = 'flex';
             try {
@@ -4765,9 +4843,10 @@
                 let fname = `kus-atlasi-${shareState.type}-${stamp}.jpg`;
                 if (shareState.format === 'pdf') { b64 = bytesToB64(jpegToPdf(b64ToBytes(b64), c.width, c.height)); mime = 'application/pdf'; fname = fname.replace(/\.jpg$/, '.pdf'); }
                 let FS = NativePlugins.Filesystem, SH = NativePlugins.Share;
+                if (mode === 'share') await copyShareTag();
                 if (FS && SH) {
                     let r = await FS.writeFile({ path: fname, data: b64, directory: 'CACHE' });
-                    await SH.share({ title: LT('Kuş Atlası', 'Bird Atlas'), files: [r.uri], dialogTitle: LT('Paylaş', 'Share') });
+                    await SH.share({ title: LT('Kuş Atlası', 'Bird Atlas'), text: SHARE_TAG, files: [r.uri], dialogTitle: LT('Paylaş', 'Share') });
                     return;
                 }
                 let blob = new Blob([b64ToBytes(b64)], { type: mime });
@@ -4792,7 +4871,9 @@
             let chips = [];
             const chip = (txt, fn, cls) => chips.push(`<span class="fchip ${cls || ''}"><span class="t">${txt}</span><button onclick="clearFilter('${fn}')" aria-label="✕">✕</button></span>`);
             if (liferMode) chip('🏆 ' + LT('Kertik haritası', 'Lifer map'), 'lifer', 'lifer');
-            if (selectedDates.size) chip('📅 ' + (selectedDates.size === 1 ? formatDisplayDate([...selectedDates][0]) : LT(`${selectedDates.size} gün`, `${selectedDates.size} days`)), 'dates');
+            let smA = selMonthActive();
+            if (smA) chip('📅 ' + monthLabel(smA), 'dates');
+            else if (selectedDates.size) chip('📅 ' + (selectedDates.size === 1 ? formatDisplayDate([...selectedDates][0]) : LT(`${selectedDates.size} gün`, `${selectedDates.size} days`)), 'dates');
             if (selectedSpecies) chip('🐦 ' + escHtml(trSpecies(selectedSpecies)), 'species');
             if (expandedLocation) chip('🔍 ' + LT('Tam konum', 'Exact points') + ': ' + escHtml(expandedLocation), 'expanded', 'expanded');
             else if (selectedLocation) chip('📍 ' + escHtml(selectedLocation), 'location');
@@ -5566,7 +5647,17 @@
         let ML_PICK = {}; try { ML_PICK = JSON.parse(localStorage.getItem('ml_pick') || '{}'); } catch (e) {}
         function photoKind(sci) { if (MY_PHOTOS[sci]) return 'own'; if (mlOn() && ML_PICK[sci] !== 'wiki' && ML_PHOTOS[sci]) return 'ml'; return WIKI_IMAGES[sci] ? 'wiki' : ''; }
         function frameKey(sci) { let k = photoKind(sci); return sci + '|' + k + (k === 'ml' ? '|' + String(ML_PHOTOS[sci]).split('/asset/')[1] : ''); }
-        function frameOf(sci) { let f = sci && PHOTO_FRAME[frameKey(sci)]; return f || { x: 0.5, y: 0.5, z: 1 }; }
+        // Otomatik ortalama: Wikipedia fotoğrafında kuşun yeri önceden hesaplandı (scripts/foto-odak.mjs, KOMUTLAR 13 → data/foto-odak.json);
+        // cihazda hesap yok. Fotoğraf Wikipedia'da değiştiyse (dosya adı farklı) kullanılmaz. Elle ayar her zaman önce gelir.
+        let AUTO_FRAME = {};
+        const wikiFile = u => { try { return decodeURIComponent(String(u).split('?')[0].split('/').pop()).replace(/^\d+px-/, ''); } catch (e) { return ''; } };
+        function autoFrame(sci) {
+            if (!sci || photoKind(sci) !== 'wiki') return null;
+            let a = AUTO_FRAME[sci]; if (!Array.isArray(a) || (a[3] && wikiFile(WIKI_IMAGES[sci]) !== a[3])) return null;
+            return { x: a[0], y: a[1], z: a[2] || 1 };
+        }
+        (async () => { try { let r = await fetch('data/foto-odak.json'); if (r.ok) { AUTO_FRAME = (await r.json()).frames || {}; if (typeof decoratePhotos === 'function') decoratePhotos(); } } catch (e) {} })();
+        function frameOf(sci) { let f = sci && PHOTO_FRAME[frameKey(sci)]; return f || autoFrame(sci) || { x: 0.5, y: 0.5, z: 1 }; }
         function saveFrames() { try { localStorage.setItem('photo_frame', JSON.stringify(PHOTO_FRAME)); } catch (e) {} }
         let _urlSci = null;
         function sciOfUrl(u) {
@@ -5648,14 +5739,14 @@
         async function initFrameEditor(sci, src) {
             let cv = document.getElementById('pv-canvas'); if (!cv) return;
             let ctx = cv.getContext('2d'), img = await loadImg(src, false); if (!img || !cv.isConnected) return;
-            let key = frameKey(sci), f = Object.assign({ x: 0.5, y: 0.5, z: 1 }, PHOTO_FRAME[key]);
+            let key = frameKey(sci), base = Object.assign({ x: 0.5, y: 0.5, z: 1 }, autoFrame(sci)), f = Object.assign({}, base, PHOTO_FRAME[key]);   // base: otomatik ortalama (yoksa orta)
             const W = cv.width;
             const draw = () => {
                 ctx.clearRect(0, 0, W, W); drawCover(ctx, img, 0, 0, W, W, f.x, f.y, f.z);
                 ctx.save(); ctx.fillStyle = 'rgba(255,255,255,0.38)'; ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.arc(W / 2, W / 2, W / 2 - 2, 0, Math.PI * 2, true); ctx.fill('evenodd');
                 ctx.setLineDash([14, 10]); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.beginPath(); ctx.arc(W / 2, W / 2, W / 2 - 3, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
             };
-            const save = () => { PHOTO_FRAME[key] = { x: +f.x.toFixed(3), y: +f.y.toFixed(3), z: +f.z.toFixed(2) }; if (f.x === 0.5 && f.y === 0.5 && f.z === 1) delete PHOTO_FRAME[key]; saveFrames(); decoratePhotos(); };
+            const save = () => { PHOTO_FRAME[key] = { x: +f.x.toFixed(3), y: +f.y.toFixed(3), z: +f.z.toFixed(2) }; if (f.x === base.x && f.y === base.y && f.z === base.z) delete PHOTO_FRAME[key]; saveFrames(); decoratePhotos(); };
             draw();
             // Sürükleme: görüntü parmağı takip etsin (taşan kısım kadar kaydırılabilir)
             let pts = new Map(), last = null, pinch0 = null, lastTap = 0;
@@ -5663,7 +5754,7 @@
             const scale = () => W / cv.getBoundingClientRect().width;
             cv.addEventListener('pointerdown', e => {
                 e.preventDefault(); cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-                if (pts.size === 1) { last = { x: e.clientX, y: e.clientY }; let t = Date.now(); if (t - lastTap < 300) { f = { x: 0.5, y: 0.5, z: 1 }; draw(); save(); } lastTap = t; }
+                if (pts.size === 1) { last = { x: e.clientX, y: e.clientY }; let t = Date.now(); if (t - lastTap < 300) { f = Object.assign({}, base); draw(); save(); } lastTap = t; }
                 if (pts.size === 2) { let [a, b] = [...pts.values()]; pinch0 = { d: Math.hypot(a.x - b.x, a.y - b.y), z: f.z }; }
             });
             cv.addEventListener('pointermove', e => {
@@ -6033,6 +6124,29 @@
             box.innerHTML += `<div class="chat-msg chat-bot"><span class="msg-bubble">${r.html}</span>${shareSuggestHtml(q)}${suggestionButtons(r.suggestions)}</div>`;
             box.scrollTop = box.scrollHeight;
         }
+        // "Haritadaki daireler" adımı: en çok tür görülen yerin dairesini aç (bölge baloncuğu değil, yer dairesi görünsün diye yakın)
+        let tourSpot = null;
+        function tourOpenSpot() {
+            let m = {}; obsData.forEach(d => { if (d.lat && d.lon && d.loc) (m[d.loc] = m[d.loc] || { loc: d.loc, lat: d.lat, lon: d.lon, s: new Set() }).s.add(d.sci_name); });
+            let best = Object.values(m).sort((a, b) => b.s.size - a.s.size)[0]; if (!best) return;
+            tourSpot = best;
+            let H = innerHeight - tourSafe().b;
+            tourFocus(L.latLng(best.lat, best.lon), Math.max(PROV_ZOOM + 1, 10), innerWidth / 2, H * (innerWidth >= 900 ? 0.62 : 0.55));
+            setTimeout(() => {
+                if (!tourSteps[tourIdx] || tourSteps[tourIdx].id !== 'circle') return;
+                let hit = null;
+                markerLayerGroup.eachLayer(l => { if (hit || !(l instanceof L.CircleMarker) || !l.getPopup()) return; let c = l.getPopup().getContent(); if (typeof c === 'string' && c.includes(`data-loc="${best.loc.replace(/"/g, '&quot;')}"`)) hit = l; });
+                if (hit) hit.openPopup();
+                setTimeout(placeTour, 300);
+            }, 500);
+        }
+        function tourCircleMarkerRect() {
+            try {
+                if (!tourSpot) return null;
+                let c = mapObj.getContainer().getBoundingClientRect(), p = mapObj.latLngToContainerPoint([tourSpot.lat, tourSpot.lon]);
+                return { left: c.left + p.x - 34, top: c.top + p.y - 34, width: 68, height: 68 };
+            } catch (e) { return null; }
+        }
         function buildTourSteps(preData) {
             let s = [];
             if (preData) {
@@ -6066,6 +6180,11 @@
                 enter: () => { ensureTab('obs'); setObsSub('species'); },
                 title: LT('Gözlemlerim → Türler', 'My sightings → Species'),
                 text: LT('Gördüğün bütün türler. Bir türe dokununca harita yalnız onu gösterir; "📍 konum · 📅 gün" yazısı nerede ve ne zaman gördüğünü açar. Aramayı Türkçe, İngilizce ya da Latince yapabilirsin.', 'Every species you saw. Tap one to show only it on the map; the "📍 places · 📅 days" line shows where and when. Search in Turkish, English or Latin.') });
+            s.push({ id: 'circle', target: () => document.querySelector('#map .leaflet-popup') || tourCircleMarkerRect(), place: 'bottom',
+                enter: () => { clearFilter('all'); closeTabs(); document.body.classList.add('tour-circle'); tourOpenSpot(); },
+                leave: () => { try { mapObj.closePopup(); } catch (e) {} tourSpot = null; document.body.classList.remove('tour-circle'); },
+                title: LT('Haritadaki daireler', 'Circles on the map'),
+                text: LT('Bir daireye dokununca o yerin kutusu açılır: türler fotoğraflarıyla ve onları burada hangi günler gördüğün. "🌍📅 Tüm gözlemlerim" türü başka nerede gördüğünü gösterir. Uzaktan bakınca daireler bölge baloncuğu olur.', 'Tap a circle to open that place: its species with photos and the days you saw them there. "🌍📅 All my sightings" shows where else you saw a species. Zoomed out, circles merge into region bubbles.') });
             s.push({ id: 'myphoto', target: () => document.querySelector('#photo-viewer .pv-card'),
                 enter: () => {
                     ensureTab('obs'); setObsSub('species');
@@ -6135,7 +6254,7 @@
             if (t.closest('#tabbar')) return st.id === 'tabs';
             if (t.closest('#map, #mini-popup, #photo-viewer, #filter-bar, #explore-dock')) return true;
             if (t.closest('#chat-window')) return st.id === 'mavis';
-            if (t.closest('#share-overlay')) return st.id === 'share';
+            if (t.closest('#share-overlay')) return st.id === 'share' || tourOverlay() != null;   // Maviş / daire kutusundan açılan paylaşım kartı da denenebilir
             let list = st.targets ? st.targets() : (st.target ? [st.target()] : []);
             return list.some(el => el && el.contains && el.contains(t));
         }
@@ -6206,17 +6325,27 @@
             }
             return q.width && q.height ? q : null;
         }
+        // Adım sırasında kullanıcının kendisi açtığı pencere (Maviş'in önerdiği paylaşım kartı, türün büyük fotoğrafı): vurgu ona geçer
+        function tourOverlay() {
+            let sh = $t('share-overlay'), pv = $t('photo-viewer');
+            if (sh && sh.style.display === 'flex') return document.querySelector('#share-overlay .ov-card');
+            if (pv && pv.style.display && pv.style.display !== 'none') return document.querySelector('#photo-viewer .pv-card');
+            return null;
+        }
         function placeTour() {
             let st = tourSteps[tourIdx], r = $t('tour'); if (!st || !r) return;
             let svg = r.querySelector('.tour-svg'), tip = r.querySelector('.tour-tip');
             let sa = tourSafe(), W = innerWidth, H = innerHeight - sa.b, T0 = sa.t, pad = 6;
             let list = st.targets ? st.targets() : (st.target ? [st.target()] : []);
+            let ov = st.pre ? null : tourOverlay();
+            if (ov && !list.some(el => el === ov)) list = [ov];
             let rects = list.map(t => tourRectOf(t, st.fit)).filter(Boolean).map(q => {
                 let x = Math.max(4, q.left - pad), y = Math.max(4 + T0, q.top - pad);
                 return { x, y, w: Math.min(W - 4, q.left + q.width + pad) - x, h: Math.min(H - 4, q.top + q.height + pad) - y };
             }).filter(q => q.w > 4 && q.h > 4);
             let hole = q => `M${q.x + 12} ${q.y}H${q.x + q.w - 12}Q${q.x + q.w} ${q.y} ${q.x + q.w} ${q.y + 12}V${q.y + q.h - 12}Q${q.x + q.w} ${q.y + q.h} ${q.x + q.w - 12} ${q.y + q.h}H${q.x + 12}Q${q.x} ${q.y + q.h} ${q.x} ${q.y + q.h - 12}V${q.y + 12}Q${q.x} ${q.y} ${q.x + 12} ${q.y}Z`;
-            let dimA = rects.length ? (st.light ? 0.22 : 0.62) : 0.62;
+            let lost = !rects.length && list.length > 0;   // adımın penceresi kullanıcı tarafından kapatıldı: harita görünsün, kutu altta
+            let dimA = rects.length ? (st.light ? 0.22 : 0.62) : lost ? 0 : 0.62;
             svg.setAttribute('viewBox', `0 0 ${W} ${innerHeight}`);
             svg.innerHTML = `<path fill-rule="evenodd" fill="rgba(8,22,44,${dimA})" d="M0 0H${W}V${innerHeight}H0Z ${rects.map(hole).join(' ')}"/>`
                 + rects.map(q => `<path d="${hole(q)}" fill="none" stroke="#E9C440" stroke-width="3"/>`).join('');
@@ -6225,7 +6354,7 @@
             th = tip.offsetHeight || th;
             let clampX = x => Math.max(12, Math.min(W - tw - 12, x));
             let cands = [];
-            if (!rects.length) cands.push([(W - tw) / 2, (T0 + H) / 2 - th / 2]);
+            if (!rects.length && !lost) cands.push([(W - tw) / 2, (T0 + H) / 2 - th / 2]);
             if (st.place === 'bottom') cands.push([(W - tw) / 2, H - th - 16], [W - tw - 16, H - th - 16]);
             rects.forEach(q => { cands.push([clampX(q.x + q.w / 2 - tw / 2), q.y + q.h + 12], [clampX(q.x + q.w / 2 - tw / 2), q.y - th - 12]); });
             cands.push([(W - tw) / 2, H - th - 16], [W - tw - 16, H - th - 16], [16, H - th - 16], [W - tw - 16, T0 + 90]);

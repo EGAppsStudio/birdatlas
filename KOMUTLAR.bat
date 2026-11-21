@@ -26,7 +26,8 @@ echo.
 echo   BAKIM
 echo  10  Paketleri kur / guncelle    (npm install)
 echo  11  Simgeler + sync             (logo degisince)
-echo  12  Tur adlarini indir          (6 dilde kus adlari; eBird API anahtari ister)
+echo  12  Tur adlarini indir          (6 dilde kus adlari + familyalar; eBird API anahtari ister)
+echo  13  Fotograflari ortala         (Wikipedia fotograflarinda kusu bulur; bir kere, ~30-60 dk)
 echo.
 echo   0  Cikis
 echo.
@@ -44,6 +45,7 @@ if "%SEC%"=="9" goto montaj
 if "%SEC%"=="10" goto install
 if "%SEC%"=="11" goto ikon
 if "%SEC%"=="12" goto taksonomi
+if "%SEC%"=="13" goto odak
 if "%SEC%"=="0" exit /b 0
 goto menu
 
@@ -138,6 +140,15 @@ call npm run taksonomi -- %KEY%
 if errorlevel 1 goto hata
 echo.
 echo  Tamam. Simdi 5 (sync) ya da 1 (Android Studio).
+goto bitti
+
+:odak
+echo.
+echo  Wikipedia tur fotograflarinda kus bulunuyor (internet gerekir). Ctrl+C ile durdurabilirsin; sonra kaldigi yerden devam eder.
+call npm run foto-odak
+if errorlevel 1 goto hata
+echo.
+echo  Tamam. GitHub Desktop: Commit + Push. Telefon icin 2 (sync).
 goto bitti
 
 :install

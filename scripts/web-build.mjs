@@ -28,6 +28,8 @@ writeFileSync(sw, readFileSync(sw, 'utf8').replace('__VERSION__', ver));
 const appHtml = join(dist, 'app', 'index.html');
 writeFileSync(appHtml, readFileSync(appHtml, 'utf8')
   .replace("fetch('data/ebird-taxonomy.json')", `fetch('data/ebird-taxonomy.json?v=${ver}')`)
+  .replace("fetch('data/ebird-families.json')", `fetch('data/ebird-families.json?v=${ver}')`)
+  .replace("fetch('data/foto-odak.json')", `fetch('data/foto-odak.json?v=${ver}')`)
   .replace("fetch('data/ornek-veri.csv')", `fetch('data/ornek-veri.csv?v=${ver}')`)
   .replace("var I18N_V = ''", `var I18N_V = '${ver}'`));
 

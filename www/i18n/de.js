@@ -646,5 +646,15 @@ window.I18N_DE = {
 "<b>{0}</b> fewer": "<b>{0}</b> weniger",
 " for ": " für ",
 " – your lifer 🏆": " – dein Lifer 🏆",
-" (+{0} records without a number, \"X\")": " (+{0} Einträge ohne Zahl, „X“)"
+" (+{0} records without a number, \"X\")": " (+{0} Einträge ohne Zahl, „X“)",
+"Press back again to exit": "Zum Beenden noch einmal Zurück drücken",
+"Other": "Sonstige",
+"Month selected": "Monat ausgewählt",
+"Select whole month": "Ganzen Monat auswählen",
+"Group by family": "Nach Familie gruppieren",
+"Sharing on Instagram? Add <b>#BirdAtlasApp</b> so we can see your card 💙": "Teilst du auf Instagram? Füge <b>#BirdAtlasApp</b> hinzu, damit wir deine Karte sehen 💙",
+"📋 Copied: ": "📋 Kopiert: ",
+"Paste it in your Instagram caption — we'd love to see your card 💙": "Füge es in deine Instagram-Beschreibung ein – wir würden deine Karte gern sehen 💙",
+"Circles on the map": "Kreise auf der Karte",
+"Tap a circle to open that place: its species with photos and the days you saw them there. \"🌍📅 All my sightings\" shows where else you saw a species. Zoomed out, circles merge into region bubbles.": "Tippe auf einen Kreis, um den Ort zu öffnen: seine Arten mit Fotos und die Tage, an denen du sie dort gesehen hast. „🌍📅 Alle meine Beobachtungen“ zeigt, wo du eine Art sonst noch gesehen hast. Herausgezoomt werden Kreise zu Regionsblasen."
 };
